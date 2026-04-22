@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { API_BASE_URL } from '../config'
 
 const STATS_MAP = [
   { key: 'total_detections', label: 'Total Detections', icon: 'analytics', color: 'text-primary' },
@@ -10,7 +11,7 @@ const STATS_MAP = [
   { key: 'system_latency', label: 'System Latency', icon: 'timer', color: 'text-rose-500' },
 ]
 
-const SIDEBAR_LINKS = [
+const SIDEBAR_LINKS: { label: string; icon: string; action?: string; path?: string }[] = [
   { label: 'Main Dashboard', icon: 'dashboard', action: 'dashboard' },
   { label: 'Tutorial Manager', icon: 'video_library', action: 'YouTube Manager' },
   { label: 'User Logs', icon: 'assignment', action: 'System Logs' },
@@ -86,7 +87,7 @@ export default function Admin() {
     fetchLogs();
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/admin/stats');
+        const res = await fetch(`${API_BASE_URL}/api/admin/stats`);
         const data = await res.json();
         setLiveStats(data);
       } catch (err) {
@@ -123,29 +124,29 @@ export default function Admin() {
   };
 
   const fetchTutorials = async () => {
-    const res = await fetch('http://localhost:8000/api/tutorials');
+    const res = await fetch(`${API_BASE_URL}/api/tutorials`);
     setTutorials(await res.json());
   };
 
   const fetchGestures = async () => {
-    const res = await fetch('http://localhost:8000/api/admin/gestures');
+    const res = await fetch(`${API_BASE_URL}/api/admin/gestures`);
     setGestures(await res.json());
   };
 
   const fetchHistory = async () => {
-    const res = await fetch('http://localhost:8000/api/history/all');
+    const res = await fetch(`${API_BASE_URL}/api/history/all`);
     setHistory(await res.json());
   };
 
   const fetchLogs = async () => {
-    const res = await fetch('http://localhost:8000/api/admin/logs');
+    const res = await fetch(`${API_BASE_URL}/api/admin/logs`);
     setLogs(await res.json());
   };
 
   const handleAddTutorial = async () => {
     if (!newTutorial.youtube_url) return alert("URL is required");
     try {
-      await fetch('http://localhost:8000/api/tutorials', {
+      await fetch(`${API_BASE_URL}/api/tutorials`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newTutorial)
@@ -160,14 +161,14 @@ export default function Admin() {
 
   const handleDeleteTutorial = async (id: number) => {
     if (confirm("Delete this tutorial?")) {
-      await fetch(`http://localhost:8000/api/tutorials/${id}`, { method: 'DELETE' });
+      await fetch(`${API_BASE_URL}/api/tutorials/${id}`, { method: 'DELETE' });
       fetchTutorials();
     }
   };
 
   const handleExportCSV = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/admin/export-metrics');
+      const res = await fetch(`${API_BASE_URL}/api/admin/export-metrics`);
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -184,7 +185,7 @@ export default function Admin() {
   const handleSystemRestart = async () => {
     if (confirm("Soft-restart the AI pipeline? Current connections will stay active.")) {
       try {
-        const res = await fetch('http://localhost:8000/api/admin/restart', { method: 'POST' });
+        const res = await fetch(`${API_BASE_URL}/api/admin/restart`, { method: 'POST' });
         const data = await res.json();
         alert(data.message);
       } catch (err) {
@@ -197,7 +198,7 @@ export default function Admin() {
     const msg = prompt("Enter global notification message:");
     if (msg) {
       try {
-        await fetch('http://localhost:8000/api/admin/notify', {
+        await fetch(`${API_BASE_URL}/api/admin/notify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: msg })

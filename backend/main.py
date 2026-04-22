@@ -31,9 +31,23 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Allow specific Vite frontend ports to connect
+origins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175"
+]
+
+# Add production frontend URL if defined
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://127.0.0.1:5175"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

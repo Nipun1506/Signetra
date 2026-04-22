@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { logGestureHistory } from '../utils/history'
 import { TUTORIALS } from '../data/tutorials'
+import { WS_BASE_URL } from '../config'
 
 export default function Practice() {
   const { gestureId } = useParams()
@@ -72,7 +73,7 @@ export default function Practice() {
 
   const connectWs = () => {
     const host = window.location.hostname
-    wsRef.current = new WebSocket(`ws://${host}:8000/ws/detection`)
+    wsRef.current = new WebSocket(`${WS_BASE_URL}/ws/detection`)
     
     wsRef.current.onopen = () => {
       frameIntervalRef.current = window.setInterval(() => {

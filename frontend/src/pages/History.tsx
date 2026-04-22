@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { API_BASE_URL } from '../config'
 
 export interface HistoryEntry {
   id: string;
@@ -20,7 +21,7 @@ export default function History() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/history/all');
+        const res = await fetch(`${API_BASE_URL}/api/history/all`);
         const data = await res.json();
         
         const mapped: HistoryEntry[] = data.map((item: any) => ({

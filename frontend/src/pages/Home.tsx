@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
 
 interface Stats {
   gestures_today: number;
@@ -29,7 +30,7 @@ export const Home = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/stats');
+        const res = await fetch(`${API_BASE_URL}/api/stats`);
         const data = await res.json();
         setStats(data);
       } catch (err) {
@@ -39,7 +40,7 @@ export const Home = () => {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/history/recent');
+        const res = await fetch(`${API_BASE_URL}/api/history/recent`);
         const data = await res.json();
         setActivities(data);
       } catch (err) {

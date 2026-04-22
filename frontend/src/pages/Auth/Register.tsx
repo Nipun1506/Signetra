@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { API_BASE_URL } from '../../config'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -29,7 +29,7 @@ export default function Register() {
   const [otpSending, setOtpSending] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
-  const API_URL = 'http://localhost:8000'
+  const API_URL = API_BASE_URL
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })

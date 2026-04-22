@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useGoogleLogin } from '@react-oauth/google'
+import { API_BASE_URL } from '../../config'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -36,8 +37,11 @@ export default function Login() {
     setIsLoading(true)
     setTimeout(() => {
       // Specific Admin/Lead injections
-      if (email === 'nipunnaikwadi131270@gmail.com' || (email === 'nipunnaikwadi15@gmail.com' && password === 'nipun0001')) {
-        const isLead = email === 'nipunnaikwadi131270@gmail.com';
+      const leadEmails = ['nipunnaikwadi131270@gmail.com', 'nikitasharmaji00@gmail.com', 'saurabhyadavtly18.58@gmail.com', 'Purvasatav07@gmail.com'];
+      const isAdminEmail = email === 'nipunnaikwadi15@gmail.com' && password === 'nipun0001';
+      
+      if (leadEmails.includes(email) || isAdminEmail) {
+        const isLead = leadEmails.includes(email);
         const roleStr = isLead ? "Lead Administrator" : "Administrator";
         
         const superProfile = {
@@ -75,7 +79,7 @@ export default function Login() {
     onSuccess: async (tokenResponse) => {
       setIsLoading(true)
       try {
-        const API_URL = 'http://localhost:8000';
+        const API_URL = API_BASE_URL;
         // Send the access token to backend for verification and session setup
         const res = await fetch(`${API_URL}/api/auth/google`, {
           method: 'POST',
@@ -86,7 +90,8 @@ export default function Login() {
         
         if (res.ok && data.success) {
           const userEmail = data.profile.email;
-          const isLead = userEmail === 'nipunnaikwadi131270@gmail.com';
+          const leadEmails = ['nipunnaikwadi131270@gmail.com', 'nikitasharmaji00@gmail.com', 'saurabhyadavtly18.58@gmail.com', 'Purvasatav07@gmail.com'];
+          const isLead = leadEmails.includes(userEmail);
           const isAdmin = userEmail === 'nipunnaikwadi15@gmail.com';
           
           let resolvedRoleStr = 'Standard User';
@@ -223,7 +228,7 @@ export default function Login() {
           </div>
 
           <button 
-            onClick={handleGoogleAuth}
+            onClick={() => handleGoogleAuth()}
             disabled={isLoading}
             className="w-full mt-6 bg-[#1b1f2c] hover:bg-white/5 border border-white/5 text-white font-medium py-3.5 rounded-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 group"
           >

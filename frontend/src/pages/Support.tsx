@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../config'
 
 export default function Support() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export default function Support() {
 
   const fetchTickets = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/support/tickets');
+      const res = await fetch(`${API_BASE_URL}/api/support/tickets`);
       setTickets(await res.json());
     } catch (err) {
       console.error("Failed to fetch tickets", err);
@@ -43,7 +44,7 @@ export default function Support() {
 
   const fetchReplies = async (ticketId: number) => {
     try {
-      const res = await fetch(`http://localhost:8000/api/support/tickets/${ticketId}/replies`);
+      const res = await fetch(`${API_BASE_URL}/api/support/tickets/${ticketId}/replies`);
       setReplies(await res.json());
     } catch (err) {
       console.error("Failed to fetch replies", err);
@@ -55,7 +56,7 @@ export default function Support() {
     setTicketStatus('sending');
     
     try {
-      await fetch('http://localhost:8000/api/support/tickets', {
+      await fetch(`${API_BASE_URL}/api/support/tickets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -75,7 +76,7 @@ export default function Support() {
     if (!replyText.trim() || !selectedTicket) return;
     setIsSendingReply(true);
     try {
-      await fetch(`http://localhost:8000/api/support/tickets/${selectedTicket.id}/replies`, {
+      await fetch(`${API_BASE_URL}/api/support/tickets/${selectedTicket.id}/replies`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -95,7 +96,7 @@ export default function Support() {
   const handleUpdateStatus = async (newStatus: any) => {
     if (!selectedTicket) return;
     try {
-      await fetch(`http://localhost:8000/api/support/tickets/${selectedTicket.id}/status`, {
+      await fetch(`${API_BASE_URL}/api/support/tickets/${selectedTicket.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

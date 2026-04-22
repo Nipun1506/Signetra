@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from 'framer-motion'
 import { logGestureHistory } from '../utils/history'
+import { WS_BASE_URL } from '../config'
 
 const GESTURES = [
   { id: '1', phrase: 'STOP', category: 'General', combo: '⌘ S', icon: 'back_hand' },
@@ -147,7 +148,7 @@ export default function Recognize() {
 
   const connectWs = () => {
     const host = window.location.hostname
-    wsRef.current = new WebSocket(`ws://${host}:8000/ws/detection`)
+    wsRef.current = new WebSocket(`${WS_BASE_URL}/ws/detection`)
 
     wsRef.current.onopen = () => {
       console.log("✅ WebSocket connected")
