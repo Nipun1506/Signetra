@@ -150,7 +150,7 @@ export default function Landing() {
                 { name: 'Nipun Naikwadi', role: 'Founder & Lead Engineer', image: '/assets/nipun.jpg' },
                 { name: 'Purva Satav', role: 'Founder & Lead Engineer', image: '/assets/purva.jpg' },
                 { name: 'Nikita Sharma', role: 'Founder & Lead Engineer', image: '/assets/nikita.jpg' },
-                { name: 'Developer 4', role: 'Backend Systems', image: 'https://ui-avatars.com/api/?name=Developer+Four&background=random' }
+                { name: 'Saurabh Yadav', role: 'Founder and Lead engineer', image: '/assets/saurabh.jpg' }
               ].map((dev, i) => (
                 <div key={i} className="group relative">
                   <div className="w-full aspect-[4/5] bg-surface-container-low rounded-3xl overflow-hidden border border-outline-variant/5 shadow-xl relative">
