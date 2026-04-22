@@ -21,7 +21,8 @@ GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "")
-OTP_DEV_MODE = os.getenv("OTP_DEV_MODE", "true").lower() == "true"
+# Default to True ONLY if we are clearly in a local dev environment
+OTP_DEV_MODE = os.getenv("OTP_DEV_MODE", "false").lower() == "true"
 OTP_EXPIRY_MINUTES = int(os.getenv("OTP_EXPIRY_MINUTES", "5"))
 
 # ---------------------------------------------------------------------------

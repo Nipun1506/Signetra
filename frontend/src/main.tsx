@@ -27,16 +27,30 @@ window.fetch = async (...args) => {
   return originalFetch(...args);
 };
 
+const Root = () => {
+  const content = (
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
+  );
+
+  if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === '') {
+    return content;
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      {content}
+    </GoogleOAuthProvider>
+  );
+};
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
-        </QueryClientProvider>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+    <Root />
   </React.StrictMode>,
 )
