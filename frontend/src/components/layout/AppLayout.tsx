@@ -136,7 +136,7 @@ export const AppLayout = () => {
                   Contact Support: <a href="mailto:signetracare@gmail.com" className="text-primary hover:underline">signetracare@gmail.com</a>
                 </div>
                 <p className="text-[8px] text-on-surface-variant font-black uppercase tracking-widest opacity-60">
-                   Intellectual Property of Nipun Naikwadi
+                   Intellectual Property of Team Signetra
                 </p>
               </div>
               <p className="text-[10px] text-on-surface-variant">

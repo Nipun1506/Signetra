@@ -207,7 +207,7 @@ export default function Landing() {
                 &copy; {new Date().getFullYear()} Signetra Systems. All rights reserved.
               </p>
               <p className="text-[10px] text-on-surface-variant/60 font-bold uppercase tracking-widest">
-                Intellectual Property of Nipun Naikwadi
+                Intellectual Property of Team Signetra
               </p>
             </div>
             <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
