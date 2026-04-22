@@ -114,7 +114,22 @@ export const AppLayout = () => {
             className="h-8 w-8 rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center text-[10px] font-bold cursor-pointer transition-transform hover:scale-110 overflow-hidden shadow-lg shadow-primary/20"
             title="Your Profile"
           >
-            <img src={localStorage.getItem('signetra_profile') ? JSON.parse(localStorage.getItem('signetra_profile')!).avatarUrl || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png" : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"} onError={(e:any) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = 'NP'; }} className="w-full h-full object-cover" />
+            {(() => {
+              try {
+                const profileStr = localStorage.getItem('signetra_profile');
+                if (!profileStr) return <span className="material-symbols-outlined text-sm">person</span>;
+                const profile = JSON.parse(profileStr);
+                return (
+                  <img 
+                    src={profile?.avatarUrl || "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"} 
+                    onError={(e:any) => { e.target.src = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"; }} 
+                    className="w-full h-full object-cover" 
+                  />
+                );
+              } catch (e) {
+                return <span className="material-symbols-outlined text-sm">person</span>;
+              }
+            })()}
           </Link>
         </div>
       </header>

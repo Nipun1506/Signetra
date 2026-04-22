@@ -42,7 +42,11 @@ export const Home = () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/history/recent`);
         const data = await res.json();
-        setActivities(data);
+        if (Array.isArray(data)) {
+          setActivities(data);
+        } else {
+          setActivities([]);
+        }
       } catch (err) {
         console.error("Failed to fetch history", err);
       }
@@ -61,6 +65,7 @@ export const Home = () => {
   }, []);
 
   const getIcon = (phrase: string) => {
+    if (!phrase) return 'gesture';
     const iconMap: Record<string, string> = {
       'STOP': 'back_hand',
       'HELP': 'sports_mma',
@@ -77,13 +82,16 @@ export const Home = () => {
   };
 
   const getTimeAgo = (timestamp: string) => {
+    if (!timestamp) return 'Time unknown';
     const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return 'Recently';
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     
     if (diffMins < 1) return 'Just now';
     if (diffMins === 1) return '1 min ago';
+    if (diffMins > 1440) return date.toLocaleDateString();
     return `${diffMins} mins ago`;
   };
 
