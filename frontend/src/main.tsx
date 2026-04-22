@@ -16,8 +16,8 @@ const Root = () => {
       <AuthProvider>
         <BrowserRouter>
           <App />
-        </AuthProvider>
-      </QueryClientProvider>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   );
 
