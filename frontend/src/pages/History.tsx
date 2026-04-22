@@ -21,8 +21,13 @@ export default function History() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/history/all`);
-        const data = await res.json();
+        const token = localStorage.getItem('signetra_token');
+        const res = await fetch(`${API_BASE_URL}/api/history/all`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error('Unauthorized');
         
         const mapped: HistoryEntry[] = data.map((item: any) => ({
           id: String(item.id),

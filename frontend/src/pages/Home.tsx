@@ -30,7 +30,13 @@ export const Home = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/stats`);
+        const token = localStorage.getItem('signetra_token');
+        const res = await fetch(`${API_BASE_URL}/api/stats`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
         setStats(data);
       } catch (err) {
@@ -40,7 +46,13 @@ export const Home = () => {
 
     const fetchHistory = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/history/recent`);
+        const token = localStorage.getItem('signetra_token');
+        const res = await fetch(`${API_BASE_URL}/api/history/recent`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error('Unauthorized');
         const data = await res.json();
         if (Array.isArray(data)) {
           setActivities(data);
