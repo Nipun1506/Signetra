@@ -148,7 +148,7 @@ export default function Landing() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 { name: 'Nipun Naikwadi', role: 'Founder & Lead Engineer', image: '/assets/nipun.jpg' },
-                { name: 'Developer 2', role: 'AI / ML Engineer', image: 'https://ui-avatars.com/api/?name=Developer+Two&background=random' },
+                { name: 'Purva Satav', role: 'Founder & Lead Engineer', image: '/assets/purva.jpg' },
                 { name: 'Developer 3', role: 'Frontend Architect', image: 'https://ui-avatars.com/api/?name=Developer+Three&background=random' },
                 { name: 'Developer 4', role: 'Backend Systems', image: 'https://ui-avatars.com/api/?name=Developer+Four&background=random' }
               ].map((dev, i) => (
