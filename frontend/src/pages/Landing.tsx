@@ -13,7 +13,7 @@ export default function Landing() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as any } }
   }
 
   return (
@@ -147,7 +147,7 @@ export default function Landing() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { name: 'Nipun Naikwadi', role: 'Founder & Lead Engineer', image: 'https://ui-avatars.com/api/?name=Nipun+Naikwadi&background=random' },
+                { name: 'Nipun Naikwadi', role: 'Founder & Lead Engineer', image: '/assets/nipun.jpg' },
                 { name: 'Developer 2', role: 'AI / ML Engineer', image: 'https://ui-avatars.com/api/?name=Developer+Two&background=random' },
                 { name: 'Developer 3', role: 'Frontend Architect', image: 'https://ui-avatars.com/api/?name=Developer+Three&background=random' },
                 { name: 'Developer 4', role: 'Backend Systems', image: 'https://ui-avatars.com/api/?name=Developer+Four&background=random' }
