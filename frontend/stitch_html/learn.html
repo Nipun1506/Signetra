@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIGNETRA | Learn - Digital Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0e1a;
+            color: #dfe2f3;
+            margin: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(38, 42, 55, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%);
+        }
+        .ambient-glow {
+            box-shadow: 0 20px 40px -15px rgba(77, 142, 255, 0.15);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f131f;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #313442;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#dfe2f3",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b1c6f9",
+                        "background": "#0f131f",
+                        "surface-dim": "#0f131f",
+                        "on-secondary-fixed": "#001a42",
+                        "tertiary-fixed-dim": "#ffb786",
+                        "inverse-primary": "#005ac2",
+                        "tertiary": "#ffb786",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed-variant": "#723600",
+                        "surface-container": "#1b1f2c",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface-container-highest": "#313442",
+                        "on-tertiary-container": "#461f00",
+                        "on-tertiary": "#502400",
+                        "secondary": "#b1c6f9",
+                        "secondary-container": "#304671",
+                        "surface": "#0f131f",
+                        "primary-fixed": "#d8e2ff",
+                        "tertiary-container": "#df7412",
+                        "on-tertiary-fixed": "#311400",
+                        "surface-container-lowest": "#0a0e1a",
+                        "secondary-fixed": "#d8e2ff",
+                        "inverse-surface": "#dfe2f3",
+                        "on-secondary": "#182f59",
+                        "primary": "#adc6ff",
+                        "on-error": "#690005",
+                        "on-secondary-fixed-variant": "#304671",
+                        "on-primary-container": "#00285d",
+                        "surface-tint": "#adc6ff",
+                        "error-container": "#93000a",
+                        "primary-container": "#4d8eff",
+                        "on-secondary-container": "#9fb5e7",
+                        "on-primary": "#002e6a",
+                        "surface-container-low": "#171b28",
+                        "on-primary-fixed-variant": "#004395",
+                        "surface-variant": "#313442",
+                        "surface-bright": "#353946",
+                        "outline": "#8c909f",
+                        "on-primary-fixed": "#001a42",
+                        "outline-variant": "#424754",
+                        "inverse-on-surface": "#2c303d",
+                        "tertiary-fixed": "#ffdcc6",
+                        "surface-container-high": "#262a37",
+                        "on-surface": "#dfe2f3",
+                        "on-surface-variant": "#c2c6d6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-container-lowest text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#0f131f] z-50">
+<div class="flex flex-col h-full py-6">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 primary-gradient rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-xl" style="font-variation-settings: 'FILL' 1;">waves</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-[#adc6ff]">SIGNETRA</h1>
+<p class="text-[10px] uppercase tracking-widest text-[#c2c6d6] opacity-60">Digital Curator</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-2 custom-scrollbar overflow-y-auto">
+<!-- Home -->
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<span class="material-symbols-outlined text-xl">home</span>
+<span class="font-medium tracking-wide text-sm">Home</span>
+</a>
+<!-- Recognize -->
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<span class="material-symbols-outlined text-xl">gesture</span>
+<span class="font-medium tracking-wide text-sm">Recognize</span>
+</a>
+<!-- Learn (Active) -->
+<a class="text-[#adc6ff] border-l-4 border-[#4d8eff] bg-[#1b1f2c] font-semibold px-4 py-3 flex items-center gap-3 transition-colors rounded-r-xl" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-medium tracking-wide text-sm">Learn</span>
+</a>
+<!-- Zoom -->
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<span class="material-symbols-outlined text-xl">videocam</span>
+<span class="font-medium tracking-wide text-sm">Zoom</span>
+</a>
+<!-- WhatsApp -->
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<span class="material-symbols-outlined text-xl">chat</span>
+<span class="font-medium tracking-wide text-sm">WhatsApp</span>
+</a>
+<!-- History -->
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<span class="material-symbols-outlined text-xl">history</span>
+<span class="font-medium tracking-wide text-sm">History</span>
+</a>
+<!-- Settings -->
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="font-medium tracking-wide text-sm">Settings</span>
+</a>
+<!-- Admin -->
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<span class="material-symbols-outlined text-xl">admin_panel_settings</span>
+<span class="font-medium tracking-wide text-sm">Admin</span>
+</a>
+</nav>
+<div class="mt-auto px-4 pt-4 border-t border-outline-variant/10">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl group" href="#">
+<img alt="Profile" class="w-8 h-8 rounded-full border border-primary/20" data-alt="professional headshot of a person with friendly expression against a neutral studio background soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBn8UQZAZ56FrTKuUPNsWh-t82gTtON-5r-5dSgd-SYreJCQfXA3hC9r0I8gvvd1o1LilgnsDjY7D3GHuvLyYcFvFZ9fugsaNQmePKXp1aU1z7tnWPtyHTbJn6gihPKNHc1gLctMLkROJltZUc8tt_3InExC4hf6raplIuHLiuizC-tmv33EHCs8t1YmkVBQpMm7hPt8DnUX1d_SYlFpAhA9wTf-LGf6rLFHHOMGgtHRNxANUKFp1T9Q2LkWL4ccHMi80MAv8zt0js"/>
+<span class="font-medium tracking-wide text-sm">Profile</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen relative">
+<!-- TopNavBar Anchor -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-40 bg-[#0f131f]/60 backdrop-blur-xl flex justify-end items-center px-8 shadow-lg shadow-blue-500/10">
+<div class="flex items-center gap-6">
+<button class="text-[#c2c6d6] hover:text-white transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="text-[#c2c6d6] hover:text-white transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="pt-24 px-10 pb-12 max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-10">
+<div>
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Learning Module</h2>
+<p class="text-on-surface-variant max-w-md">Master the language of light and motion through our curated curriculum of visual linguistics.</p>
+</div>
+<div class="flex gap-1 bg-surface-container-low p-1 rounded-xl">
+<button class="px-6 py-2 bg-surface-container-highest text-primary font-semibold rounded-lg text-sm transition-all">Symbol Tutorials</button>
+<button class="px-6 py-2 text-on-surface-variant hover:text-on-surface font-medium rounded-lg text-sm transition-all">Video Library</button>
+</div>
+</div>
+<!-- Tab 1: Symbol Tutorials Grid -->
+<section class="space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+<!-- Tutorial Card Component (Loop of 15) -->
+<!-- Pattern 1: Beginner -->
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<img alt="Hand gesture" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale" data-alt="minimalist studio photography of hand performing sign language gesture against a dark matte background dramatic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBedL78ZfYc4JbFC97K8kGFgRRRWryJdGmjcaEfmb_f1rmQKWSXSMuoTansjr_gquCqTA0jkpRLOl4judEpn4B4ZGyory1rzsYoynlQxy5o3LBy1pyNX-_lCeiYGXUh9Zn0_yzRKaxiNqqSEha2QtJU5vLI5glOZJK8PdvY0TTvNKSE2A7mmRC4_GAa5VWHwe5dnR_Glcs6cmuFJu52PgXiVyXVU6-NvewgWjDYkogBk7WxhZmE4_Sh7hrpFCjkWIJb5wvkq0co-5s"/>
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">back_hand</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Hello</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">BEGINNER</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 leading-relaxed italic">"Greeting a new companion with light."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+                            PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Repeat cards for layout demonstration -->
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<img alt="Hand gesture" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale" data-alt="close up of hands making shapes against a dark backdrop with blue rim lighting highlighting the contours" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACKFTNGX_9DbRAo_g6ReqLXAkNmVnwQj4D_EKZxU-DeuxiQHygB_XsFPNlBrZaCTvG64tXStDB9cEWrnLSMvC0m3PtXjEZT5nxN2prknYcTKNVFVnVI4IS2ULUIgxpiTL-cKmvIv2vWAQcjzyC_GIYwNE8hfGEBDG541f6yftWv4A_6fcVrYK1iEOKBXOG4roaTtwNYZRlgdz0ZRmkm_TiZ2joIeoGoYNOluzZXsjfd3dfay2bWRmaD6NS9DUUzaGkvTAYX6SbtLg"/>
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">front_hand</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Wait</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container border border-tertiary/20">INTERMEDIATE</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 leading-relaxed italic">"Patience is the foundation of sight."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+                            PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Complex Pattern -->
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<img alt="Hand gesture" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale" data-alt="abstract artistic photography of multiple hands creating complex geometry in the shadows with blue highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkvZjHa7e1LcfF0nQ55jctZ56UtE8xZsT1qANh0c-cDgDdcYaYXPwEV-Jr8HYT-8vV4veJGewIzsovBG8NwEcOvpJcGnlfcIzbwpguDyOF4xdFXolChodEu4OhS9kbM0e_nU7CLdpME8ENY6yJNFH42x5x8_Jd3fGAooVN_o3v6J-WLvlhjzrgvBktoswJVxJs3qDZwyLIul8hJWoZ0seAqF3IB6bmuSq7ZseH77Xzqj2nqyrvybJnIlvWTifnLpX-JLHwoqdgQXg"/>
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">fluid</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Infinity</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-error-container text-on-error-container border border-error/20">ADVANCED</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 leading-relaxed italic">"The loop of recursive knowledge."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+                            PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Loop Fillers (Mocking remaining cards) -->
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">waving_hand</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Goodbye</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">BEGINNER</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 leading-relaxed italic">"Closing the current stream."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">pan_tool</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Stop</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">BEGINNER</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 leading-relaxed italic">"The wall of immediate stillness."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<!-- Row 2 -->
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">thumbs_up_down</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Decision</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container">INTERMEDIATE</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Evaluating binary possibilities."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">sign_language</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Friend</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">BEGINNER</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Two entities in synchronous dance."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">pinch</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Select</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-error-container text-on-error-container">ADVANCED</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Precision retrieval of specific data."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">hand_gesture</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Flow</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container">INTERMEDIATE</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"The continuous thread of discourse."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">mobile_hand</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Success</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">BEGINNER</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Achievement unlocked through motion."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<!-- Row 3 -->
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">self_care</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Care</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">BEGINNER</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"A supportive embrace of the signal."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">touch_app</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Select</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container">INTERMEDIATE</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Single point focus and activation."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">co_present</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Present</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-error-container text-on-error-container">ADVANCED</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Directing communal focus outward."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">spatial_tracking</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Track</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container">INTERMEDIATE</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Following the path of the signal."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+<div class="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">record_voice_over</span>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-on-surface">Speak</h3>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">BEGINNER</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4 italic">"Visual translation of verbal intent."</p>
+<button class="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">PRACTICE <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+</div>
+</section>
+<!-- Video Library Header -->
+<section class="mt-20 border-t border-outline-variant/10 pt-16">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+<div>
+<h2 class="text-2xl font-bold text-on-surface tracking-tight mb-2 uppercase text-xs opacity-60">Digital Archives</h2>
+<p class="text-3xl font-extrabold text-on-surface">Video Library</p>
+</div>
+<div class="flex flex-wrap gap-4 w-full md:w-auto">
+<div class="relative flex-1 md:w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-on-surface-variant/50" placeholder="Search Masterclasses..." type="text"/>
+</div>
+<select class="bg-surface-container-low border-none rounded-xl px-6 py-3 text-sm font-medium text-on-surface-variant focus:ring-2 focus:ring-primary/20">
+<option>All Difficulty</option>
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+</select>
+</div>
+</div>
+<!-- Video Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Video Card 1 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-video rounded-xl overflow-hidden mb-4 ambient-glow">
+<img alt="Video thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="high contrast video thumbnail showing a person signing in a dimly lit tech lab with neon blue light strips in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGGmYZXPU5jl3mCgJ3SbdY0vgNPlT53WuW-YXOIJ4ekrh2rgpdKyLVry1nML2itAXwD37bFbVDa8vOjWoHWLUwLdUD7fq0liaL1DB-INgxY9TnRUEcy0U8WkhKiD9FX0hPwxqiVDOnEhfMaV20By1WBLxE1JvUdwlMyNHa9rltSGgA2mcV8Rq3-adexT-rqFmz4112CIWyeV7sEfxLLAJeE1_3vzTyLHjYiJoeYAyz04fmQNc1T6LttYQusOxbm619PQBe4Tqh7DI"/>
+<div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+<div class="w-16 h-16 rounded-full glass-panel flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-3 right-3 bg-black/70 px-2 py-1 rounded text-[10px] font-bold text-white backdrop-blur-md">12:45</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-bold text-on-surface group-hover:text-primary transition-colors text-lg">Introduction to Sign-Digital Curating</h4>
+<p class="text-on-surface-variant text-sm mt-1">Foundational concepts of gesture mapping.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">more_vert</span>
+</div>
+</div>
+<!-- Video Card 2 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-video rounded-xl overflow-hidden mb-4 ambient-glow">
+<img alt="Video thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="cinematic close up of glowing circuit lines and hands interacting with a transparent digital interface holographic aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6zhv96_Xz7ARgeGgTWiHOAzvgCk7zK2VwOA4v9iRttmlYPUMJM8SUIJ1d7zcvSCZXeJX8CxTKEtRZz8qtFmlE4YyPQ58bw2FgcpDw-b3ISO4wY6SCPEC0LWbMd5RVmU_nda6i7wxXKI4pd7p-7a7bioiQvjtwn3sKlls50FmGxA69mwZS-sK53ZqkpWByvWVI1BqoyIi4Ret3c5uQZbiHF9tVTnSLs6qhndPjgiz1QUlVAE86X7-_UnrGdcbJXS3nA3VOfBoj6gE"/>
+<div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+<div class="w-16 h-16 rounded-full glass-panel flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-3 right-3 bg-black/70 px-2 py-1 rounded text-[10px] font-bold text-white backdrop-blur-md">24:10</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-bold text-on-surface group-hover:text-primary transition-colors text-lg">Advanced Spatial Syntax</h4>
+<p class="text-on-surface-variant text-sm mt-1">Mastering 3D grammar in sign language.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">more_vert</span>
+</div>
+</div>
+<!-- Video Card 3 -->
+<div class="group cursor-pointer">
+<div class="relative aspect-video rounded-xl overflow-hidden mb-4 ambient-glow">
+<img alt="Video thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="minimalist overhead shot of a laptop and notebook with warm glowing light from the screen in a dark modern office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADMitBsVEoRCuh_RTR5Z7YsCaLvlYHfhzxJ6EFoI2ooqKJPyh7ft-IEc4o_oqErYlYsaJc472EhlAKU79e5m5Zt6egUJC04Gxxzw6pJWv7EE6sJVi2t0yVbogH1zd73VMiS9mV0IgaC2VmBchSG_6N5AsMCuQjVyR4WXR6-DiEzcc0ppVcsnbMlqt2IOybtAXr3z3kv3WPWEzOxLrnTxcWNboiVuKOVgojKyi50pL9bbkZvExLZ5vqLRiWr_F8usvcuuZivF0zjDc"/>
+<div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+<div class="w-16 h-16 rounded-full glass-panel flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-3 right-3 bg-black/70 px-2 py-1 rounded text-[10px] font-bold text-white backdrop-blur-md">08:22</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-bold text-on-surface group-hover:text-primary transition-colors text-lg">Daily Practice Routine</h4>
+<p class="text-on-surface-variant text-sm mt-1">10 minutes to maintain your visual agility.</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">more_vert</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Progress FAB -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="primary-gradient w-16 h-16 rounded-full shadow-2xl shadow-primary/30 flex items-center justify-center group">
+<span class="material-symbols-outlined text-on-primary text-3xl group-hover:rotate-12 transition-transform">emoji_events</span>
+<div class="absolute -top-2 -right-2 bg-on-background text-primary-container text-[10px] font-extrabold w-6 h-6 rounded-full flex items-center justify-center border-2 border-primary">72%</div>
+</button>
+</div>
+</main>
+</body></html>

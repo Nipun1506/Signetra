@@ -1,0 +1,814 @@
+################################################################################
+# SIGNETRA FRONTEND SOURCE CODE
+################################################################################
+
+# FILE: src/App.tsx
+import React, { useState, useEffect } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { AppLayout } from './components/layout/AppLayout'
+import { Home } from './pages/Home'
+import Recognize from './pages/Recognize'
+import Learn from './pages/Learn'
+import ZoomIntegration from './pages/ZoomIntegration'
+import WhatsAppIntegration from './pages/WhatsAppIntegration'
+import History from './pages/History'
+import Settings from './pages/Settings'
+import Admin from './pages/Admin'
+
+export default function App() {
+  const [loading, setLoading] = useState(true)
+  const location = useLocation()
+
+  useEffect(() => {
+    // Keep the loading screen as requested for 2.5 seconds
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 2500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-[#0a0e1a] flex flex-col items-center justify-center">
+        <div className="relative">
+          <motion.div 
+            animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-24 h-24 bg-gradient-to-br from-[#adc6ff] to-[#4d8eff] rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/20"
+          >
+            <span className="material-symbols-outlined text-white text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>waves</span>
+          </motion.div>
+          <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full -z-10 animate-pulse"></div>
+        </div>
+        <h1 className="mt-8 text-2xl font-bold tracking-tighter text-[#adc6ff]">SIGNETRA</h1>
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#c2c6d6] mt-2 opacity-50">Initializing AI Pipeline...</p>
+      </div>
+    )
+  }
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/recognize" element={<Recognize />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/zoom" element={<ZoomIntegration />} />
+          <Route path="/whatsapp" element={<WhatsAppIntegration />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/admin" element={<Admin />} />
+        </Route>
+      </Routes>
+    </AnimatePresence>
+  )
+}
+
+---
+
+# FILE: src/main.tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import App from './App.tsx'
+import './index.css'
+
+const queryClient = new QueryClient()
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
+)
+
+---
+
+# FILE: src/components/layout/AppLayout.tsx
+import React from 'react'
+import { Outlet, Link, useLocation } from 'react-router-dom'
+
+export const AppLayout = () => {
+  const location = useLocation()
+
+  const navItems = [
+    { name: 'Home', path: '/', icon: 'home' },
+    { name: 'Recognize', path: '/recognize', icon: 'gesture' },
+    { name: 'Learn', path: '/learn', icon: 'school' },
+    { name: 'Zoom', path: '/zoom', icon: 'videocam' },
+    { name: 'WhatsApp', path: '/whatsapp', icon: 'chat' },
+    { name: 'History', path: '/history', icon: 'history' },
+    { name: 'Settings', path: '/settings', icon: 'settings' },
+    { name: 'Admin', path: '/admin', icon: 'admin_panel_settings' },
+  ]
+
+  return (
+    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body overflow-hidden">
+      {/* SideNavBar Integration */}
+      <aside className="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#0f131f] py-6 z-50">
+        <div className="px-6 mb-10">
+          <h1 className="text-xl font-bold tracking-tight text-[#adc6ff]">SIGNETRA</h1>
+          <p className="text-xs text-on-surface-variant font-medium tracking-wider mt-1">Digital Curator</p>
+        </div>
+        <nav className="flex-1 flex flex-col gap-1">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`px-4 py-3 flex items-center gap-3 transition-colors ${
+                  isActive
+                    ? "text-[#adc6ff] border-l-4 border-[#4d8eff] bg-[#1b1f2c] font-semibold"
+                    : "text-[#c2c6d6] hover:text-[#adc6ff] hover:bg-[#262a37]"
+                }`}
+              >
+                <span className="material-symbols-outlined">{item.icon}</span>
+                <span className="font-['Inter'] text-sm font-medium tracking-wide">{item.name}</span>
+              </Link>
+            )
+          })}
+        </nav>
+        <div className="mt-auto px-2">
+          <button className="text-[#c2c6d6] hover:text-[#adc6ff] hover:bg-[#262a37] px-4 py-3 flex items-center gap-3 transition-colors rounded-xl w-full text-left">
+            <span className="material-symbols-outlined">account_circle</span>
+            <span className="font-['Inter'] text-sm font-medium tracking-wide">Profile</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* TopNavBar Integration */}
+      <header className="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-40 bg-[#0f131f]/60 backdrop-blur-xl flex justify-end items-center px-8 shadow-lg shadow-blue-500/10">
+        <div className="flex items-center gap-6">
+          <button className="text-[#c2c6d6] hover:text-white transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined">notifications</span>
+          </button>
+          <button className="text-[#c2c6d6] hover:text-white transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined">help</span>
+          </button>
+          <div className="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
+            JD
+          </div>
+        </div>
+      </header>
+
+      <main className="ml-64 flex flex-1 h-screen overflow-y-auto bg-surface-container-lowest custom-scrollbar">
+        <Outlet />
+      </main>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/Home.tsx
+import React from 'react'
+import { Link } from 'react-router-dom'
+
+export const Home = () => {
+  return (
+    <div className="pt-24 pb-12 px-10 min-h-screen w-full">
+      {/* Hero Section: Asymmetrical Layout */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mb-16">
+        <div className="lg:col-span-7 space-y-6">
+          <h2 className="text-6xl font-extrabold text-on-background tracking-tighter leading-none">
+            Welcome to <span className="text-primary">SIGNETRA</span>
+          </h2>
+          <p className="text-xl text-on-surface-variant max-w-xl font-light">
+            Real-time sign language recognition for everyone. Bridging the gap between sound and silence with advanced AI curation.
+          </p>
+          <div className="flex gap-4 pt-4">
+            <Link to="/recognize">
+              <button className="bg-gradient-to-br from-primary to-primary-container text-on-primary-container px-8 py-4 rounded-xl font-bold tracking-wide hover:scale-105 active:opacity-80 transition-all">
+                Start Recognizing
+              </button>
+            </Link>
+            <Link to="/learn">
+              <button className="border border-outline-variant hover:bg-surface-container-high text-primary px-8 py-4 rounded-xl font-bold tracking-wide transition-all">
+                Learn Signs
+              </button>
+            </Link>
+          </div>
+        </div>
+        <div className="lg:col-span-5 relative group">
+          <div className="absolute -inset-4 bg-primary/10 blur-3xl rounded-full opacity-50 group-hover:opacity-70 transition-opacity"></div>
+          <img alt="Sign Language Illustration" className="relative z-10 w-full aspect-square object-contain drop-shadow-[0_0_30px_rgba(173,198,255,0.3)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKOSXCrp-hwsEVlYjUc1XFIndviPiV6-iUkc11S4IAc-wylf2yNH4L-bl1rNQIxk2Q_06nExynsJeGJPwWv4O2ilzZWWJbUQWfA6jtPWmoXl6TgkQY3OO0qbnR9Tx9JoNBxFJeoqWCsN3T6PuPUHDQiL4qFYf63Y4D_JFR7DQW_2MPY3x7dGHRFG3WoVNHAzuXNx5oeAOlKQ4aGv9h5UnDnafSRfmoGt5-ienELwl-1GsUTWoaact4d54tRKvaubgjAiHj6aOzdaE" />
+        </div>
+      </section>
+
+      {/* Stats Grid: Tonal Layering */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="bg-surface-container-low p-6 rounded-xl border-l-2 border-primary/20 hover:bg-surface-container transition-colors">
+          <span className="material-symbols-outlined text-primary mb-4 block">gesture</span>
+          <div className="text-3xl font-bold text-on-surface leading-none mb-2">128</div>
+          <div className="text-sm font-medium text-on-surface-variant tracking-wider uppercase">Gestures Recognized Today</div>
+        </div>
+        <div className="bg-surface-container-low p-6 rounded-xl border-l-2 border-primary/20 hover:bg-surface-container transition-colors">
+          <span className="material-symbols-outlined text-primary mb-4 block">book</span>
+          <div className="text-3xl font-bold text-on-surface leading-none mb-2">12</div>
+          <div className="text-sm font-medium text-on-surface-variant tracking-wider uppercase">Total Signs Learned</div>
+        </div>
+        <div className="bg-surface-container-low p-6 rounded-xl border-l-2 border-primary/20 hover:bg-surface-container transition-colors">
+          <span className="material-symbols-outlined text-primary mb-4 block">sensors</span>
+          <div className="text-3xl font-bold text-on-surface leading-none mb-2">5</div>
+          <div className="text-sm font-medium text-on-surface-variant tracking-wider uppercase">Active Sessions</div>
+        </div>
+        <div className="bg-surface-container-low p-6 rounded-xl border-l-2 border-primary/20 hover:bg-surface-container transition-colors">
+          <span className="material-symbols-outlined text-primary mb-4 block">leaderboard</span>
+          <div className="text-3xl font-bold text-on-surface leading-none mb-2">98.4%</div>
+          <div className="text-sm font-medium text-on-surface-variant tracking-wider uppercase">Accuracy Rate</div>
+        </div>
+      </section>
+
+      {/* Quick Access: Bento Grid Inspired */}
+      <section className="mb-16">
+        <div className="flex justify-between items-end mb-8">
+          <h3 className="text-2xl font-bold tracking-tight text-on-background">Quick Access</h3>
+          <a className="text-primary text-sm font-semibold hover:underline" href="#">View All Features</a>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link to="/recognize">
+            <div className="group cursor-pointer relative overflow-hidden rounded-xl bg-surface-container-high border-b-4 border-primary p-8 transition-transform hover:-translate-y-1">
+              <div className="flex justify-between items-start mb-12">
+                <div className="bg-primary-container/20 p-3 rounded-lg">
+                  <span className="material-symbols-outlined text-primary text-3xl">camera</span>
+                </div>
+                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">arrow_outward</span>
+              </div>
+              <h4 className="text-xl font-bold mb-2">Live Recognition</h4>
+              <p className="text-on-surface-variant text-sm">Instant translation from camera feed to text and audio.</p>
+            </div>
+          </Link>
+          <Link to="/learn">
+            <div className="group cursor-pointer relative overflow-hidden rounded-xl bg-surface-container-high border-b-4 border-tertiary-container p-8 transition-transform hover:-translate-y-1">
+              <div className="flex justify-between items-start mb-12">
+                <div className="bg-tertiary-container/20 p-3 rounded-lg">
+                  <span className="material-symbols-outlined text-tertiary text-3xl">menu_book</span>
+                </div>
+                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors">arrow_outward</span>
+              </div>
+              <h4 className="text-xl font-bold mb-2">Learning Module</h4>
+              <p className="text-on-surface-variant text-sm">Interactive curriculum to master ASL and regional sign languages.</p>
+            </div>
+          </Link>
+          <Link to="/zoom">
+            <div className="group cursor-pointer relative overflow-hidden rounded-xl bg-surface-container-high border-b-4 border-[#4ADE80] p-8 transition-transform hover:-translate-y-1">
+              <div className="flex justify-between items-start mb-12">
+                <div className="bg-[#4ADE80]/10 p-3 rounded-lg">
+                  <span className="material-symbols-outlined text-[#4ADE80] text-3xl">video_call</span>
+                </div>
+                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-[#4ADE80] transition-colors">arrow_outward</span>
+              </div>
+              <h4 className="text-xl font-bold mb-2">Video Call Overlay</h4>
+              <p className="text-on-surface-variant text-sm">Seamless integration for Zoom, Teams, and WhatsApp Web.</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* Recent Activity Feed: Editorial Style */}
+      <section className="max-w-4xl">
+        <h3 className="text-2xl font-bold tracking-tight text-on-background mb-8">Recent Activity</h3>
+        <div className="bg-surface-container-low rounded-xl overflow-hidden">
+          <div className="divide-y divide-outline-variant/10">
+            <div className="p-4 flex items-center gap-6 hover:bg-surface-container transition-colors">
+              <div className="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary">back_hand</span>
+              </div>
+              <div className="flex-1">
+                <div className="text-on-surface font-semibold text-lg">"Hello"</div>
+                <div className="text-on-surface-variant text-xs">Detected 2 mins ago • Live Camera</div>
+              </div>
+              <div className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20">
+                99.2% Conf.
+              </div>
+            </div>
+            <div className="p-4 flex items-center gap-6 hover:bg-surface-container transition-colors">
+              <div className="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary">pan_tool</span>
+              </div>
+              <div className="flex-1">
+                <div className="text-on-surface font-semibold text-lg">"Wait"</div>
+                <div className="text-on-surface-variant text-xs">Detected 15 mins ago • WhatsApp Overlay</div>
+              </div>
+              <div className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20">
+                97.8% Conf.
+              </div>
+            </div>
+            <div className="p-4 flex items-center gap-6 hover:bg-surface-container transition-colors">
+              <div className="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary">waving_hand</span>
+              </div>
+              <div className="flex-1">
+                <div className="text-on-surface font-semibold text-lg">"Thank You"</div>
+                <div className="text-on-surface-variant text-xs">Detected 42 mins ago • Zoom Integration</div>
+              </div>
+              <div className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20">
+                98.5% Conf.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/Recognize.tsx
+import React, { useRef, useEffect, useState } from 'react'
+import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from 'framer-motion'
+
+const GESTURES = [
+  { id: '1', phrase: 'HELLO', category: 'Greeting', combo: '⌘ H', icon: 'front_hand' },
+  { id: '2', phrase: 'STOP', category: 'Command', combo: '⌘ S', icon: 'back_hand' },
+  { id: '3', phrase: 'YES', category: 'Affirmation', combo: '⌘ Y', icon: 'thumb_up' },
+  { id: '4', phrase: 'NO', category: 'Negation', combo: '⌘ N', icon: 'thumb_down' },
+  { id: '5', phrase: 'THANK YOU', category: 'Social', combo: '⌘ T', icon: 'pan_tool' },
+  { id: '6', phrase: 'HELP', category: 'Urgent', combo: '⌘ ?', icon: 'help' },
+  { id: '7', phrase: 'PLEASE', category: 'Social', combo: '⌘ P', icon: 'volunteer_activism' }
+]
+
+export default function Recognize() {
+  const [isActive, setIsActive] = useState(false)
+  const [source, setSource] = useState<'webcam'|'iphone'>('webcam')
+  const [mode, setMode] = useState<'text'|'text-speech'>('speech')
+  const [currentGesture, setCurrentGesture] = useState<any>(null)
+  
+  const confidenceValue = useMotionValue(0)
+  const animatedConfidence = useSpring(confidenceValue, { stiffness: 100, damping: 20 })
+  const [displayConf, setDisplayConf] = useState(0)
+  
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const wsRef = useRef<WebSocket | null>(null)
+
+  useEffect(() => {
+    const unsubscribe = animatedConfidence.on("change", (latest) => {
+      setDisplayConf(Math.round(latest))
+    })
+    return unsubscribe
+  }, [animatedConfidence])
+
+  useEffect(() => {
+    if (isActive) {
+      startCamera()
+    } else {
+      stopCamera()
+    }
+    return () => stopCamera()
+  }, [isActive, source])
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480, facingMode: source === 'webcam' ? 'user' : 'environment' } 
+      })
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+      }
+      connectWs()
+    } catch (err) {
+      console.error("Camera access error:", err)
+    }
+  }
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream
+      stream.getTracks().forEach(track => track.stop())
+      videoRef.current.srcObject = null
+    }
+    if (wsRef.current) {
+      wsRef.current.close()
+    }
+    setCurrentGesture(null)
+    confidenceValue.set(0)
+  }
+
+  const connectWs = () => {
+    const host = window.location.hostname
+    wsRef.current = new WebSocket(`ws://${host}:8000/ws/detection`)
+    wsRef.current.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.phrase) {
+          setCurrentGesture(data)
+          confidenceValue.set(data.confidence)
+          if (data.landmarks && canvasRef.current) {
+            drawLandmarks(data.landmarks)
+          }
+        }
+      } catch (e) {}
+    }
+  }
+
+  const drawLandmarks = (landmarks: any[]) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.clearRect(0,0, canvas.width, canvas.height)
+    
+    ctx.fillStyle = '#adc6ff'
+    ctx.strokeStyle = '#adc6ff'
+    ctx.lineWidth = 1.5
+
+    landmarks.forEach((lm, i) => {
+      const x = (1 - lm[0]) * canvas.width
+      const y = lm[1] * canvas.height
+      ctx.beginPath()
+      ctx.arc(x, y, 3, 0, 2*Math.PI)
+      ctx.fill()
+      
+      if (i > 0) {
+        const prev = landmarks[i-1]
+        const px = (1 - prev[0]) * canvas.width
+        const py = prev[1] * canvas.height
+        ctx.beginPath()
+        ctx.moveTo(px, py)
+        ctx.lineTo(x, y)
+        ctx.stroke()
+      }
+    })
+  }
+
+  return (
+    <div className="flex w-full h-full pt-24">
+      <section className="w-3/5 p-6 h-full flex flex-col relative w-full">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold tracking-tight">Vision Interface</h2>
+          <button 
+            onClick={() => setIsActive(!isActive)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
+              isActive 
+                ? 'bg-rose-500/10 border-rose-500/30 text-rose-500 hover:bg-rose-500/20' 
+                : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20'
+            }`}
+          >
+            {isActive ? (
+              <>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                </span>
+                <span className="text-xs font-bold tracking-widest uppercase">Stop Feed</span>
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-[14px]">videocam</span>
+                <span className="text-xs font-bold tracking-widest uppercase">Start Feed</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <div className="flex-1 relative rounded-[14px] overflow-hidden bg-surface-container-lowest border-2 border-primary/10 shadow-[0_0_40px_rgba(173,198,255,0.08)] group">
+          <video 
+            ref={videoRef} 
+            autoPlay 
+            playsInline 
+            muted 
+            className={`absolute inset-0 w-full h-full object-cover transform -scale-x-100 transition-all ${
+              !isActive ? 'opacity-0 grayscale-[0.3]' : 'opacity-100 grayscale-[0.1]'
+            }`}
+          />
+          
+          {!isActive && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-on-surface-variant font-bold uppercase tracking-wider text-sm tracking-widest opacity-50 z-10">
+              <span className="material-symbols-outlined text-4xl mb-2">videocam_off</span>
+              Camera Off
+            </div>
+          )}
+
+          <canvas 
+            ref={canvasRef} 
+            className="absolute inset-0 w-full h-full pointer-events-none z-20" 
+            width={640} 
+            height={480}
+            style={{ width: '100%', height: '100%' }}
+          />
+
+          <AnimatePresence>
+            {isActive && currentGesture && (
+              <motion.div 
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-background/90 to-transparent p-8 flex items-end justify-between z-30"
+              >
+                <div>
+                  <span className="label-md uppercase text-primary tracking-widest font-bold text-xs">Identified Gesture</span>
+                  <h3 className="text-7xl font-extrabold tracking-tighter text-white">{currentGesture.phrase.toUpperCase()}</h3>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="px-4 py-2 bg-primary-container/20 backdrop-blur-md rounded-full border border-primary/30 flex items-center gap-2">
+                    <span className="text-primary font-bold text-lg">{displayConf}%</span>
+                    <span className="text-xs uppercase tracking-tighter text-primary/80">Confidence</span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </section>
+
+      <aside className="w-2/5 h-full bg-surface-container-low p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar">
+        <section className="bg-surface-container-high rounded-[14px] p-5 space-y-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-primary">System Controls</h4>
+            <span className="material-symbols-outlined text-on-surface-variant text-sm">tune</span>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase font-bold text-on-surface-variant">Camera Source</label>
+              <div className="flex bg-surface-container rounded-lg p-1">
+                {['webcam', 'iphone'].map(t => (
+                  <button 
+                    key={t}
+                    onClick={() => setSource(t as any)} 
+                    className={`flex-1 text-[10px] py-1.5 rounded-md font-bold uppercase ${
+                      source === t ? 'bg-primary text-on-primary' : 'text-on-surface-variant font-medium hover:bg-white/5'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase font-bold text-on-surface-variant">Output Mode</label>
+              <div className="flex bg-surface-container rounded-lg p-1">
+                {['text', 'speech'].map(t => (
+                  <button 
+                    key={t}
+                    onClick={() => setMode(t as any)} 
+                    className={`flex-1 text-[10px] py-1.5 rounded-md font-bold uppercase ${
+                      mode === t ? 'bg-primary text-on-primary' : 'text-on-surface-variant font-medium hover:bg-white/5'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-surface-container-highest rounded-[14px] p-6 border-l-4 border-primary shadow-xl">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-primary tracking-widest">Current Transcription</span>
+              <h5 className="text-lg font-medium text-white mt-1">
+                {currentGesture ? `"${currentGesture.phrase}"` : "Waiting for gesture..."}
+              </h5>
+            </div>
+            <div className="relative flex items-center justify-center w-12 h-12">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" strokeWidth="3" className="text-surface-container-low" />
+                <motion.circle 
+                  cx="18" cy="18" r="15.915" fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="3"
+                  className="text-primary"
+                  strokeDasharray="100 100"
+                  strokeDashoffset={useTransform(animatedConfidence, v => 100 - v)}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute text-[10px] font-bold">{displayConf}%</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="flex-1 flex flex-col min-h-0">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4 mt-2">Quick Reference Library</h4>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+            {GESTURES.map(g => {
+              const matches = currentGesture?.phrase?.toUpperCase() === g.phrase
+              return (
+                <div key={g.id} className={`${matches ? 'bg-primary/10 border border-primary/20' : 'bg-surface-container border border-transparent'} rounded-xl p-3 flex items-center justify-between hover:bg-surface-container-high transition-colors`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`material-symbols-outlined ${matches ? 'text-primary' : 'text-on-surface-variant'}`} style={matches ? {fontVariationSettings: "'FILL' 1"} : {}}>
+                      {g.icon}
+                    </span>
+                    <div>
+                      <p className={`text-sm font-semibold ${matches ? 'text-white' : 'text-on-surface'}`}>{g.phrase}</p>
+                      <p className={`text-[10px] ${matches ? 'text-primary/70' : 'text-on-surface-variant'}`}>{g.category}</p>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${matches ? 'text-primary bg-primary/10' : 'text-on-surface-variant bg-surface-container-lowest'}`}>
+                    {g.combo}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      </aside>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/Learn.tsx
+import React from 'react'
+
+const TUTORIALS = [
+  { id: 1, title: 'Hello', difficulty: 'BEGINNER', description: '"Greeting a new companion with light."', icon: 'back_hand', bg: 'primary/10', text: 'primary' },
+  { id: 2, title: 'Wait', difficulty: 'INTERMEDIATE', description: '"Patience is the foundation of sight."', icon: 'front_hand', bg: 'tertiary-container', text: 'on-tertiary-container' },
+  { id: 3, title: 'Infinity', difficulty: 'ADVANCED', description: '"The loop of recursive knowledge."', icon: 'fluid', bg: 'error-container', text: 'on-error-container' },
+  { id: 4, title: 'Goodbye', difficulty: 'BEGINNER', description: '"Closing the current stream."', icon: 'waving_hand', bg: 'primary/10', text: 'primary' },
+  { id: 5, title: 'Stop', difficulty: 'BEGINNER', description: '"The wall of immediate stillness."', icon: 'pan_tool', bg: 'primary/10', text: 'primary' },
+  { id: 6, title: 'Decision', difficulty: 'INTERMEDIATE', description: '"Evaluating binary possibilities."', icon: 'thumbs_up_down', bg: 'tertiary-container', text: 'on-tertiary-container' },
+  { id: 7, title: 'Friend', difficulty: 'BEGINNER', description: '"Two entities in synchronous dance."', icon: 'sign_language', bg: 'primary/10', text: 'primary' },
+  { id: 8, title: 'Select', difficulty: 'ADVANCED', description: '"Precision retrieval of specific data."', icon: 'pinch', bg: 'error-container', text: 'on-error-container' },
+  { id: 9, title: 'Flow', difficulty: 'INTERMEDIATE', description: '"The continuous thread of discourse."', icon: 'hand_gesture', bg: 'tertiary-container', text: 'on-tertiary-container' },
+  { id: 10, title: 'Success', difficulty: 'BEGINNER', description: '"Achievement unlocked through motion."', icon: 'mobile_hand', bg: 'primary/10', text: 'primary' },
+]
+
+const VIDEOS = [
+  { id: 1, title: 'Introduction to Sign-Digital Curating', duration: '12:45', desc: 'Foundational concepts of gesture mapping.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCGGmYZXPU5jl3mCgJ3SbdY0vgNPlT53WuW-YXOIJ4ekrh2rgpdKyLVry1nML2itAXwD37bFbVDa8vOjWoHWLUwLdUD7fq0liaL1DB-INgxY9TnRUEcy0U8WkhKiD9FX0hPwxqiVDOnEhfMaV20By1WBLxE1JvUdwlMyNHa9rltSGgA2mcV8Rq3-adexT-rqFmz4112CIWyeV7sEfxLLAJeE1_3vzTyLHjYiJoeYAyz04fmQNc1T6LttYQusOxbm619PQBe4Tqh7DI' },
+  { id: 2, title: 'Advanced Spatial Syntax', duration: '24:10', desc: 'Mastering 3D grammar in sign language.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA6zhv96_Xz7ARgeGgTWiHOAzvgCk7zK2VwOA4v9iRttmlYPUMJM8SUIJ1d7zcvSCZXeJX8CxTKEtRZz8qtFmlE4YyPQ58bw2FgcpDw-b3ISO4wY6SCPEC0LWbMd5RVmU_nda6i7wxXKI4pd7p-7a7bioiQvjtwn3sKlls50FmGxA69mwZS-sK53ZqkpWByvWVI1BqoyIi4Ret3c5uQZbiHF9tVTnSLs6qhndPjgiz1QUlVAE86X7-_UnrGdcbJXS3nA3VOfBoj6gE' },
+  { id: 3, title: 'Daily Practice Routine', duration: '08:22', desc: '10 minutes to maintain your visual agility.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuADMitBsVEoRCuh_RTR5Z7YsCaLvlYHfhzxJ6EFoI2ooqKJPyh7ft-IEc4o_oqErYlYsaJc472EhlAKU79e5m5Zt6egUJC04Gxxzw6pJWv7EE6sJVi2t0yVbogH1zd73VMiS9mV0IgaC2VmBchSG_6N5AsMCuQjVyR4WXR6-DiEzcc0ppVcsnbMlqt2IOybtAXr3z3kv3WPWEzOxLrnTxcWNboiVuKOVgojKyi50pL9bbkZvExLZ5vqLRiWr_F8usvcuuZivF0zjDc' },
+]
+
+export default function Learn() {
+  return (
+    <div className="pt-24 px-10 pb-12 max-w-7xl mx-auto w-full">
+      <div className="flex justify-between items-end mb-10">
+        <div>
+          <h2 className="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Learning Module</h2>
+          <p className="text-on-surface-variant max-w-md italic">Master the language of light and motion through our curated curriculum.</p>
+        </div>
+      </div>
+
+      <section className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          {TUTORIALS.map((t) => (
+            <div key={t.id} className="bg-surface-container-high rounded-[14px] p-5 flex flex-col group hover:bg-surface-variant transition-all duration-300 border border-outline-variant/5">
+              <div className="aspect-square bg-surface-container rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                <span className="material-symbols-outlined text-6xl text-primary opacity-80 group-hover:scale-110 transition-transform duration-500">{t.icon}</span>
+              </div>
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-bold text-on-surface">{t.title}</h3>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded bg-${t.bg} text-${t.text} border border-primary/20`}>{t.difficulty}</span>
+              </div>
+              <button className="mt-auto w-full py-2.5 rounded-lg border border-primary/20 text-primary text-xs font-bold hover:bg-primary hover:text-on-primary transition-all flex items-center justify-center gap-2">
+                PRACTICE <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/ZoomIntegration.tsx
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function ZoomIntegration() {
+  return (
+    <div className="pt-24 pb-12 px-12 max-w-7xl mx-auto space-y-16 w-full font-body">
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-primary-container/20 text-primary font-label text-xs tracking-widest uppercase w-fit">Integration Available</span>
+          <h2 className="text-5xl font-extrabold tracking-tight font-headline text-on-surface leading-tight">
+            Use SIGNETRA in <br/><span className="text-primary">Zoom calls</span>
+          </h2>
+          <div className="flex gap-4 pt-4">
+            <button className="bg-gradient-to-br from-primary to-primary-container text-[#00285d] font-bold px-8 py-4 rounded-lg flex items-center gap-2 hover:opacity-90 transition-all shadow-xl shadow-blue-500/20">
+              <span className="material-symbols-outlined font-bold">download</span>
+              Download Extension
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/WhatsAppIntegration.tsx
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function WhatsAppIntegration() {
+  return (
+    <div className="pt-24 pb-12 px-10 w-full font-body">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-4xl font-extrabold tracking-tight text-on-surface mb-2">WhatsApp Web Bridge</h2>
+        <p className="text-on-surface-variant text-lg max-w-xl italic">Translate Sign Language into text instantly within your WhatsApp Web conversations.</p>
+      </div>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/History.tsx
+import React from 'react'
+import { motion } from 'framer-motion'
+
+const HISTORY_DATA = [
+  { time: '14:23:05', gesture: 'Hello', icon: 'front_hand', phrase: '"Hello everyone"', confidence: '98%', platform: 'Webcam', duration: '1.2s', status: 'high' }
+]
+
+export default function History() {
+  return (
+    <div className="pt-24 pb-12 px-10 w-full font-body">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-10">Detection History</h2>
+        <section className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 shadow-xl shadow-blue-500/5">
+          <div className="text-3xl font-extrabold text-on-surface">1,284 total detections</div>
+        </section>
+      </div>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/Settings.tsx
+import React from 'react'
+
+export default function Settings() {
+  return (
+    <div className="pt-24 pb-12 px-8 md:px-12 w-full font-body">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-extrabold tracking-tight text-on-surface mb-12">Settings</h2>
+        <section className="bg-surface-container-low rounded-[1.5rem] p-8 border border-outline-variant/10">
+          <h3 className="text-xl font-bold tracking-tight text-white mb-8">System Configuration</h3>
+        </section>
+      </div>
+    </div>
+  )
+}
+
+---
+
+# FILE: src/pages/Admin.tsx
+import React from 'react'
+
+export default function Admin() {
+  return (
+    <div className="pt-24 pb-12 px-10 w-full font-body">
+      <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-10">Admin Dashboard</h2>
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+          <span className="text-on-surface-variant font-bold text-[10px] uppercase tracking-widest">Total Detections</span>
+          <div className="text-3xl font-bold text-white">42,891</div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+---
+
+# FILE: tailwind.config.js
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        "background": "#0f131f",
+        "primary": "#adc6ff",
+        "surface": "#0f131f",
+        "on-surface": "#dfe2f3",
+      }
+    }
+  }
+}
+
+---
+
+# FILE: package.json
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc -b && vite build"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "framer-motion": "^12.38.0",
+    "react-router-dom": "^7.14.1"
+  }
+}

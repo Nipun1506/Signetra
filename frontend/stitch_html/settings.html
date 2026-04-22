@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIGNETRA - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-background": "#dfe2f3",
+                  "on-error-container": "#ffdad6",
+                  "secondary-fixed-dim": "#b1c6f9",
+                  "background": "#0f131f",
+                  "surface-dim": "#0f131f",
+                  "on-secondary-fixed": "#001a42",
+                  "tertiary-fixed-dim": "#ffb786",
+                  "inverse-primary": "#005ac2",
+                  "tertiary": "#ffb786",
+                  "error": "#ffb4ab",
+                  "on-tertiary-fixed-variant": "#723600",
+                  "surface-container": "#1b1f2c",
+                  "primary-fixed-dim": "#adc6ff",
+                  "surface-container-highest": "#313442",
+                  "on-tertiary-container": "#461f00",
+                  "on-tertiary": "#502400",
+                  "secondary": "#b1c6f9",
+                  "secondary-container": "#304671",
+                  "surface": "#0f131f",
+                  "primary-fixed": "#d8e2ff",
+                  "tertiary-container": "#df7412",
+                  "on-tertiary-fixed": "#311400",
+                  "surface-container-lowest": "#0a0e1a",
+                  "secondary-fixed": "#d8e2ff",
+                  "inverse-surface": "#dfe2f3",
+                  "on-secondary": "#182f59",
+                  "primary": "#adc6ff",
+                  "on-error": "#690005",
+                  "on-secondary-fixed-variant": "#304671",
+                  "on-primary-container": "#00285d",
+                  "surface-tint": "#adc6ff",
+                  "error-container": "#93000a",
+                  "primary-container": "#4d8eff",
+                  "on-secondary-container": "#9fb5e7",
+                  "on-primary": "#002e6a",
+                  "surface-container-low": "#171b28",
+                  "on-primary-fixed-variant": "#004395",
+                  "surface-variant": "#313442",
+                  "surface-bright": "#353946",
+                  "outline": "#8c909f",
+                  "on-primary-fixed": "#001a42",
+                  "outline-variant": "#424754",
+                  "inverse-on-surface": "#2c303d",
+                  "tertiary-fixed": "#ffdcc6",
+                  "surface-container-high": "#262a37",
+                  "on-surface": "#dfe2f3",
+                  "on-surface-variant": "#c2c6d6"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.875rem",
+                  "lg": "0.875rem",
+                  "xl": "1rem",
+                  "full": "9999px"
+          },
+          "fontFamily": {
+                  "headline": ["Inter"],
+                  "body": ["Inter"],
+                  "label": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body { background-color: #0a0e1a; font-family: 'Inter', sans-serif; color: #dfe2f3; }
+    .glass { background: rgba(49, 52, 66, 0.6); backdrop-filter: blur(20px); }
+    .ambient-blue-glow { box-shadow: 0 0 40px -10px rgba(173, 198, 255, 0.15); }
+    .primary-gradient { background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%); }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    input[type="range"] { accent-color: #adc6ff; }
+  </style>
+</head>
+<body class="flex min-h-screen overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#0f131f] z-50">
+<div class="flex flex-col h-full py-6">
+<!-- Brand Header -->
+<div class="px-6 mb-10">
+<h1 class="text-xl font-bold tracking-tight text-[#adc6ff]">SIGNETRA</h1>
+<p class="text-[10px] font-medium tracking-[0.2em] text-[#c2c6d6]/60 uppercase">Digital Curator</p>
+</div>
+<!-- Main Navigation -->
+<nav class="flex-1 space-y-1">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Home</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="gesture">gesture</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Recognize</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Learn</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Zoom</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">WhatsApp</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">History</span>
+</a>
+<a class="text-[#adc6ff] border-l-4 border-[#4d8eff] bg-[#1b1f2c] font-semibold px-6 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Settings</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Admin</span>
+</a>
+</nav>
+<!-- Footer Navigation -->
+<div class="mt-auto pt-6 px-4">
+<div class="flex items-center gap-3 px-2 py-3 bg-[#171b28] rounded-xl cursor-pointer hover:bg-[#262a37] transition-all">
+<span class="material-symbols-outlined text-[#adc6ff]" data-icon="account_circle">account_circle</span>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-on-surface">Profile</span>
+<span class="text-[10px] text-on-surface-variant">Manage Account</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 p-8 md:p-12">
+<!-- Header Section -->
+<header class="max-w-6xl mx-auto mb-12 flex justify-between items-end">
+<div>
+<span class="text-primary font-bold tracking-[0.2em] text-xs uppercase mb-2 block">System Configuration</span>
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface">Settings</h2>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2 rounded-full border border-outline-variant/20 text-on-surface-variant text-sm font-medium hover:bg-surface-container-high transition-all">Reset Default</button>
+<button class="px-8 py-2 rounded-full primary-gradient text-on-primary text-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Save Changes</button>
+</div>
+</header>
+<!-- Settings Grid -->
+<div class="max-w-6xl mx-auto space-y-8 pb-20">
+<!-- Section 1: Camera (Bento Layout) -->
+<section class="bg-surface-container-low rounded-[1.5rem] p-8 ambient-blue-glow">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="photo_camera">photo_camera</span>
+<h3 class="text-xl font-bold tracking-tight">Camera</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Left: Controls -->
+<div class="md:col-span-5 space-y-6">
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Source Device</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl text-on-surface p-3 focus:ring-2 focus:ring-primary/30 appearance-none">
+<option>FaceTime HD Camera (Built-in)</option>
+<option>Logitech StreamCam</option>
+<option>Virtual Camera (OBS)</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Output Resolution</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl text-on-surface p-3 focus:ring-2 focus:ring-primary/30 appearance-none">
+<option>1080p (1920x1080) @ 60fps</option>
+<option>720p (1280x720) @ 60fps</option>
+<option>480p (640x480) @ 30fps</option>
+</select>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-xl">
+<div>
+<span class="block text-sm font-semibold">Mirror View</span>
+<span class="text-xs text-on-surface-variant">Flip video horizontally</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Right: Preview Thumbnail -->
+<div class="md:col-span-7">
+<div class="relative w-full aspect-video rounded-[1rem] overflow-hidden bg-surface-container-lowest group">
+<img class="w-full h-full object-cover opacity-60 grayscale-[0.2]" data-alt="Modern workspace interior with soft blue ambient light, camera lens perspective focused on an empty chair with tech elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY0BNQZy2cIXiwMyF4jxVL0Yllw90Ff6GLOMiejDxmH8CWaX9Ym9CqIqK05QwGkkf8FJF6hHZ_GRhpm9dfZ_5QvtySqRZMMRvb5OPCEC9gEN90XRU3_hSTfUu5JyKeskQHV7ju07Y0fJm0uxbsY75x-yTaIge4xrk_VtNRdr-zNvn66h56Muv7z0APhWzZkpthoCF1k5FzlAD5DZpWmK6Mm1txQ1fcZeS1gX5RjQNS2Kt8UF6XzqfWd95XrFi7gvEqNcmCgDF7dzc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/80 to-transparent"></div>
+<div class="absolute top-4 left-4 flex items-center gap-2 px-3 py-1 bg-error/80 backdrop-blur-md rounded-full">
+<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+<span class="text-[10px] font-bold text-white uppercase tracking-tighter">Live Preview</span>
+</div>
+<div class="absolute bottom-4 left-4 flex items-center gap-4">
+<button class="p-2 bg-primary text-on-primary rounded-full shadow-lg">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span>
+</button>
+<span class="text-xs font-medium text-white/80">Active Stream: 2.4Mbps</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Grid for Recognition and Speech -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Section 2: Recognition -->
+<section class="bg-surface-container-low rounded-[1.5rem] p-8 ambient-blue-glow">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="gesture">gesture</span>
+<h3 class="text-xl font-bold tracking-tight">Recognition</h3>
+</div>
+<div class="space-y-10">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold">Confidence Threshold</label>
+<span class="px-3 py-1 bg-primary-container text-on-primary-container rounded-lg text-xs font-bold">75%</span>
+</div>
+<input class="w-full h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="75"/>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<label class="text-sm font-semibold">Recognition Cooldown</label>
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface rounded-lg text-xs font-bold">2.0s</span>
+</div>
+<input class="w-full h-2 bg-surface-container-highest rounded-lg appearance-none cursor-pointer" max="10" min="0" step="0.5" type="range" value="2"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Max Concurrent Hands</label>
+<div class="flex gap-4">
+<button class="flex-1 py-2 rounded-xl bg-primary text-on-primary font-bold">1 Hand</button>
+<button class="flex-1 py-2 rounded-xl bg-surface-container-highest text-on-surface font-semibold hover:bg-surface-container-high transition-colors">2 Hands</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Speech -->
+<section class="bg-surface-container-low rounded-[1.5rem] p-8 ambient-blue-glow">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="settings_voice">settings_voice</span>
+<h3 class="text-xl font-bold tracking-tight">Speech</h3>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-surface-container-highest/40 rounded-xl">
+<span class="text-sm font-semibold">Enable Text-to-Speech</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Voice Selection</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl text-on-surface p-3 appearance-none">
+<option>Premium - David (Neural)</option>
+<option>Premium - Sarah (Neural)</option>
+<option>Standard - Michael</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-3">
+<label class="text-xs font-semibold px-1">Speech Rate</label>
+<input class="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none" type="range" value="50"/>
+</div>
+<div class="space-y-3">
+<label class="text-xs font-semibold px-1">Voice Pitch</label>
+<input class="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none" type="range" value="40"/>
+</div>
+</div>
+<button class="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl border border-primary/20 text-primary font-bold hover:bg-primary/5 transition-all">
+<span class="material-symbols-outlined" data-icon="volume_up">volume_up</span>
+              Test Voice Output
+            </button>
+</div>
+</section>
+</div>
+<!-- Section 4: Appearance -->
+<section class="bg-surface-container-low rounded-[1.5rem] p-8 ambient-blue-glow">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="palette">palette</span>
+<h3 class="text-xl font-bold tracking-tight">Appearance</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="space-y-3">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Interface Theme</label>
+<div class="grid grid-cols-2 gap-2 bg-surface-container-highest p-1 rounded-xl">
+<button class="py-2 rounded-lg text-xs font-bold text-on-surface-variant">Light</button>
+<button class="py-2 rounded-lg text-xs font-bold bg-surface-container text-primary shadow-sm">Dark</button>
+</div>
+</div>
+<div class="space-y-3">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Sidebar State</label>
+<div class="grid grid-cols-2 gap-2 bg-surface-container-highest p-1 rounded-xl">
+<button class="py-2 rounded-lg text-xs font-bold bg-surface-container text-primary shadow-sm">Expanded</button>
+<button class="py-2 rounded-lg text-xs font-bold text-on-surface-variant">Compact</button>
+</div>
+</div>
+<div class="space-y-3">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">Font Scale</label>
+<select class="w-full bg-surface-container-highest border-none rounded-xl text-on-surface p-2.5 text-sm appearance-none">
+<option>Default (14px)</option>
+<option>Comfortable (16px)</option>
+<option>Large (18px)</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section 5: Integrations -->
+<section class="bg-surface-container-low rounded-[1.5rem] p-8 ambient-blue-glow">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
+<h3 class="text-xl font-bold tracking-tight">Integrations</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<div class="md:col-span-4 space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#2D8CFF]" data-icon="videocam">videocam</span>
+<span class="text-sm font-semibold">Zoom Bridge</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#25D366]" data-icon="chat">chat</span>
+<span class="text-sm font-semibold">WhatsApp Web</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="md:col-span-8 flex flex-col justify-between">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">WebSocket Port</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl text-on-surface p-3 font-mono" type="text" value="8080"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-1">API Endpoint</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl text-on-surface p-3 font-mono text-xs" type="text" value="https://api.signetra.io/v1"/>
+</div>
+</div>
+<button class="w-full py-4 rounded-xl glass border border-primary/10 text-on-surface font-bold flex items-center justify-center gap-3 hover:bg-surface-container-highest transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="cloud_sync">cloud_sync</span>
+              Test Connection Status
+            </button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- TopNavBar (Fixed Right Top) -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-40 bg-[#0f131f]/60 backdrop-blur-xl flex justify-end items-center px-8 transition-transform duration-300 shadow-lg shadow-blue-500/10">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-[#c2c6d6] cursor-pointer hover:text-white transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+</div>
+<div class="flex items-center gap-2 text-[#c2c6d6] cursor-pointer hover:text-white transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="help">help</span>
+<span class="font-['Inter'] text-sm uppercase tracking-[0.05em]">Help</span>
+</div>
+<div class="w-px h-6 bg-outline-variant/30"></div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full primary-gradient flex items-center justify-center text-[10px] font-bold text-on-primary">JD</div>
+</div>
+</div>
+</header>
+</body></html>

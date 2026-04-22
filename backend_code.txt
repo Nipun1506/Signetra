@@ -1,0 +1,500 @@
+################################################################################
+# SIGNETRA BACKEND SOURCE CODE
+################################################################################
+
+# FILE: main.py
+from fastapi import FastAPI, BackgroundTasks, Depends, WebSocket, WebSocketDisconnect, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
+import datetime
+import os
+
+from database import engine, Base, get_db
+import models
+from websocket_manager import manager
+from camera_handler import camera_handler
+from gesture_classifier import GestureClassifier
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="SIGNETRA API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+classifier = GestureClassifier()
+
+@app.get("/api/health")
+def health_check():
+    return {"status": "healthy", "camera_running": camera_handler.is_running}
+
+@app.post("/api/camera/start")
+def start_camera(source: int = 0):
+    if camera_handler.is_running:
+        return {"status": "already running"}
+    camera_handler.start(source)
+    return {"status": "started"}
+
+@app.post("/api/camera/stop")
+def stop_camera():
+    if not camera_handler.is_running:
+        return {"status": "not running"}
+    camera_handler.stop()
+    return {"status": "stopped"}
+
+@app.get("/api/gestures/all")
+def get_all_gestures(db: Session = Depends(get_db)):
+    gestures = db.query(models.GestureTemplate).all()
+    # if Db is empty, return static predefined patterns loaded from classifier
+    if not gestures:
+        res = []
+        for name, phrase in classifier.phrases.items():
+            category = classifier.categories.get(name, "Unknown")
+            res.append({"id": name, "name": name, "phrase": phrase, "category": category})
+        return res
+    return gestures
+
+@app.get("/api/analytics/summary")
+def get_analytics_summary(db: Session = Depends(get_db)):
+    total_detections = db.query(models.DetectionHistory).count()
+    return {
+        "total_detections": total_detections,
+        "active_users": 1,
+        "avg_accuracy": "94%"
+    }
+
+@app.get("/api/history")
+def get_history(limit: int = 5, db: Session = Depends(get_db)):
+    return db.query(models.DetectionHistory).order_by(models.DetectionHistory.timestamp.desc()).limit(limit).all()
+
+@app.websocket("/ws/detection")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # Handle any incoming msgs if needed, e.g. set configs
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+
+# A stub endpoint for extension download
+@app.get("/api/extension/download")
+def download_extension():
+    # Return 404 for now
+    file_path = "extension.zip"
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="application/zip", filename="signetra-extension.zip")
+    raise HTTPException(status_code=404, detail="Extension zip not found")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+---
+
+# FILE: gesture_classifier.py
+import json
+import math
+import os
+import glob
+from typing import Dict, Any, List
+
+class GestureClassifier:
+    def __init__(self):
+        self.templates: Dict[str, List[float]] = {}
+        self.phrases: Dict[str, str] = {}
+        self.categories: Dict[str, str] = {}
+        self.load_templates()
+
+    def load_templates(self):
+        # Load all JSON files from gestures directory
+        template_dir = os.path.join(os.path.dirname(__file__), "gestures", "templates")
+        if not os.path.exists(template_dir):
+            os.makedirs(template_dir, exist_ok=True)
+            self._create_mock_gestures(template_dir)
+
+        for filename in glob.glob(os.path.join(template_dir, "*.json")):
+            with open(filename, "r") as f:
+                data = json.load(f)
+                name = data["name"]
+                self.phrases[name] = data["phrase"]
+                self.categories[name] = data["category"]
+                
+                # Assume landmarks are stored as [{"x": _, "y": _, "z": _}, ...]
+                raw_landmarks = [[lm["x"], lm["y"], lm["z"]] for lm in data["landmarks"]]
+                self.templates[name] = self.normalize_landmarks(raw_landmarks)
+
+    def normalize_landmarks(self, landmarks: List[List[float]]) -> List[float]:
+        # wrist is landmarks[0]
+        wrist = landmarks[0]
+        # translate so wrist is at (0,0,0)
+        translated = []
+        for lm in landmarks:
+            translated.append([lm[0] - wrist[0], lm[1] - wrist[1], lm[2] - wrist[2]])
+        
+        # calculate palm size (distance from wrist to middle finger mcp - landmarks[9])
+        mcp = translated[9]
+        palm_size = math.sqrt(mcp[0]**2 + mcp[1]**2 + mcp[2]**2)
+        if palm_size == 0:
+            palm_size = 1 # avoid division by zero safety constraint
+            
+        normalized = []
+        for lm in translated:
+            normalized.append(lm[0] / palm_size)
+            normalized.append(lm[1] / palm_size)
+            normalized.append(lm[2] / palm_size)
+            
+        return normalized
+
+    def cosine_similarity(self, a: List[float], b: List[float]) -> float:
+        dot_product = sum(x*y for x, y in zip(a, b))
+        norm_a = math.sqrt(sum(x*x for x in a))
+        norm_b = math.sqrt(sum(y*y for y in b))
+        if norm_a == 0 or norm_b == 0:
+            return 0
+        return dot_product / (norm_a * norm_b)
+
+    def classify(self, raw_landmarks: List[List[float]]) -> dict:
+        normalized = self.normalize_landmarks(raw_landmarks)
+        best_match = None
+        best_score = 0
+        
+        for gesture_name, template in self.templates.items():
+            score = self.cosine_similarity(normalized, template)
+            if score > best_score:
+                best_score = score
+                best_match = gesture_name
+                
+        if best_score >= 0.75 and best_match is not None:
+            return {
+                "phrase": self.phrases[best_match],
+                "confidence": round(best_score * 100, 1),
+                "category": self.categories[best_match],
+                "gesture_id": best_match
+            }
+        return None
+
+    def _create_mock_gestures(self, template_dir: str):
+        # Create the 15 requested gestures if they don't exist
+        mock_gestures = [
+            {"name": "help", "phrase": "Help", "category": "Emergency", "difficulty": "Hard"},
+            {"name": "danger", "phrase": "Danger", "category": "Emergency", "difficulty": "Medium"},
+            {"name": "lost", "phrase": "Lost", "category": "Emergency", "difficulty": "Hard"},
+            {"name": "ambulance", "phrase": "Ambulance", "category": "Emergency", "difficulty": "Hard"},
+            {"name": "doctor", "phrase": "Doctor", "category": "Emergency", "difficulty": "Medium"},
+            {"name": "hello_signetra", "phrase": "Hello Signetra", "category": "Greeting", "difficulty": "Easy"},
+            {"name": "nice_project", "phrase": "Nice Project", "category": "Greeting", "difficulty": "Medium"},
+            {"name": "water", "phrase": "Water", "category": "Basic Need", "difficulty": "Easy"},
+            {"name": "food", "phrase": "Food", "category": "Basic Need", "difficulty": "Easy"},
+            {"name": "bathroom", "phrase": "Bathroom", "category": "Basic Need", "difficulty": "Medium"},
+            {"name": "yes", "phrase": "Yes", "category": "Response", "difficulty": "Easy"},
+            {"name": "no", "phrase": "No", "category": "Response", "difficulty": "Easy"},
+            {"name": "please", "phrase": "Please", "category": "Response", "difficulty": "Easy"},
+            {"name": "thank_you", "phrase": "Thank You", "category": "Response", "difficulty": "Easy"},
+            {"name": "dont_understand", "phrase": "I Don't Understand", "category": "Response", "difficulty": "Hard"}
+        ]
+        
+        # mock landmark is just 21 coordinate dicts, with small variations so cosine sim works
+        for i, g in enumerate(mock_gestures):
+            ld = [{"x": j * 0.1, "y": j * 0.1 + (i*0.01), "z": j * 0.05} for j in range(21)]
+            # ensure wrist is origin
+            ld[0] = {"x": 0.0, "y": 0.0, "z": 0.0}
+            # ensure palm size isn't 0
+            ld[9] = {"x": 1.0, "y": 1.0, "z": 1.0}
+            
+            data = {
+                "name": g["name"],
+                "phrase": g["phrase"],
+                "category": g["category"],
+                "difficulty": g["difficulty"],
+                "landmarks": ld
+            }
+            with open(os.path.join(template_dir, f"{g['name']}.json"), "w") as f:
+                json.dump(data, f, indent=2)
+
+---
+
+# FILE: camera_handler.py
+import cv2
+import mediapipe as mp
+import threading
+import time
+import asyncio
+from gesture_classifier import GestureClassifier
+from websocket_manager import manager
+from tts_handler import TTSHandler
+
+mp_hands = mp.solutions.hands
+mp_drawing = mp.solutions.drawing_utils
+
+class CameraHandler:
+    def __init__(self):
+        self.cap = None
+        self.is_running = False
+        self.thread = None
+        self.classifier = GestureClassifier()
+        self.tts = TTSHandler()
+        self.last_detection_time = 0
+        self.cooldown = 2.0
+        self.source = 0
+
+    def start(self, source=0):
+        if self.is_running:
+            return
+        
+        self.source = source
+        self.cap = cv2.VideoCapture(source)
+        self.cap.set(cv2.CAP_PROP_FPS, 30)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        
+        self.is_running = True
+        self.thread = threading.Thread(target=self._run, daemon=True)
+        self.thread.start()
+
+    def stop(self):
+        self.is_running = False
+        if self.thread:
+            self.thread.join()
+        if self.cap:
+            self.cap.release()
+            self.cap = None
+
+    def _run(self):
+        with mp_hands.Hands(
+            model_complexity=0,
+            min_detection_confidence=0.7,
+            min_tracking_confidence=0.7) as hands:
+            
+            while self.is_running:
+                success, image = self.cap.read()
+                if not success:
+                    time.sleep(0.1)
+                    continue
+
+                image = cv2.flip(image, 1)
+                image.flags.writeable = False
+                image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                results = hands.process(image_rgb)
+                
+                if results.multi_hand_landmarks:
+                    for hand_landmarks in results.multi_hand_landmarks:
+                        landmarks = []
+                        for lm in hand_landmarks.landmark:
+                            landmarks.append([lm.x, lm.y, lm.z])
+                            
+                        result = self.classifier.classify(landmarks)
+                        
+                        if result:
+                            current_time = time.time()
+                            if current_time - self.last_detection_time > self.cooldown:
+                                self.last_detection_time = current_time
+                                
+                                message = {
+                                    "phrase": result["phrase"],
+                                    "confidence": result["confidence"],
+                                    "category": result["category"],
+                                    "gesture_id": result["gesture_id"],
+                                    "landmarks": landmarks,
+                                    "timestamp": current_time
+                                }
+                                
+                                try:
+                                    loop = asyncio.get_event_loop()
+                                    if loop.is_running():
+                                        asyncio.run_coroutine_threadsafe(manager.broadcast(message), loop)
+                                except Exception as e:
+                                    print(f"Error broadcasting: {e}")
+                                    
+                                self.tts.speak(result["phrase"])
+                                break
+                                
+                time.sleep(1/30)
+
+camera_handler = CameraHandler()
+
+---
+
+# FILE: tts_handler.py
+import edge_tts
+import pyttsx3
+import threading
+import asyncio
+import io
+import os
+import sys
+
+class TTSHandler:
+    def __init__(self):
+        self.queue = []
+        self.is_speaking = False
+        self.lock = threading.Lock()
+        
+        try:
+            self.engine = pyttsx3.init()
+            self.engine.setProperty('rate', 150)
+            self.use_fallback = False
+        except Exception:
+            self.use_fallback = True
+
+    def speak(self, text: str):
+        with self.lock:
+            self.queue.append(text)
+            if not self.is_speaking:
+                self.is_speaking = True
+                threading.Thread(target=self._process_queue, daemon=True).start()
+
+    def _process_queue(self):
+        while True:
+            with self.lock:
+                if not self.queue:
+                    self.is_speaking = False
+                    break
+                text = self.queue.pop(0)
+
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(self._edge_tts_speak(text))
+                loop.close()
+            except Exception as e:
+                print(f"edge-tts failed: {e}. using pyttsx3 fallback.")
+                if not self.use_fallback:
+                    self.engine.say(text)
+                    self.engine.runAndWait()
+
+    async def _edge_tts_speak(self, text: str):
+        communicate = edge_tts.Communicate(text, "en-US-AriaNeural")
+        temp_file = "temp_tts.mp3"
+        await communicate.save(temp_file)
+        if sys.platform == "darwin":
+            os.system(f"afplay {temp_file}")
+        elif sys.platform == "win32":
+            os.system(f"start {temp_file}")
+        else:
+            os.system(f"mpg123 -q {temp_file} 2>/dev/null")
+            
+        if os.path.exists(temp_file):
+            try:
+                os.remove(temp_file)
+            except:
+                pass
+
+---
+
+# FILE: websocket_manager.py
+from fastapi import WebSocket
+from typing import List
+import json
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        msg_str = json.dumps(message)
+        for connection in self.active_connections:
+            try:
+                await connection.send_text(msg_str)
+            except Exception as e:
+                self.disconnect(connection)
+
+manager = ConnectionManager()
+
+---
+
+# FILE: models.py
+import datetime
+from sqlalchemy import Column, Integer, String, Float, Text, JSON, DateTime
+from database import Base
+
+class DetectionHistory(Base):
+    __tablename__ = "detection_history"
+    id = Column(Integer, primary_key=True, index=True)
+    phrase = Column(String, index=True)
+    confidence = Column(Float)
+    category = Column(String)
+    platform = Column(String)
+    gesture_id = Column(String, index=True)
+    session_id = Column(String)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
+class Tutorial(Base):
+    __tablename__ = "tutorials"
+    id = Column(Integer, primary_key=True, index=True)
+    youtube_url = Column(String)
+    title = Column(String)
+    description = Column(Text)
+    difficulty = Column(String)
+    order_index = Column(Integer)
+    thumbnail_url = Column(String)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class Settings(Base):
+    __tablename__ = "settings"
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String, unique=True, index=True)
+    value = Column(String)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+class GestureTemplate(Base):
+    __tablename__ = "gesture_templates"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True)
+    phrase = Column(String)
+    category = Column(String)
+    difficulty = Column(String)
+    landmark_json = Column(JSON)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+---
+
+# FILE: database.py
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./signetra_local.db")
+connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+---
+
+# FILE: requirements.txt
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+websockets
+opencv-python-headless
+mediapipe
+edge-tts
+pyttsx3
+python-multipart
+python-dotenv
+pydantic
+pydantic-settings

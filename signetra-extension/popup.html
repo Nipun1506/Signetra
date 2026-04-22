@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo">✋</div>
+    <div>
+      <h1 class="title">SIGNETRA</h1>
+      <p class="subtitle">Sign Language Overlay</p>
+    </div>
+  </div>
+
+  <div class="status-container">
+    <div id="status-dot" class="dot red"></div>
+    <span id="status-text">Checking status...</span>
+  </div>
+
+  <div class="toggles">
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="toggle-title">Zoom Overlay</span>
+        <span class="toggle-url">app.zoom.us</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="zoom-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    
+    <div class="separator"></div>
+
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <span class="toggle-title">WhatsApp Overlay</span>
+        <span class="toggle-url">web.whatsapp.com</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="whatsapp-toggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="footer">
+    SIGNETRA v1.0 — Your hands, your voice
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

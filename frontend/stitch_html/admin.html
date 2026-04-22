@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIGNETRA Admin Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#dfe2f3",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#b1c6f9",
+                    "background": "#0f131f",
+                    "surface-dim": "#0f131f",
+                    "on-secondary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ffb786",
+                    "inverse-primary": "#005ac2",
+                    "tertiary": "#ffb786",
+                    "error": "#ffb4ab",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "surface-container": "#1b1f2c",
+                    "primary-fixed-dim": "#adc6ff",
+                    "surface-container-highest": "#313442",
+                    "on-tertiary-container": "#461f00",
+                    "on-tertiary": "#502400",
+                    "secondary": "#b1c6f9",
+                    "secondary-container": "#304671",
+                    "surface": "#0f131f",
+                    "primary-fixed": "#d8e2ff",
+                    "tertiary-container": "#df7412",
+                    "on-tertiary-fixed": "#311400",
+                    "surface-container-lowest": "#0a0e1a",
+                    "secondary-fixed": "#d8e2ff",
+                    "inverse-surface": "#dfe2f3",
+                    "on-secondary": "#182f59",
+                    "primary": "#adc6ff",
+                    "on-error": "#690005",
+                    "on-secondary-fixed-variant": "#304671",
+                    "on-primary-container": "#00285d",
+                    "surface-tint": "#adc6ff",
+                    "error-container": "#93000a",
+                    "primary-container": "#4d8eff",
+                    "on-secondary-container": "#9fb5e7",
+                    "on-primary": "#002e6a",
+                    "surface-container-low": "#171b28",
+                    "on-primary-fixed-variant": "#004395",
+                    "surface-variant": "#313442",
+                    "surface-bright": "#353946",
+                    "outline": "#8c909f",
+                    "on-primary-fixed": "#001a42",
+                    "outline-variant": "#424754",
+                    "inverse-on-surface": "#2c303d",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-container-high": "#262a37",
+                    "on-surface": "#dfe2f3",
+                    "on-surface-variant": "#c2c6d6"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        display: inline-block;
+        line-height: 1;
+        text-transform: none;
+        letter-spacing: normal;
+        word-wrap: normal;
+        white-space: nowrap;
+        direction: ltr;
+      }
+      .glass-card {
+        background: rgba(49, 52, 66, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .primary-gradient {
+        background: linear-gradient(135deg, #adc6ff 0%, #4d8eff 100%);
+      }
+      body {
+        background-color: #0a0e1a;
+        color: #dfe2f3;
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+</head>
+<body class="min-h-screen overflow-x-hidden">
+<!-- ADMIN SIDE NAV -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#0f131f] py-6 z-50">
+<div class="px-6 mb-8">
+<h1 class="text-xl font-bold tracking-tight text-[#adc6ff]">SIGNETRA</h1>
+<p class="text-xs font-medium tracking-wide text-[#c2c6d6] opacity-60">Digital Curator</p>
+</div>
+<nav class="flex-grow flex flex-col">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span> Home
+            </a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="gesture">gesture</span> Recognize
+            </a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span> Learn
+            </a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span> Zoom
+            </a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span> WhatsApp
+            </a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span> History
+            </a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span> Settings
+            </a>
+<!-- Active State: Admin -->
+<a class="text-[#adc6ff] border-l-4 border-[#4d8eff] bg-[#1b1f2c] font-semibold px-4 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span> Admin
+            </a>
+</nav>
+<div class="mt-auto px-4">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span> Profile
+            </a>
+</div>
+</aside>
+<!-- TOP BAR -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-40 bg-[#0f131f]/60 backdrop-blur-xl flex justify-end items-center px-8 shadow-lg shadow-blue-500/10">
+<div class="flex items-center gap-6">
+<button class="text-[#c2c6d6] hover:text-white transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="text-[#c2c6d6] hover:text-white transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="professional male portrait avatar in a clinical tech environment with blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFJaBaXH-m9n9Wps1F5lEM-W0xVWIP0fYulmUJXGxQxFpX7EmoqVv_HzBurNsmbrtXyYNH6Oj8ogsGASFXoHqYHExz_zTSdmLoyvPnp6v6xRNCkA_oOTx3zzVP7e-bDVMR_2tsjB-B54gcVA0xOLP1AfRJLhiIdM3NFiVGYDNzzWJcouo1B-IhWDBLX1sQPx4k6B9tUhPJmVLYdm9R_c-UT19CdN8mpnl53JYEIi9dw53Jv1TNjdORRlq1XRNlEJwWMvdb3cvOxuI"/>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT CANVAS -->
+<main class="ml-64 pt-24 pb-12 px-10">
+<!-- DASHBOARD HEADER -->
+<div class="mb-10 flex justify-between items-end">
+<div>
+<h2 class="text-3xl font-bold tracking-tight text-on-surface">Admin Dashboard</h2>
+<p class="text-on-surface-variant body-lg">System-wide monitoring and content curation.</p>
+</div>
+<div class="flex gap-4">
+<button class="bg-surface-container-high px-4 py-2 rounded-xl text-primary font-medium hover:bg-surface-container-highest transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span> Export CSV
+                </button>
+<button class="primary-gradient px-6 py-2 rounded-xl text-on-primary font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:opacity-80 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="add">add</span> Add Tutorial
+                </button>
+</div>
+</div>
+<!-- BENTO ANALYTICS -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+<div class="bg-surface-container p-6 rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-bold text-xs uppercase tracking-widest">Total Detections</span>
+<span class="material-symbols-outlined text-primary" data-icon="trending_up">trending_up</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">42,891</div>
+<div class="text-xs text-primary mt-2">+12.4% from last week</div>
+</div>
+<div class="bg-surface-container p-6 rounded-xl">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-bold text-xs uppercase tracking-widest">Active Users</span>
+<span class="material-symbols-outlined text-secondary" data-icon="group">group</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">1,204</div>
+<div class="text-xs text-on-surface-variant mt-2">Currently online</div>
+</div>
+<div class="bg-surface-container p-6 rounded-xl">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-bold text-xs uppercase tracking-widest">New Gestures</span>
+<span class="material-symbols-outlined text-tertiary" data-icon="neurology">neurology</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">15</div>
+<div class="text-xs text-on-surface-variant mt-2">Pending verification</div>
+</div>
+<div class="bg-surface-container p-6 rounded-xl">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-bold text-xs uppercase tracking-widest">System Latency</span>
+<span class="material-symbols-outlined text-error" data-icon="speed">speed</span>
+</div>
+<div class="text-3xl font-bold text-on-surface">42ms</div>
+<div class="text-xs text-on-surface-variant mt-2">Optimal range</div>
+</div>
+</section>
+<!-- CHARTS & DATA VISUALS -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+<div class="lg:col-span-2 bg-surface-container p-8 rounded-xl min-h-[300px]">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-xl font-semibold">Daily Detections</h3>
+<select class="bg-surface-container-high border-none text-sm rounded-lg px-3 py-1 text-on-surface focus:ring-1 focus:ring-primary">
+<option>Last 7 Days</option>
+<option>Last 30 Days</option>
+</select>
+</div>
+<!-- Simulated Line Chart Area -->
+<div class="h-48 w-full flex items-end gap-2 px-2">
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-lg transition-all h-[40%]"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-lg transition-all h-[60%]"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-lg transition-all h-[55%]"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-lg transition-all h-[80%]"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-lg transition-all h-[75%]"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-lg transition-all h-[95%]"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-lg transition-all h-[85%]"></div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<div class="bg-surface-container p-8 rounded-xl">
+<h3 class="text-xl font-semibold mb-8">Top Gestures</h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span>ASL: Hello</span>
+<span class="text-primary font-bold">4.2k</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[85%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span>ASL: Thank You</span>
+<span class="text-primary font-bold">3.8k</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span>BSL: Please</span>
+<span class="text-primary font-bold">2.1k</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[45%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span>Alphabet: A</span>
+<span class="text-primary font-bold">1.5k</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[30%]"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CONTENT TABS & MANAGERS -->
+<section class="mb-10">
+<div class="flex gap-8 border-b border-outline-variant/20 mb-8">
+<button class="pb-4 text-primary border-b-2 border-primary font-bold text-sm tracking-wide">YouTube Manager</button>
+<button class="pb-4 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm tracking-wide">Gesture Library</button>
+<button class="pb-4 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm tracking-wide">User History</button>
+<button class="pb-4 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm tracking-wide">System Logs</button>
+</div>
+<!-- YouTube Manager Table -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high">
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest">Thumbnail</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest">Tutorial Name</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest">Language</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest">Difficulty</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container-highest transition-colors">
+<td class="px-6 py-4">
+<img class="w-20 h-12 object-cover rounded-lg border border-outline-variant/20" data-alt="close up of hands performing sign language gestures against a dark blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk9vZbwA-M0uQKX7otSKKSQpmJxPKzEEjWXYmaHYsNwez19qU7UDPkXLE-gfD0jB8RP2bA-RC6F8jhN5uiVlhLudwpvyk7Il0bwuYYdLAj3pXqt72-7ner3kc7Jm4_oOqXY_MURjMmCvPJj6A61UL4cWKAnKiOtVMGLMr0Y_qGEo9SHpbGQdEu8X1pvyCzNyJzLMrTfjdfckxGW_Usi57hqr7yyD4_Tv_w9JeS9KezWos1Fy0wirEsks-ZEwJ7DHbe3tueJ1fATKY"/>
+</td>
+<td class="px-6 py-4 font-medium">Intro to ASL: Basic Greetings</td>
+<td class="px-6 py-4 text-on-surface-variant">ASL</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full bg-primary-container/20 text-primary text-xs font-bold">Beginner</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-primary"><span class="material-symbols-outlined text-lg" data-icon="edit">edit</span></button>
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-error"><span class="material-symbols-outlined text-lg" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest transition-colors">
+<td class="px-6 py-4">
+<img class="w-20 h-12 object-cover rounded-lg border border-outline-variant/20" data-alt="vibrant educational graphic showing human hands signing against a minimalist studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn9Av5ZPdS1d4mdDM1rbxDja0J2e47c7OqulefgHKc3A3IW7dP3YxndNyoxaO03cT7h-A9zd7A0HACsZIOqz6OKFmCDn4IETD9L_zFlKcPwWLXkFd0_R_9dkj9ePBCWMY1DFb784HYnB7u_CEtwf-OyHN_maeFyitkHrtCKW6hYGwurzjdPiiv9I_-qqkY8imYR4Wugu7TrIszIQ-DxMKNCNFP_IDI1yNVnf1lSjOrKqWQxQFQNczaLsdxM4tuqR2_2cfIpOgCKC8"/>
+</td>
+<td class="px-6 py-4 font-medium">BSL: Intermediate Medical Terms</td>
+<td class="px-6 py-4 text-on-surface-variant">BSL</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full bg-tertiary-container/20 text-tertiary text-xs font-bold">Intermediate</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-primary"><span class="material-symbols-outlined text-lg" data-icon="edit">edit</span></button>
+<button class="p-2 hover:bg-surface-container-high rounded-lg text-error"><span class="material-symbols-outlined text-lg" data-icon="delete">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- GESTURE LIBRARY BENTO GRID -->
+<section class="mb-12">
+<h3 class="text-2xl font-bold mb-6">Gesture Library</h3>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+<!-- Repeated Gesture Cards -->
+<div class="bg-surface-container p-4 rounded-xl group hover:shadow-lg hover:shadow-primary/5 transition-all">
+<div class="aspect-video bg-surface-container-high rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity" data-alt="3D point cloud visualization of a human hand mapping digital landmarks" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAiED7sdC0X7PhRDTyqoFnR9TBCuHn7OiGsErQPwtgLikpqWtzTm4AdmIDuOCSyeIFFSrPudu83-uEjYKEewvCkNy-W7prb8mNyJbQ5J5ktUc378ahT_Gi3h7SWqt9sRqXZn-6qlgWdk3tq8huYQ3lqLKInZmS0sFHmMCFFrT9XrnBLQmLuZEffxkyi-tDk8Iikkl2H1Tv-0tc5nE7RhVhP53HHU9-q7UgVzEzuokfQMYXLIQ68WtZPlouTcw9gNt813ycqWnqAq4o"/>
+</div>
+<h4 class="font-bold text-on-surface">Gesture: Alpha_A</h4>
+<p class="text-xs text-on-surface-variant mb-4">JSON Landmarks: Validated</p>
+<button class="w-full bg-surface-container-highest py-2 rounded-lg text-xs font-bold text-primary group-hover:bg-primary group-hover:text-on-primary transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="code">code</span> Edit Landmarks
+                    </button>
+</div>
+<!-- 14 more repeated cards placeholder -->
+<div class="bg-surface-container p-4 rounded-xl border border-outline-variant/10 flex flex-col items-center justify-center border-dashed group cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2" data-icon="add_circle">add_circle</span>
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Train New Gesture</span>
+</div>
+<!-- Simulating grid fullness -->
+<div class="bg-surface-container p-4 rounded-xl opacity-80"><div class="aspect-video bg-surface-container-high rounded-lg mb-4"></div><div class="h-4 bg-surface-container-high rounded w-3/4 mb-2"></div><div class="h-4 bg-surface-container-high rounded w-1/2"></div></div>
+<div class="bg-surface-container p-4 rounded-xl opacity-80"><div class="aspect-video bg-surface-container-high rounded-lg mb-4"></div><div class="h-4 bg-surface-container-high rounded w-3/4 mb-2"></div><div class="h-4 bg-surface-container-high rounded w-1/2"></div></div>
+<div class="bg-surface-container p-4 rounded-xl opacity-80"><div class="aspect-video bg-surface-container-high rounded-lg mb-4"></div><div class="h-4 bg-surface-container-high rounded w-3/4 mb-2"></div><div class="h-4 bg-surface-container-high rounded w-1/2"></div></div>
+</div>
+</section>
+</main>
+<!-- ADMIN LOGIN MODAL (OVERLAY) - Shown conditionally by state in real app, here for design -->
+<div class="fixed inset-0 z-[100] bg-surface-container-lowest/80 backdrop-blur-md flex items-center justify-center hidden">
+<div class="w-full max-w-md glass-card p-10 rounded-2xl shadow-2xl border border-outline-variant/20">
+<div class="text-center mb-10">
+<div class="text-4xl font-extrabold tracking-tighter text-[#adc6ff] mb-2">SIGNETRA</div>
+<div class="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">Admin Authentication</div>
+</div>
+<form class="space-y-6">
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Username</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-on-surface focus:ring-2 focus:ring-primary/50 transition-all" placeholder="admin_user" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Password</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-on-surface focus:ring-2 focus:ring-primary/50 transition-all" placeholder="••••••••" type="password"/>
+</div>
+<button class="w-full primary-gradient py-4 rounded-xl text-on-primary font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.01] active:opacity-90 transition-all" type="button">
+                    Access Terminal
+                </button>
+</form>
+<p class="mt-8 text-center text-xs text-on-surface-variant">
+<span class="material-symbols-outlined align-middle mr-1 text-sm" data-icon="lock">lock</span> 
+                Authorized access only. All actions are logged.
+            </p>
+</div>
+</div>
+<!-- ADD TUTORIAL DRAWER (HIDDEN) -->
+<div class="fixed top-0 right-0 h-full w-96 bg-surface-container-high z-[60] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
+<div class="p-8 border-b border-outline-variant/20 flex justify-between items-center">
+<h3 class="text-xl font-bold">Add New Tutorial</h3>
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="p-8 space-y-6 flex-grow overflow-y-auto">
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">YouTube URL</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-on-surface" placeholder="https://youtube.com/..." type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Tutorial Title</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-on-surface" placeholder="Advanced Expression" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Language</label>
+<select class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-on-surface">
+<option>ASL</option>
+<option>BSL</option>
+<option>ISL</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Difficulty</label>
+<select class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 text-on-surface">
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+</select>
+</div>
+</div>
+</div>
+<div class="p-8 bg-surface-container-highest">
+<button class="w-full primary-gradient py-4 rounded-xl text-on-primary font-bold shadow-lg">Save &amp; Publish</button>
+</div>
+</div>
+</body></html>

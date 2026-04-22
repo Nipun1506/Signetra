@@ -1,0 +1,26 @@
+# Node environment
+node_modules/
+dist/
+dist-ssr/
+build/
+
+# Python environment
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment Variables (CRITICAL)
+.env
+.env.*
+*.local
+
+# Database
+*.db
+*.sqlite3
+
+# Editor / System
+.vscode/
+.idea/
+.DS_Store

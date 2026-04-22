@@ -1,0 +1,18 @@
+export const TUTORIALS = [
+  { id: 1, title: 'Stop', phrase: 'STOP', difficulty: 'BEGINNER', description: '"Universal halt signal via open palm."', icon: 'back_hand', bg: 'primary/10', text: 'primary', img: '/assets/gestures/stop.jpg' },
+  { id: 2, title: 'Help', phrase: 'HELP', difficulty: 'URGENT', description: '"Clenched fist expressing urgency."', icon: 'sports_mma', bg: 'error-container', text: 'on-error-container', img: '/assets/gestures/no.jpg' },
+  { id: 3, title: 'Yes', phrase: 'YES', difficulty: 'BEGINNER', description: '"Thumbs up of agreement."', icon: 'thumb_up', bg: 'primary/10', text: 'primary', img: '/assets/gestures/yes.jpg' },
+  { id: 4, title: 'No', phrase: 'NO', difficulty: 'BEGINNER', description: '"Curled hook indicating refusal."', icon: 'swipe_down', bg: 'tertiary-container', text: 'on-tertiary-container', img: '/assets/gestures/help.jpg' },
+  { id: 5, title: 'Hello', phrase: 'HELLO', difficulty: 'BEGINNER', description: '"Friendly peace sign greeting."', icon: 'front_hand', bg: 'primary/10', text: 'primary', img: '/assets/gestures/hello.jpg' },
+  { id: 6, title: 'Thank You', phrase: 'THANK YOU', difficulty: 'INTERMEDIATE', description: '"OK pinch showing exact gratitude."', icon: 'pan_tool', bg: 'tertiary-container', text: 'on-tertiary-container', img: '/assets/gestures/thank_you.jpg' },
+  { id: 7, title: 'Sorry', phrase: 'SORRY', difficulty: 'BEGINNER', description: '"Subtle pinky swear apology."', icon: 'sign_language', bg: 'primary/10', text: 'primary', img: '/assets/gestures/sorry.jpg' },
+  { id: 8, title: 'I Love You', phrase: 'I LOVE YOU', difficulty: 'ADVANCED', description: '"Classic Rock On / ILY symbol."', icon: 'favorite', bg: 'error-container', text: 'on-error-container', img: '/assets/gestures/i_love_you.jpg' },
+  { id: 9, title: 'Please', phrase: 'PLEASE', difficulty: 'INTERMEDIATE', description: '"Scout salute with three fingers up."', icon: 'volunteer_activism', bg: 'tertiary-container', text: 'on-tertiary-container', img: '/assets/gestures/please.jpg' },
+  { id: 10, title: 'Water', phrase: 'WATER', difficulty: 'INTERMEDIATE', description: '"L-Shape indicating a basic need."', icon: 'water_drop', bg: 'primary/10', text: 'primary', img: '/assets/gestures/water.jpg' },
+]
+
+export const VIDEOS = [
+  { id: 1, title: 'Introduction to Sign-Digital Curating', duration: '12:45', desc: 'Foundational concepts of gesture mapping.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCGGmYZXPU5jl3mCgJ3SbdY0vgNPlT53WuW-YXOIJ4ekrh2rgpdKyLVry1nML2itAXwD37bFbVDa8vOjWoHWLUwLdUD7fq0liaL1DB-INgxY9TnRUEcy0U8WkhKiD9FX0hPwxqiVDOnEhfMaV20By1WBLxE1JvUdwlMyNHa9rltSGgA2mcV8Rq3-adexT-rqFmz4112CIWyeV7sEfxLLAJeE1_3vzTyLHjYiJoeYAyz04fmQNc1T6LttYQusOxbm619PQBe4Tqh7DI' },
+  { id: 2, title: 'Advanced Spatial Syntax', duration: '24:10', desc: 'Mastering 3D grammar in sign language.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA6zhv96_Xz7ARgeGgTWiHOAzvgCk7zK2VwOA4v9iRttmlYPUMJM8SUIJ1d7zcvSCZXeJX8CxTKEtRZz8qtFmlE4YyPQ58bw2FgcpDw-b3ISO4wY6SCPEC0LWbMd5RVmU_nda6i7wxXKI4pd7p-7a7bioiQvjtwn3sKlls50FmGxA69mwZS-sK53ZqkpWByvWVI1BqoyIi4Ret3c5uQZbiHF9tVTnSLs6qhndPjgiz1QUlVAE86X7-_UnrGdcbJXS3nA3VOfBoj6gE' },
+  { id: 3, title: 'Daily Practice Routine', duration: '08:22', desc: '10 minutes to maintain your visual agility.', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuADMitBsVEoRCuh_RTR5Z7YsCaLvlYHfhzxJ6EFoI2ooqKJPyh7ft-IEc4o_oqErYlYsaJc472EhlAKU79e5m5Zt6egUJC04Gxxzw6pJWv7EE6sJVi2t0yVbogH1zd73VMiS9mV0IgaC2VmBchSG_6N5AsMCuQjVyR4WXR6-DiEzcc0ppVcsnbMlqt2IOybtAXr3z3kv3WPWEzOxLrnTxcWNboiVuKOVgojKyi50pL9bbkZvExLZ5vqLRiWr_F8usvcuuZivF0zjDc' },
+]

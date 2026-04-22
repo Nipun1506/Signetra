@@ -1,0 +1,126 @@
+"""
+Signetra OTP Service
+====================
+Handles OTP generation, hashing, email dispatch (Gmail SMTP),
+and SMS dispatch (Twilio or dev-mode console logging).
+"""
+
+import os
+import random
+import hashlib
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime, timedelta
+
+# ---------------------------------------------------------------------------
+# Configuration (loaded from environment / .env)
+# ---------------------------------------------------------------------------
+GMAIL_EMAIL = os.getenv("GMAIL_EMAIL", "")
+GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "")
+OTP_DEV_MODE = os.getenv("OTP_DEV_MODE", "true").lower() == "true"
+OTP_EXPIRY_MINUTES = int(os.getenv("OTP_EXPIRY_MINUTES", "5"))
+
+# ---------------------------------------------------------------------------
+# Core Helpers
+# ---------------------------------------------------------------------------
+
+def generate_otp() -> str:
+    """Generate a cryptographically acceptable 6-digit OTP."""
+    return f"{random.SystemRandom().randint(100000, 999999)}"
+
+
+def hash_otp(code: str) -> str:
+    """SHA-256 hash of the OTP for secure DB storage."""
+    return hashlib.sha256(code.encode()).hexdigest()
+
+
+def verify_otp(stored_hash: str, user_input: str) -> bool:
+    """Compare user-supplied OTP against the stored hash."""
+    return hash_otp(user_input.strip()) == stored_hash
+
+
+def get_expiry() -> datetime:
+    """Return a datetime OTP_EXPIRY_MINUTES from now."""
+    return datetime.utcnow() + timedelta(minutes=OTP_EXPIRY_MINUTES)
+
+
+# ---------------------------------------------------------------------------
+# Email Dispatch (Gmail SMTP)
+# ---------------------------------------------------------------------------
+
+def _build_email_html(otp_code: str) -> str:
+    """Build a sleek HTML email for the OTP."""
+    return f"""
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 480px; margin: 0 auto; background: #0a0e1a; border-radius: 16px; overflow: hidden; border: 1px solid rgba(77,142,255,0.2);">
+        <div style="background: linear-gradient(135deg, #4d8eff 0%, #adc6ff 100%); padding: 32px; text-align: center;">
+            <h1 style="color: #001a42; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">SIGNETRA</h1>
+            <p style="color: #001a42; margin: 8px 0 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: 3px; font-weight: 600;">Verification Code</p>
+        </div>
+        <div style="padding: 40px 32px; text-align: center;">
+            <p style="color: #c2c6d6; font-size: 14px; margin: 0 0 24px 0;">Your one-time verification code is:</p>
+            <div style="background: #1b1f2c; border: 1px solid rgba(77,142,255,0.3); border-radius: 12px; padding: 20px; display: inline-block;">
+                <span style="color: #4d8eff; font-size: 36px; font-weight: 800; letter-spacing: 12px; font-family: 'Courier New', monospace;">{otp_code}</span>
+            </div>
+            <p style="color: #8a8e9c; font-size: 12px; margin: 24px 0 0 0;">This code expires in <strong style="color: #adc6ff;">{OTP_EXPIRY_MINUTES} minutes</strong>.</p>
+            <p style="color: #8a8e9c; font-size: 11px; margin: 16px 0 0 0;">If you did not request this, please ignore this email.</p>
+        </div>
+        <div style="background: #0d1121; padding: 16px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05);">
+            <p style="color: #555; font-size: 10px; margin: 0;">© 2026 Signetra · ASL Recognition Platform</p>
+        </div>
+    </div>
+    """
+
+
+def send_email_otp(to_email: str, otp_code: str) -> bool:
+    """Send the OTP to the given email via Gmail SMTP."""
+    if not GMAIL_EMAIL or not GMAIL_APP_PASSWORD:
+        print(f"[OTP-DEV] Email OTP for {to_email}: {otp_code}  (Gmail not configured)")
+        return True
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"Signetra – Your Verification Code: {otp_code}"
+        msg["From"] = f"Signetra <{GMAIL_EMAIL}>"
+        msg["To"] = to_email
+
+        html_body = _build_email_html(otp_code)
+        msg.attach(MIMEText(html_body, "html"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
+            server.sendmail(GMAIL_EMAIL, to_email, msg.as_string())
+
+        print(f"[OTP] Email sent to {to_email}")
+        return True
+    except Exception as e:
+        print(f"[OTP-ERROR] Failed to send email to {to_email}: {e}")
+        return False
+
+
+# ---------------------------------------------------------------------------
+# SMS Dispatch (Twilio or Dev-Mode)
+# ---------------------------------------------------------------------------
+
+def send_sms_otp(to_phone: str, otp_code: str) -> bool:
+    """Send the OTP via SMS. In dev mode, logs to console instead."""
+    if OTP_DEV_MODE or not TWILIO_ACCOUNT_SID:
+        print(f"[OTP-DEV] SMS OTP for {to_phone}: {otp_code}  (dev mode / Twilio not configured)")
+        return True
+
+    try:
+        from twilio.rest import Client
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        message = client.messages.create(
+            body=f"Your Signetra verification code is: {otp_code}. It expires in {OTP_EXPIRY_MINUTES} minutes.",
+            from_=TWILIO_PHONE_NUMBER,
+            to=to_phone,
+        )
+        print(f"[OTP] SMS sent to {to_phone} (SID: {message.sid})")
+        return True
+    except Exception as e:
+        print(f"[OTP-ERROR] Failed to send SMS to {to_phone}: {e}")
+        return False

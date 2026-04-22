@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-background": "#dfe2f3",
+            "on-error-container": "#ffdad6",
+            "secondary-fixed-dim": "#b1c6f9",
+            "background": "#0f131f",
+            "surface-dim": "#0f131f",
+            "on-secondary-fixed": "#001a42",
+            "tertiary-fixed-dim": "#ffb786",
+            "inverse-primary": "#005ac2",
+            "tertiary": "#ffb786",
+            "error": "#ffb4ab",
+            "on-tertiary-fixed-variant": "#723600",
+            "surface-container": "#1b1f2c",
+            "primary-fixed-dim": "#adc6ff",
+            "surface-container-highest": "#313442",
+            "on-tertiary-container": "#461f00",
+            "on-tertiary": "#502400",
+            "secondary": "#b1c6f9",
+            "secondary-container": "#304671",
+            "surface": "#0f131f",
+            "primary-fixed": "#d8e2ff",
+            "tertiary-container": "#df7412",
+            "on-tertiary-fixed": "#311400",
+            "surface-container-lowest": "#0a0e1a",
+            "secondary-fixed": "#d8e2ff",
+            "inverse-surface": "#dfe2f3",
+            "on-secondary": "#182f59",
+            "primary": "#adc6ff",
+            "on-error": "#690005",
+            "on-secondary-fixed-variant": "#304671",
+            "on-primary-container": "#00285d",
+            "surface-tint": "#adc6ff",
+            "error-container": "#93000a",
+            "primary-container": "#4d8eff",
+            "on-secondary-container": "#9fb5e7",
+            "on-primary": "#002e6a",
+            "surface-container-low": "#171b28",
+            "on-primary-fixed-variant": "#004395",
+            "surface-variant": "#313442",
+            "surface-bright": "#353946",
+            "outline": "#8c909f",
+            "on-primary-fixed": "#001a42",
+            "outline-variant": "#424754",
+            "inverse-on-surface": "#2c303d",
+            "tertiary-fixed": "#ffdcc6",
+            "surface-container-high": "#262a37",
+            "on-surface": "#dfe2f3",
+            "on-surface-variant": "#c2c6d6",
+            "whatsapp-green": "#25D366"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.875rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Inter"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-effect {
+      background: rgba(49, 52, 66, 0.6);
+      backdrop-filter: blur(20px);
+    }
+    .ambient-glow-whatsapp {
+      box-shadow: 0 0 40px -10px rgba(37, 211, 102, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#0f131f] z-50">
+<div class="flex flex-col h-full py-6">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-xl" data-icon="waving_hand">waving_hand</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-[#adc6ff] leading-none">SIGNETRA</h1>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Digital Curator</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Home</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="gesture">gesture</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Recognize</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Learn</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Zoom</span>
+</a>
+<a class="text-[#adc6ff] border-l-4 border-[#4d8eff] bg-[#1b1f2c] font-semibold px-4 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">WhatsApp</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">History</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Settings</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Admin</span>
+</a>
+</nav>
+<div class="mt-auto px-4">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Profile</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 z-40 bg-[#0f131f]/60 backdrop-blur-xl flex justify-end items-center px-8 shadow-lg shadow-blue-500/10">
+<div class="flex items-center gap-6">
+<button class="text-[#c2c6d6] hover:text-white transition-colors flex items-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-[#c2c6d6] hover:text-white transition-colors flex items-center">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-3">
+<span class="text-xs font-['Inter'] uppercase tracking-[0.05em] text-[#adc6ff] font-bold">Connected</span>
+<div class="w-2 h-2 rounded-full bg-whatsapp-green shadow-[0_0_8px_#25D366]"></div>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="ml-64 pt-24 pb-12 px-10 min-h-screen">
+<div class="max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="max-w-2xl">
+<div class="flex items-center gap-2 mb-3">
+<span class="px-3 py-1 rounded-full bg-whatsapp-green/10 text-whatsapp-green text-[10px] font-bold uppercase tracking-widest border border-whatsapp-green/20">Active Integration</span>
+</div>
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">WhatsApp Web Real-time Bridge</h2>
+<p class="text-on-surface-variant text-lg">Translate Sign Language into text instantly within your WhatsApp Web conversations using our proprietary computer vision engine.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="p-4 bg-surface-container rounded-xl flex items-center gap-4 ambient-glow-whatsapp">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">Interface Status</span>
+<span class="text-sm font-semibold text-whatsapp-green">WhatsApp Overlay Enabled</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-whatsapp-green"></div>
+</label>
+</div>
+</div>
+</header>
+<!-- Layout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Mockup Video Call (Main Content) -->
+<section class="lg:col-span-8 space-y-6">
+<div class="relative aspect-video rounded-xl overflow-hidden bg-surface-container-lowest border border-outline-variant/10 shadow-2xl group">
+<img class="w-full h-full object-cover opacity-80" data-alt="Screenshot of a professional woman on a video call using sign language, seen through a digital interface with green highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBZFfS2S40KtNjiYGaoJ_tzPvM_xtCyUNLPO03Si3L2kv3zEU5aN2VbNL-A_YasnhZOF7ykGpF5inQQ06jRxcKkMA4puNDscIAOJ7C9tWmqUMY4uqQcvvMlOgcXmMPxw23UAVF2mJIWJwXpTBzDzWs83Jpp7CWeIXiwFtsgZbbYapAxmkjM5GUGodL8CmgA_kp-qTI3UTT8ChbzlxafciTXuOqu2-IOeIfC-6C27fe11X6KN5BWMcyBAlE11QgVBfcPkdqSNOxSE8"/>
+<!-- WhatsApp UI Overlays -->
+<div class="absolute top-0 left-0 w-full p-6 flex justify-between items-start">
+<div class="glass-effect rounded-xl px-4 py-2 flex items-center gap-3 border border-white/10">
+<div class="w-3 h-3 rounded-full bg-whatsapp-green animate-pulse"></div>
+<span class="text-sm font-medium text-white tracking-wide">SIGNETRA LIVE: BRIDGE ACTIVE</span>
+</div>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-full glass-effect flex items-center justify-center text-white hover:bg-whatsapp-green/40 transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="videocam">videocam</span>
+</button>
+<button class="w-10 h-10 rounded-full glass-effect flex items-center justify-center text-white hover:bg-whatsapp-green/40 transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="mic">mic</span>
+</button>
+</div>
+</div>
+<!-- Translation Caption Box -->
+<div class="absolute bottom-6 left-6 right-6">
+<div class="glass-effect rounded-xl p-5 border border-whatsapp-green/30 ambient-glow-whatsapp">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] font-bold text-whatsapp-green tracking-widest uppercase">Live Translation</span>
+</div>
+<p class="text-xl text-white font-medium italic">"I will be arriving at the main hall by 3:00 PM for the presentation."</p>
+</div>
+</div>
+<!-- Hand Tracking Visualizers -->
+<div class="absolute top-1/2 left-1/3 w-24 h-24 border-2 border-whatsapp-green/50 rounded-full opacity-40"></div>
+<div class="absolute top-1/4 left-1/4 w-32 h-32 border border-primary/30 rounded-lg rotate-45 opacity-20"></div>
+</div>
+<!-- Bottom Action Bar (Asymmetric) -->
+<div class="flex flex-wrap items-center justify-between gap-4 p-2">
+<div class="flex gap-4">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Current Language</span>
+<span class="text-sm font-semibold">ASL (American Sign Language)</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant uppercase font-bold tracking-tighter">Confidence Score</span>
+<span class="text-sm font-semibold text-whatsapp-green">98.4% Accuracy</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 rounded-xl border border-outline-variant/20 hover:bg-surface-container-high transition-all text-sm font-medium">Export Transcript</button>
+<button class="px-6 py-2.5 rounded-xl bg-whatsapp-green text-surface-container-lowest font-bold text-sm shadow-lg shadow-whatsapp-green/20 hover:scale-105 active:scale-95 transition-all">Launch Web Window</button>
+</div>
+</div>
+</section>
+<!-- Sidebar Config (Step Flow & Status) -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Status Card -->
+<div class="bg-surface-container p-6 rounded-xl border border-outline-variant/10 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-whatsapp-green/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-12 h-12 rounded-xl bg-whatsapp-green/10 flex items-center justify-center text-whatsapp-green">
+<span class="material-symbols-outlined text-3xl" data-icon="phonelink_ring">phonelink_ring</span>
+</div>
+<div>
+<h3 class="font-bold text-on-surface">Bridge Status</h3>
+<p class="text-xs text-on-surface-variant">Syncing with WhatsApp API</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low">
+<span class="text-xs text-on-surface-variant">Browser Extension</span>
+<span class="text-xs font-bold text-whatsapp-green">CONNECTED</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low">
+<span class="text-xs text-on-surface-variant">Vision Pipeline</span>
+<span class="text-xs font-bold text-whatsapp-green">READY</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low">
+<span class="text-xs text-on-surface-variant">End-to-End Encryption</span>
+<span class="text-xs font-bold text-whatsapp-green">VERIFIED</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 4-Step Setup Flow -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/5">
+<h3 class="text-sm font-bold uppercase tracking-[0.1em] text-on-surface-variant mb-6">Setup Protocol</h3>
+<div class="space-y-8 relative">
+<!-- Vertical Line -->
+<div class="absolute left-[11px] top-2 bottom-2 w-px bg-outline-variant/30"></div>
+<div class="flex gap-4 relative">
+<div class="w-6 h-6 rounded-full bg-whatsapp-green flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[14px] text-surface-container-lowest" data-icon="check" data-weight="fill">check</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Install Plugin</h4>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">Add the Signetra Chrome Extension to your browser environment.</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-6 h-6 rounded-full bg-whatsapp-green flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[14px] text-surface-container-lowest" data-icon="check" data-weight="fill">check</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Pair Account</h4>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">Scan the secure QR code to link your Signetra profile to WhatsApp Web.</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center z-10 border-2 border-surface-container-low">
+<span class="text-[10px] font-bold text-on-primary-container">03</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Calibrate Camera</h4>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">Perform a 5-second hand calibration to optimize gesture tracking.</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center z-10 border-2 border-surface-container-low">
+<span class="text-[10px] font-bold text-on-surface-variant">04</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface-variant">Start Call</h4>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">Launch a call and the Signetra overlay will appear automatically.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Tip -->
+<div class="p-4 rounded-xl bg-gradient-to-br from-[#1b1f2c] to-[#0f131f] border-l-4 border-primary">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="lightbulb">lightbulb</span>
+<p class="text-xs text-on-surface-variant italic leading-relaxed">"Signetra works best in well-lit environments. Avoid strong backlighting during video calls for maximum accuracy."</p>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+</body></html>

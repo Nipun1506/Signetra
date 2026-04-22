@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SIGNETRA - Detection History</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#dfe2f3",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#b1c6f9",
+                    "background": "#0f131f",
+                    "surface-dim": "#0f131f",
+                    "on-secondary-fixed": "#001a42",
+                    "tertiary-fixed-dim": "#ffb786",
+                    "inverse-primary": "#005ac2",
+                    "tertiary": "#ffb786",
+                    "error": "#ffb4ab",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "surface-container": "#1b1f2c",
+                    "primary-fixed-dim": "#adc6ff",
+                    "surface-container-highest": "#313442",
+                    "on-tertiary-container": "#461f00",
+                    "on-tertiary": "#502400",
+                    "secondary": "#b1c6f9",
+                    "secondary-container": "#304671",
+                    "surface": "#0f131f",
+                    "primary-fixed": "#d8e2ff",
+                    "tertiary-container": "#df7412",
+                    "on-tertiary-fixed": "#311400",
+                    "surface-container-lowest": "#0a0e1a",
+                    "secondary-fixed": "#d8e2ff",
+                    "inverse-surface": "#dfe2f3",
+                    "on-secondary": "#182f59",
+                    "primary": "#adc6ff",
+                    "on-error": "#690005",
+                    "on-secondary-fixed-variant": "#304671",
+                    "on-primary-container": "#00285d",
+                    "surface-tint": "#adc6ff",
+                    "error-container": "#93000a",
+                    "primary-container": "#4d8eff",
+                    "on-secondary-container": "#9fb5e7",
+                    "on-primary": "#002e6a",
+                    "surface-container-low": "#171b28",
+                    "on-primary-fixed-variant": "#004395",
+                    "surface-variant": "#313442",
+                    "surface-bright": "#353946",
+                    "outline": "#8c909f",
+                    "on-primary-fixed": "#001a42",
+                    "outline-variant": "#424754",
+                    "inverse-on-surface": "#2c303d",
+                    "tertiary-fixed": "#ffdcc6",
+                    "surface-container-high": "#262a37",
+                    "on-surface": "#dfe2f3",
+                    "on-surface-variant": "#c2c6d6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.875rem",
+                    "lg": "0.875rem",
+                    "xl": "1rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            background-color: #0f131f;
+            color: #dfe2f3;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(49, 52, 66, 0.6);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen">
+<!-- SideNavBar Anchor -->
+<nav class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#0f131f] py-6 z-50">
+<div class="px-6 mb-10">
+<h1 class="text-xl font-bold tracking-tight text-[#adc6ff] uppercase">SIGNETRA</h1>
+<p class="text-[10px] font-medium tracking-widest text-on-surface-variant/60 uppercase">Digital Curator</p>
+</div>
+<div class="flex-1 flex flex-col gap-1">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Home</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="gesture">gesture</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Recognize</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Learn</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="videocam">videocam</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Zoom</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">WhatsApp</span>
+</a>
+<!-- Active Navigation -->
+<a class="text-[#adc6ff] border-l-4 border-[#4d8eff] bg-[#1b1f2c] font-semibold px-[20px] py-3 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined active-icon" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">History</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Settings</span>
+</a>
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-6 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37]" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Admin</span>
+</a>
+</div>
+<div class="mt-auto px-2">
+<a class="text-[#c2c6d6] hover:text-[#adc6ff] px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[#262a37] rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-['Inter'] text-sm font-medium tracking-wide">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Top Navigation -->
+<header class="flex justify-between items-center mb-10">
+<div>
+<h2 class="text-3xl font-bold tracking-tight text-on-background">Detection History</h2>
+<p class="text-on-surface-variant mt-1">Review and audit your past sign language interactions.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary-container text-on-primary-container px-6 py-3 rounded-full font-semibold shadow-lg shadow-primary-container/20 transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                Export CSV
+            </button>
+</header>
+<!-- Summary Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col justify-between">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest text-primary/70">Total Detections</span>
+<h3 class="text-4xl font-extrabold mt-2 text-on-surface">1,284</h3>
+</div>
+<div class="mt-4 text-sm text-on-surface-variant flex items-center gap-1">
+<span class="text-emerald-400 font-bold">+12%</span> from last week
+                </div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col justify-between">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest text-primary/70">Avg Confidence</span>
+<h3 class="text-4xl font-extrabold mt-2 text-on-surface">94.2%</h3>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="bg-primary h-full w-[94.2%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col justify-between">
+<div>
+<span class="text-xs font-bold uppercase tracking-widest text-primary/70">Most Used Gesture</span>
+<div class="flex items-center gap-3 mt-2">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="front_hand">front_hand</span>
+<h3 class="text-3xl font-extrabold text-on-surface">Hello</h3>
+</div>
+</div>
+<div class="mt-4 text-sm text-on-surface-variant">342 occurrences</div>
+</div>
+</section>
+<!-- Filter Bar -->
+<section class="bg-surface-container-lowest p-4 rounded-xl mb-6 flex flex-wrap items-center gap-4 border border-outline-variant/10">
+<div class="flex flex-col gap-1.5 flex-1 min-w-[200px]">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Date Range</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="calendar_today">calendar_today</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 text-sm py-2 text-on-surface focus:ring-1 focus:ring-primary" type="text" value="Oct 01 - Oct 31, 2023"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5 w-48">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Gesture</label>
+<select class="bg-surface-container-low border-none rounded-lg text-sm py-2 text-on-surface focus:ring-1 focus:ring-primary appearance-none">
+<option>All Gestures</option>
+<option>Hello</option>
+<option>Thank You</option>
+<option>Help</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5 w-48">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Platform</label>
+<select class="bg-surface-container-low border-none rounded-lg text-sm py-2 text-on-surface focus:ring-1 focus:ring-primary">
+<option>All Platforms</option>
+<option>Webcam</option>
+<option>iPhone</option>
+</select>
+</div>
+<div class="flex flex-col gap-1.5 w-48">
+<label class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant ml-1">Min Confidence</label>
+<select class="bg-surface-container-low border-none rounded-lg text-sm py-2 text-on-surface focus:ring-1 focus:ring-primary">
+<option>Any</option>
+<option>95%+</option>
+<option>90%+</option>
+<option>80%+</option>
+</select>
+</div>
+<div class="flex items-end self-stretch pb-0.5">
+<button class="bg-surface-container-highest hover:bg-primary-container/20 text-on-surface px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Reset Filters
+                </button>
+</div>
+</section>
+<!-- Data Table -->
+<section class="bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/5">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant uppercase text-[10px] font-bold tracking-[0.1em]">
+<th class="px-6 py-4">Time</th>
+<th class="px-6 py-4">Gesture</th>
+<th class="px-6 py-4">Output Phrase</th>
+<th class="px-6 py-4">Confidence</th>
+<th class="px-6 py-4">Platform</th>
+<th class="px-6 py-4">Duration</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="bg-surface-container-lowest hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">14:23:05</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="front_hand">front_hand</span>
+<span class="text-sm font-semibold">Hello</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"Hello everyone"</td>
+<td class="px-6 py-4">
+<span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">98%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Webcam</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">1.2s</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">14:21:12</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="pan_tool">pan_tool</span>
+<span class="text-sm font-semibold">Wait</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"Please wait a moment"</td>
+<td class="px-6 py-4">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">92%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">iPhone</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">2.5s</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">14:18:44</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="thumb_up">thumb_up</span>
+<span class="text-sm font-semibold">Yes</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"Yes, that is correct"</td>
+<td class="px-6 py-4">
+<span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">99%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Webcam</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">0.8s</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">14:15:30</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="back_hand">back_hand</span>
+<span class="text-sm font-semibold">Stop</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"Stop the presentation"</td>
+<td class="px-6 py-4">
+<span class="bg-tertiary/10 text-tertiary px-3 py-1 rounded-full text-xs font-bold border border-tertiary/20">84%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Webcam</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">1.4s</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">14:12:01</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="waving_hand">waving_hand</span>
+<span class="text-sm font-semibold">Goodbye</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"Goodbye see you later"</td>
+<td class="px-6 py-4">
+<span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">97%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">iPhone</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">2.1s</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">14:08:22</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="help">help</span>
+<span class="text-sm font-semibold">Question</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"I have a question"</td>
+<td class="px-6 py-4">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">91%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Webcam</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">3.4s</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">13:55:40</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="text-sm font-semibold">Love</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"I love this tool"</td>
+<td class="px-6 py-4">
+<span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">98%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">iPhone</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">1.1s</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">13:50:11</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="menu_book">menu_book</span>
+<span class="text-sm font-semibold">Read</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"Open the document"</td>
+<td class="px-6 py-4">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">88%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Webcam</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">2.8s</td>
+</tr>
+<tr class="bg-surface-container-lowest hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">13:42:09</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="close">close</span>
+<span class="text-sm font-semibold">No</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"No, not right now"</td>
+<td class="px-6 py-4">
+<span class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20">95%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Webcam</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">0.9s</td>
+</tr>
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4 text-sm font-medium text-on-surface">13:35:55</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="search">search</span>
+<span class="text-sm font-semibold">Search</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm italic text-on-surface-variant">"Find my previous records"</td>
+<td class="px-6 py-4">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">93%</span>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">iPhone</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">4.2s</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="px-6 py-4 bg-surface-container-lowest flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Showing 1 to 10 of 1,284 entries</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high text-on-surface hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high text-on-surface hover:bg-primary/20 transition-colors">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high text-on-surface hover:bg-primary/20 transition-colors">3</button>
+<span class="flex items-center px-2 text-on-surface-variant">...</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high text-on-surface hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Visual Artifacts: Gradient Glows -->
+<div class="fixed top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] pointer-events-none rounded-full"></div>
+<div class="fixed bottom-0 left-64 w-[300px] h-[300px] bg-secondary-container/5 blur-[100px] pointer-events-none rounded-full"></div>
+</body></html>

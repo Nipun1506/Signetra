@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: signetra
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: signetra
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://signetra:password@postgres:5432/signetra
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=signetra2024
+      - JWT_SECRET=change-this-in-production
+    depends_on:
+      - postgres
+    # Mount backend for local dev reloading if desired
+    # volumes:
+    #   - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
