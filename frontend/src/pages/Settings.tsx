@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 const DEFAULT_SETTINGS = {
   mirrorView: true,
   confidenceThreshold: 75,
-  speechOutput: true,
+  outputMode: 'both',
   zoomBridge: true,
   whatsAppWeb: false,
   sourceDevice: 'default',
@@ -171,13 +171,26 @@ export default function Settings() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-                    <label>Speech Output</label>
-                    <div 
-                      onClick={() => updateSetting('speechOutput', !settings.speechOutput)}
-                      className={`w-11 h-6 rounded-full relative cursor-pointer transition-colors ${settings.speechOutput ? 'bg-primary' : 'bg-surface-container-highest'}`}
-                    >
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settings.speechOutput ? 'right-1' : 'left-1'}`}></div>
-                    </div>
+                    <label>Default Output Mode</label>
+                  </div>
+                  <div className="flex bg-surface-container rounded-xl p-1 gap-1">
+                    {[
+                      { id: 'text', label: 'Text' },
+                      { id: 'speech', label: 'Speech' },
+                      { id: 'both', label: 'Both' }
+                    ].map(m => (
+                      <button 
+                        key={m.id}
+                        onClick={() => updateSetting('outputMode', m.id)}
+                        className={`flex-1 py-3 text-xs font-bold rounded-lg transition-all ${
+                          settings.outputMode === m.id 
+                            ? 'bg-primary text-[#001a42] shadow-md' 
+                            : 'text-on-surface-variant hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>

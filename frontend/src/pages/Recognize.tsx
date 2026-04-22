@@ -20,7 +20,7 @@ export default function Recognize() {
   const [isActive, setIsActive] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [source, setSource] = useState<'webcam'|'iphone'>('webcam')
-  const [mode, setMode] = useState<'text'|'speech'|'text-speech'>('speech')
+  const [mode, setMode] = useState<'text'|'speech'|'text-speech'>('text-speech')
   const [currentGesture, setCurrentGesture] = useState<any>(null)
   
   // Settings Modal State
@@ -36,7 +36,7 @@ export default function Recognize() {
       const settings = JSON.parse(saved);
       setMinConfidence(settings.confidenceThreshold || 75);
       setMirrorView(settings.mirrorView !== undefined ? settings.mirrorView : true);
-      setMode(settings.speechOutput ? 'speech' : 'text');
+      setMode(settings.outputMode || 'text-speech');
     }
   }, []);
 
