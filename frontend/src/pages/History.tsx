@@ -28,7 +28,7 @@ export default function History() {
           }
         });
         if (!res.ok) throw new Error('Unauthorized');
-        
+        const data = await res.json();
         const mapped: HistoryEntry[] = data.map((item: any) => ({
           id: String(item.id),
           time: new Date(item.timestamp).toLocaleString(),
