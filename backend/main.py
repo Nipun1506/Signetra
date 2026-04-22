@@ -30,6 +30,10 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "Signetra API is Live!", "status": "Healthy"}
+
 # Allow specific Vite frontend ports to connect
 origins = [
     "http://localhost:5173",
