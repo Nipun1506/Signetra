@@ -67,8 +67,10 @@ speech_queue = queue.Queue()
 def speech_worker():
     try:
         import pyttsx3
+        # Try to initialize the engine. This often fails on headless servers.
         engine = pyttsx3.init()
         engine.setProperty('rate', 150)
+        print("🔊 TTS Engine initialized successfully.")
         while True:
             text = speech_queue.get()
             if text is None:
@@ -77,10 +79,15 @@ def speech_worker():
                 engine.say(text)
                 engine.runAndWait()
             except Exception as e:
-                print(f"TTS error: {e}")
+                print(f"TTS runtime error: {e}")
             speech_queue.task_done()
     except Exception as e:
-        print(f"TTS engine unavailable: {e}")
+        print(f"⚠️ TTS engine unavailable (Headless environment): {e}")
+        # Continue to consume the queue to prevent memory leaks even if we can't speak
+        while True:
+            text = speech_queue.get()
+            if text is None: break
+            speech_queue.task_done()
 
 speech_thread = threading.Thread(target=speech_worker, daemon=True)
 speech_thread.start()
