@@ -8,7 +8,7 @@ import App from './App.tsx'
 import './index.css'
 
 const queryClient = new QueryClient()
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '369831141439-10jfi2981h6ggj1so1bt7ns9dlrp3h8o.apps.googleusercontent.com'
 
 const Root = () => {
   const content = (
