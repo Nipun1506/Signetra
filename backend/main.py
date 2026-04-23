@@ -454,11 +454,14 @@ async def websocket_detection(websocket: WebSocket):
                 
             # Protect MediaPipe: verify token before processing frames
             try:
-                if not token:
-                    raise ValueError("No token")
-                verify_token(token)
+                # Use a primitive cache for the current connection session
+                if not hasattr(websocket, "_token_verified") or websocket._token_verified != token:
+                    if not token:
+                        raise ValueError("No token")
+                    verify_token(token)
+                    websocket._token_verified = token
             except Exception as e:
-                await websocket.send_text(json.dumps({"hand_detected": False, "error": "Unauthorized feed"}))
+                await websocket.send_text(json.dumps({"hand_detected": False, "error": f"Unauthorized feed: {str(e)}"}))
                 continue
 
             # Decode base64 frame to image
@@ -506,23 +509,6 @@ async def websocket_detection(websocket: WebSocket):
                     "landmarks": lm_pairs,
                     "hand_detected": True
                 }
-
-                if phrase and phrase != "UNKNOWN":
-                    # Record history
-                    db = SessionLocal()
-                    try:
-                        record = DetectionHistory(
-                            phrase=phrase,
-                            confidence=confidence,
-                            category=category,
-                            platform=data.get("source", "webcam")
-                        )
-                        db.add(record)
-                        db.commit()
-                    except:
-                        pass
-                    finally:
-                        db.close()
 
                 await websocket.send_text(json.dumps(response))
             else:

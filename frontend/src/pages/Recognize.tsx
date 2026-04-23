@@ -155,7 +155,7 @@ export default function Recognize() {
       // Start sending frames every 100ms (10fps — good balance for MediaPipe)
       frameIntervalRef.current = window.setInterval(() => {
         sendFrame()
-      }, 100)
+      }, 200)
     }
 
     wsRef.current.onmessage = (event) => {
@@ -228,8 +228,8 @@ export default function Recognize() {
     // Draw without mirroring, just scale it down to drastically reduce latency
     ctx.drawImage(video, 0, 0, targetWidth, targetHeight)
 
-    // Reduced quality to 0.4 for very low latency (~5KB per frame)
-    const frameB64 = canvas.toDataURL('image/jpeg', 0.4).split(',')[1]
+    // Reduced quality to 0.3 for very low latency (~4KB per frame)
+    const frameB64 = canvas.toDataURL('image/jpeg', 0.3).split(',')[1]
 
     const token = localStorage.getItem('signetra_token') || ""
 
