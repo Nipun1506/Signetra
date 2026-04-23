@@ -99,8 +99,8 @@ function hideOverlay() {
 function connectWebSocket() {
   if (ws || !isEnabled) return;
   
-  // NOTE: This runs on the browser, targeting the localhost backend
-  ws = new WebSocket('ws://localhost:8000/ws/detection');
+  // Targeting the Railway production backend
+  ws = new WebSocket('wss://signetra-production-95bb.up.railway.app/ws/detection');
   
   ws.onopen = () => {
     console.log('SIGNETRA WebSocket connected');

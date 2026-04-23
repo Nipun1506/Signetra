@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
       
-      const res = await fetch('http://localhost:8000/health', { signal: controller.signal });
+      const res = await fetch('https://signetra-production-95bb.up.railway.app/', { signal: controller.signal });
       clearTimeout(timeoutId);
       
       if (res.ok) {

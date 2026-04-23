@@ -33,6 +33,7 @@ app = FastAPI()
 
 @app.get("/")
 @app.head("/")
+@app.get("/health")
 def read_root():
     return {"message": "Signetra API is Live!", "status": "Healthy"}
 
