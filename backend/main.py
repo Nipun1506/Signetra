@@ -24,6 +24,7 @@ from models import DetectionHistory, GestureTemplate, SupportTicket, TicketReply
 from datetime import datetime, date
 from otp_service import generate_otp, hash_otp, verify_otp, get_expiry, send_email_otp, send_sms_otp
 from auth_utils import get_current_user, create_access_token, verify_token
+from gesture_classifier import GestureClassifier
 
 # Initialize Database
 Base.metadata.create_all(bind=engine)
@@ -65,6 +66,7 @@ hands_detector = mp_hands.Hands(
     min_tracking_confidence=0.6,
     model_complexity=1
 )
+classifier = GestureClassifier()
 
 # --- Speech Queue (for backend TTS if needed) ---
 speech_queue = queue.Queue()
@@ -477,11 +479,25 @@ async def websocket_detection(websocket: WebSocket):
             if results.multi_hand_landmarks:
                 hand = results.multi_hand_landmarks[0]
 
-                # Convert landmarks for frontend
-                lm_list = [{"x": lm.x, "y": lm.y, "z": lm.z} for lm in hand.landmark]
+                # Convert landmarks for frontend & classification
+                lm_list_frontend = [{"x": lm.x, "y": lm.y, "z": lm.z} for lm in hand.landmark]
+                lm_raw = [[lm.x, lm.y, lm.z] for lm in hand.landmark]
                 lm_pairs = [[lm.x, lm.y] for lm in hand.landmark]
 
-                phrase, confidence, category = classify_gesture(lm_list)
+                # Classification 1: Rule-based (legacy/fallback)
+                rule_phrase, rule_confidence, rule_category = classify_gesture(lm_list_frontend)
+                
+                # Classification 2: Template-based (modern)
+                template_result = classifier.classify(lm_raw)
+                
+                if template_result and template_result["confidence"] > rule_confidence:
+                    phrase = template_result["phrase"]
+                    confidence = template_result["confidence"]
+                    category = template_result["category"]
+                else:
+                    phrase = rule_phrase
+                    confidence = rule_confidence
+                    category = rule_category
 
                 response = {
                     "phrase": phrase if phrase != "UNKNOWN" else None,
@@ -683,5 +699,5 @@ def google_auth(req: GoogleAuthRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 10000))
     uvicorn.run(app, host="0.0.0.0", port=port)

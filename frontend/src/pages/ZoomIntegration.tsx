@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Video, Plug, Download, Settings, Play, CheckCircle, ExternalLink, Hand, Bot, MessageSquare, Code } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL, WS_BASE_URL } from '../config';
 
 const TYPING_SPEED = 60;
 const PAUSE_DURATION = 2000;
@@ -100,8 +101,7 @@ export default function ZoomIntegration() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
         
-        const host = window.location.hostname;
-        const res = await fetch(`http://${host}:8000/health`, { signal: controller.signal });
+        const res = await fetch(`${API_BASE_URL}/health`, { signal: controller.signal });
         clearTimeout(timeoutId);
         
         if (isMounted) {
@@ -124,8 +124,7 @@ export default function ZoomIntegration() {
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const host = window.location.hostname;
-      const response = await fetch(`http://${host}:8000/api/extension/download`);
+      const response = await fetch(`${API_BASE_URL}/api/extension/download`);
       if (!response.ok) throw new Error('Download failed');
       
       const blob = await response.blob();
@@ -187,7 +186,7 @@ export default function ZoomIntegration() {
                 <div className="w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]">
                   <div className="w-full h-full rounded-full bg-emerald-500 animate-ping opacity-75"></div>
                 </div>
-                <p className="text-emerald-400 font-medium">Running on {window.location.hostname}:8000 — ready to broadcast</p>
+                <p className="text-emerald-400 font-medium">Synced with {new URL(API_BASE_URL).hostname} — ready to broadcast</p>
               </>
             )}
 
@@ -197,7 +196,7 @@ export default function ZoomIntegration() {
                 <div className="flex flex-col">
                   <p className="text-rose-400 font-medium">Not running — start the backend first</p>
                   <code className="text-xs bg-black/40 px-2 py-1 rounded text-rose-200 mt-2 font-mono border border-rose-500/20">
-                    python3 -m uvicorn main:app --host 0.0.0.0 --port 8000
+                    python3 -m uvicorn main:app --host 0.0.0.0 --port 10000
                   </code>
                 </div>
               </>
@@ -220,7 +219,7 @@ export default function ZoomIntegration() {
           <ul className="space-y-3 text-sm text-on-surface-variant font-medium">
             <li className="flex items-start gap-2 overflow-hidden">
               <span className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5 shrink-0"></span> 
-              <span className="truncate">WebSocket: <code className="bg-black/30 px-1 rounded text-primary/80 break-all whitespace-normal">ws://{window.location.hostname}:8000/ws/detection</code></span>
+              <span className="truncate">WebSocket: <code className="bg-black/30 px-1 rounded text-primary/80 break-all whitespace-normal">{WS_BASE_URL}/ws/detection</code></span>
             </li>
             <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-primary rounded-full"></span> Latency: <span className="text-emerald-400">&lt;100ms</span></li>
             <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-primary rounded-full"></span> Works on: Zoom Web, WhatsApp Web</li>

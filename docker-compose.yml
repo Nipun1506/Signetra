@@ -17,7 +17,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "10000:10000"
     environment:
       - DATABASE_URL=postgresql://signetra:password@postgres:5432/signetra
       - ADMIN_USERNAME=admin
@@ -36,7 +36,7 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:10000
     depends_on:
       - backend
 

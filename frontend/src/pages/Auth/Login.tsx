@@ -340,7 +340,7 @@ export default function Login() {
 
                 <button 
                   onClick={async () => {
-                    const API_URL = 'http://localhost:8000';
+                    const API_URL = API_BASE_URL;
                     if (forgotStep === 1) {
                       if (!forgotContact) { setForgotError('Please enter a valid credential.'); return; }
                       setIsForgotLoading(true);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 const TYPING_SPEED = 50;
 const PAUSE_DURATION = 3000;
@@ -80,8 +81,7 @@ export default function WhatsAppIntegration() {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000);
-        const host = window.location.hostname;
-        const res = await fetch(`http://${host}:8000/health`, { signal: controller.signal });
+        const res = await fetch(`${API_BASE_URL}/health`, { signal: controller.signal });
         clearTimeout(timeoutId);
         
         if (isMounted) {
@@ -104,8 +104,7 @@ export default function WhatsAppIntegration() {
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const host = window.location.hostname;
-      const response = await fetch(`http://${host}:8000/api/extension/download`);
+      const response = await fetch(`${API_BASE_URL}/api/extension/download`);
       if (!response.ok) throw new Error('Download failed');
       
       const blob = await response.blob();

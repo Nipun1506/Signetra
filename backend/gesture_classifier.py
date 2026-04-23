@@ -12,22 +12,26 @@ class GestureClassifier:
         self.load_templates()
 
     def load_templates(self):
-        # Load all JSON files from gestures directory
-        template_dir = os.path.join(os.path.dirname(__file__), "gestures", "templates")
-        if not os.path.exists(template_dir):
-            os.makedirs(template_dir, exist_ok=True)
-            self._create_mock_gestures(template_dir)
-
-        for filename in glob.glob(os.path.join(template_dir, "*.json")):
-            with open(filename, "r") as f:
-                data = json.load(f)
-                name = data["name"]
-                self.phrases[name] = data["phrase"]
-                self.categories[name] = data["category"]
+        from database import SessionLocal
+        from models import GestureTemplate
+        
+        db = SessionLocal()
+        try:
+            templates = db.query(GestureTemplate).all()
+            for t in templates:
+                name = t.name
+                self.phrases[name] = t.phrase
+                self.categories[name] = t.category
                 
                 # Assume landmarks are stored as [{"x": _, "y": _, "z": _}, ...]
-                raw_landmarks = [[lm["x"], lm["y"], lm["z"]] for lm in data["landmarks"]]
+                data = json.loads(t.landmark_json)
+                raw_landmarks = [[lm["x"], lm["y"], lm.get("z", 0)] for lm in data]
                 self.templates[name] = self.normalize_landmarks(raw_landmarks)
+            print(f"Loaded {len(self.templates)} templates from database.")
+        except Exception as e:
+            print(f"Error loading templates from DB: {e}")
+        finally:
+            db.close()
 
     def normalize_landmarks(self, landmarks: List[List[float]]) -> List[float]:
         # wrist is landmarks[0]
