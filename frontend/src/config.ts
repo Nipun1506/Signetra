@@ -9,10 +9,8 @@
 // For local dev, Vite automatically uses .env.local or defaults provided here
 const IS_PROD = import.meta.env.PROD;
 
-// In production, we'll likely use the same host but different protocols/ports
-// Or a specific URL set in the .env file (VITE_API_URL)
 export const API_BASE_URL = IS_PROD ? "https://signetra.onrender.com" : "http://localhost:8000";
-const WS_BASE_URL = IS_PROD ? "wss://signetra.onrender.com" : "ws://localhost:8000";
+export const WS_BASE_URL = IS_PROD ? "wss://signetra.onrender.com" : "ws://localhost:8000";
 
 export const config = {
   API_BASE_URL,
