@@ -23,7 +23,7 @@ from database import SessionLocal, get_db, engine, Base
 from models import DetectionHistory, GestureTemplate, SupportTicket, TicketReply, OTPRecord
 from datetime import datetime, date
 from otp_service import generate_otp, hash_otp, verify_otp, get_expiry, send_email_otp, send_sms_otp
-from auth_utils import get_current_user, create_access_token
+from auth_utils import get_current_user, create_access_token, verify_token
 
 # Initialize Database
 Base.metadata.create_all(bind=engine)
@@ -41,7 +41,8 @@ origins = [
     "http://localhost:5175",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
-    "http://127.0.0.1:5175"
+    "http://127.0.0.1:5175",
+    "https://signetra-1.onrender.com"
 ]
 
 # Add production frontend URL if defined
@@ -455,13 +456,16 @@ async def websocket_detection(websocket: WebSocket):
                     raise ValueError("No token")
                 verify_token(token)
             except Exception as e:
-                await manager.broadcast(json.dumps({"hand_detected": False, "error": "Unauthorized feed"}))
+                await websocket.send_text(json.dumps({"hand_detected": False, "error": "Unauthorized feed"}))
                 continue
 
             # Decode base64 frame to image
-            img_bytes = base64.b64decode(frame_b64)
-            nparr = np.frombuffer(img_bytes, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            try:
+                img_bytes = base64.b64decode(frame_b64)
+                nparr = np.frombuffer(img_bytes, np.uint8)
+                img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            except:
+                continue
 
             if img is None:
                 continue
@@ -473,20 +477,22 @@ async def websocket_detection(websocket: WebSocket):
             if results.multi_hand_landmarks:
                 hand = results.multi_hand_landmarks[0]
 
-                # Convert landmarks to serializable list
+                # Convert landmarks for frontend
                 lm_list = [{"x": lm.x, "y": lm.y, "z": lm.z} for lm in hand.landmark]
-                lm_pairs = [[lm.x, lm.y] for lm in hand.landmark]  # For frontend canvas drawing
+                lm_pairs = [[lm.x, lm.y] for lm in hand.landmark]
 
                 phrase, confidence, category = classify_gesture(lm_list)
 
-                if phrase != "UNKNOWN":
-                    # Trigger backend speech only for 'speech' mode (optional — frontend also handles this)
-                    if mode in ("speech", "text-speech") and phrase != last_spoken:
-                        if speech_queue.empty():
-                            speech_queue.put(phrase)
-                        last_spoken = phrase
+                response = {
+                    "phrase": phrase if phrase != "UNKNOWN" else None,
+                    "category": category if phrase != "UNKNOWN" else None,
+                    "confidence": confidence,
+                    "landmarks": lm_pairs,
+                    "hand_detected": True
+                }
 
-                    # Save to database
+                if phrase and phrase != "UNKNOWN":
+                    # Record history
                     db = SessionLocal()
                     try:
                         record = DetectionHistory(
@@ -497,21 +503,14 @@ async def websocket_detection(websocket: WebSocket):
                         )
                         db.add(record)
                         db.commit()
-                    except Exception as e:
-                        print(f"Error saving to DB: {e}")
+                    except:
+                        pass
                     finally:
                         db.close()
 
-                    response = {
-                        "phrase": phrase,
-                        "category": category,
-                        "confidence": confidence,
-                        "landmarks": lm_pairs,
-                        "hand_detected": True
-                    }
-                    await manager.broadcast(json.dumps(response))
+                await websocket.send_text(json.dumps(response))
             else:
-                await manager.broadcast(json.dumps({
+                await websocket.send_text(json.dumps({
                     "phrase": None,
                     "confidence": 0,
                     "landmarks": [],
