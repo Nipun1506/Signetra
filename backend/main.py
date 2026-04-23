@@ -32,6 +32,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 @app.get("/")
+@app.head("/")
 def read_root():
     return {"message": "Signetra API is Live!", "status": "Healthy"}
 
@@ -682,6 +683,51 @@ def google_auth(req: GoogleAuthRequest):
         "access_token": access_token,
         "profile": profile
     }
+
+@app.post("/api/admin/populate")
+def api_populate_templates(db: Session = Depends(get_db)):
+    """Populates the database with default gesture templates and reloads the classifier."""
+    # This logic is adapted from populate_landmarks.py but using the current session
+    from populate_landmarks import get_thank_you, build_hand, thumb_extended_side, index_extended, middle_extended, ring_extended, pinky_extended, thumb_tucked, index_curled, middle_curled, ring_curled, pinky_curled, thumb_extended_up, pinky_extended, get_no
+    
+    gesture_map = {
+        "Stop": build_hand(thumb_extended_side, index_extended, middle_extended, ring_extended, pinky_extended),
+        "Help": build_hand(thumb_tucked, index_curled, middle_curled, ring_curled, pinky_curled),
+        "Yes": build_hand(thumb_extended_up, index_curled, middle_curled, ring_curled, pinky_curled),
+        "Hello": build_hand(thumb_tucked, index_extended, middle_extended, ring_curled, pinky_curled),
+        "Sorry": build_hand(thumb_tucked, index_curled, middle_curled, ring_curled, pinky_extended),
+        "I Love You": build_hand(thumb_extended_side, index_extended, middle_curled, ring_curled, pinky_extended),
+        "Please": build_hand(thumb_tucked, index_extended, middle_extended, ring_extended, pinky_extended),
+        "Water": build_hand(thumb_extended_side, index_extended, middle_curled, ring_curled, pinky_curled),
+        "Thank You": get_thank_you(),
+        "No": get_no()
+    }
+
+    count = 0
+    for name, data in gesture_map.items():
+        # Update or Insert
+        template = db.query(GestureTemplate).filter(func.lower(GestureTemplate.name) == name.lower()).first()
+        json_data = json.dumps(data)
+        if template:
+            template.landmark_json = json_data
+        else:
+            # We need phrase and category for new ones
+            # In a real app, these would come from the map or defaults
+            template = GestureTemplate(
+                name=name,
+                phrase=name,
+                category="General",
+                landmark_json=json_data
+            )
+            db.add(template)
+        count += 1
+    
+    db.commit()
+    
+    # Reload the classifier templates in memory
+    classifier.load_templates()
+    
+    return {"success": True, "message": f"Populated {count} templates and reloaded classifier.", "total_in_memory": len(classifier.templates)}
 
 if __name__ == "__main__":
     import uvicorn
