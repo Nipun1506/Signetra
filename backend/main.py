@@ -512,14 +512,14 @@ async def websocket_detection(websocket: WebSocket):
                     "hand_detected": True
                 }
 
-                await manager.broadcast(response)
+                await manager.broadcast(json.dumps(response))
             else:
-                await manager.broadcast({
+                await manager.broadcast(json.dumps({
                     "phrase": None,
                     "confidence": 0,
                     "landmarks": [],
                     "hand_detected": False
-                })
+                }))
 
     except WebSocketDisconnect:
         print("🔌 Client disconnected")
