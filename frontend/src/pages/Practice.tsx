@@ -141,26 +141,8 @@ export default function Practice() {
   }
 
   return (
-    <div className="pt-16 min-h-screen bg-[#0f131f] text-white font-body overflow-x-hidden">
-      {/* Top Header Navigation */}
-      <nav className="h-16 border-b border-white/5 flex items-center px-8 justify-between bg-[#0f131f]/80 backdrop-blur-xl fixed top-0 w-full z-50">
-        <div className="flex items-center gap-8">
-          <h1 className="text-xl font-bold tracking-tight text-[#adc6ff]">Signetra</h1>
-          <div className="flex gap-6 text-sm font-medium text-on-surface-variant">
-             <Link to="/admin" className="hover:text-white transition-colors">Dashboard</Link>
-             <span className="text-white border-b-2 border-primary pb-1">Practice</span>
-             <Link to="/learn" className="hover:text-white transition-colors">Library</Link>
-             <Link to="/history" className="hover:text-white transition-colors">History</Link>
-          </div>
-        </div>
-        <div className="flex items-center gap-6">
-          <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-white">settings</span>
-          <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-white">help</span>
-          <div className="w-8 h-8 rounded-full bg-primary-container border border-primary/20 flex items-center justify-center text-xs font-bold">JD</div>
-        </div>
-      </nav>
-
-      <div className="flex h-[calc(100vh-4rem)] pt-6">
+    <div className="min-h-screen bg-[#0f131f] text-white font-body overflow-x-hidden">
+      <div className="flex h-screen pt-6">
         {/* Left Vertical Controls */}
         <aside className="w-16 flex flex-col items-center py-8 gap-10 border-r border-white/5">
           <div className="p-2 bg-primary/20 rounded-lg text-primary cursor-pointer">
