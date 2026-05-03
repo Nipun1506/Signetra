@@ -14,15 +14,23 @@ export default function UserLogs() {
       try {
         const statsUrl = `${API_BASE_URL}/api/admin/stats`;
         const logsUrl = `${API_BASE_URL}/api/admin/logs`;
+        const token = localStorage.getItem('signetra_token');
         
-        console.log(`[UserLogs] Fetching stats from: ${statsUrl}`);
-        console.log(`[UserLogs] Fetching logs from: ${logsUrl}`);
+        const headers = {
+          'Authorization': `Bearer ${token}`
+        };
+
+        console.log(`[UserLogs] Fetching data with token: ${token ? 'PRESENT' : 'MISSING'}`);
 
         const [statsRes, logsRes] = await Promise.all([
-          fetch(statsUrl),
-          fetch(logsUrl)
+          fetch(statsUrl, { headers }),
+          fetch(logsUrl, { headers })
         ])
         
+        if (statsRes.status === 401 || logsRes.status === 401) {
+           throw new Error("Unauthorized access. Please relogin as admin.");
+        }
+
         if (!statsRes.ok || !logsRes.ok) {
            throw new Error(`HTTP Error: Stats ${statsRes.status}, Logs ${logsRes.status}`);
         }

@@ -81,21 +81,30 @@ export default function Admin() {
   const [newTutorial, setNewTutorial] = useState({ youtube_url: '', title: '', difficulty: 'Beginner' });
 
   useEffect(() => {
-    fetchTutorials();
-    fetchGestures();
-    fetchHistory();
-    fetchLogs();
+    const token = localStorage.getItem('signetra_token');
+    const headers = { 'Authorization': `Bearer ${token}` };
+
+    const fetchAllData = () => {
+      fetchTutorials();
+      fetchGestures();
+      fetchHistory();
+      fetchLogs();
+      fetchStats();
+    };
+
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/admin/stats`);
+        const res = await fetch(`${API_BASE_URL}/api/admin/stats`, { headers });
+        if (res.status === 401) return;
         const data = await res.json();
         setLiveStats(data);
       } catch (err) {
         console.error("Failed to fetch admin stats", err);
       }
     };
-    fetchStats();
-    const interval = setInterval(fetchStats, 10000); // 10s refresh
+
+    fetchAllData();
+    const interval = setInterval(fetchStats, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -124,31 +133,47 @@ export default function Admin() {
   };
 
   const fetchTutorials = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/tutorials`);
-    setTutorials(await res.json());
+    const token = localStorage.getItem('signetra_token');
+    const res = await fetch(`${API_BASE_URL}/api/tutorials`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) setTutorials(await res.json());
   };
 
   const fetchGestures = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/admin/gestures`);
-    setGestures(await res.json());
+    const token = localStorage.getItem('signetra_token');
+    const res = await fetch(`${API_BASE_URL}/api/admin/gestures`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) setGestures(await res.json());
   };
 
   const fetchHistory = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/history/all`);
-    setHistory(await res.json());
+    const token = localStorage.getItem('signetra_token');
+    const res = await fetch(`${API_BASE_URL}/api/history/all`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) setHistory(await res.json());
   };
 
   const fetchLogs = async () => {
-    const res = await fetch(`${API_BASE_URL}/api/admin/logs`);
-    setLogs(await res.json());
+    const token = localStorage.getItem('signetra_token');
+    const res = await fetch(`${API_BASE_URL}/api/admin/logs`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.ok) setLogs(await res.json());
   };
 
   const handleAddTutorial = async () => {
     if (!newTutorial.youtube_url) return alert("URL is required");
     try {
+      const token = localStorage.getItem('signetra_token');
       await fetch(`${API_BASE_URL}/api/tutorials`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(newTutorial)
       });
       setShowAddTutorial(false);
@@ -161,14 +186,21 @@ export default function Admin() {
 
   const handleDeleteTutorial = async (id: number) => {
     if (confirm("Delete this tutorial?")) {
-      await fetch(`${API_BASE_URL}/api/tutorials/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('signetra_token');
+      await fetch(`${API_BASE_URL}/api/tutorials/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       fetchTutorials();
     }
   };
 
   const handleExportCSV = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/export-metrics`);
+      const token = localStorage.getItem('signetra_token');
+      const res = await fetch(`${API_BASE_URL}/api/admin/export-metrics`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -185,7 +217,11 @@ export default function Admin() {
   const handleSystemRestart = async () => {
     if (confirm("Soft-restart the AI pipeline? Current connections will stay active.")) {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/admin/restart`, { method: 'POST' });
+        const token = localStorage.getItem('signetra_token');
+        const res = await fetch(`${API_BASE_URL}/api/admin/restart`, { 
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         const data = await res.json();
         alert(data.message);
       } catch (err) {
@@ -198,9 +234,13 @@ export default function Admin() {
     const msg = prompt("Enter global notification message:");
     if (msg) {
       try {
+        const token = localStorage.getItem('signetra_token');
         await fetch(`${API_BASE_URL}/api/admin/notify`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify({ message: msg })
         });
         alert("Notification sent to all active users.");
