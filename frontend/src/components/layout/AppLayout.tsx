@@ -136,7 +136,7 @@ export const AppLayout = () => {
         </div>
       </header>
 
-      <main className="ml-20 flex flex-1 h-screen overflow-y-auto bg-surface-container-lowest custom-scrollbar transition-all duration-300">
+      <main className="ml-20 flex flex-1 h-screen overflow-y-auto pt-16 bg-surface-container-lowest custom-scrollbar transition-all duration-300">
         <div className="flex flex-col min-h-full w-full">
           <div className="flex-1 px-8 py-6">
             <Outlet />

@@ -90,7 +90,7 @@ export default function UserLogs() {
   }
 
   return (
-    <div className="pb-12 min-h-full text-white">
+    <div className="pt-24 pb-12 min-h-full text-white">
       {error && (
         <div className="mb-6 bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl flex items-center gap-3 text-rose-500">
            <span className="material-symbols-outlined">error</span>
