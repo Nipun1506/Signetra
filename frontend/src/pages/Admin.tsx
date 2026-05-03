@@ -250,6 +250,23 @@ export default function Admin() {
     }
   };
 
+  const handlePopulate = async () => {
+    if (confirm("Populate gesture library with default templates? This will reload the AI classifier.")) {
+      try {
+        const token = localStorage.getItem('signetra_token');
+        const res = await fetch(`${API_BASE_URL}/api/admin/populate`, { 
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        alert(data.message);
+        fetchGestures();
+      } catch (err) {
+        alert("Population failed");
+      }
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-[#0f131f] text-white">
       {/* Admin Sidebar */}
@@ -352,7 +369,19 @@ export default function Admin() {
 
         {/* Global Action Header - Lead Admin Only */}
         {role === 'lead_admin' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12">
+           <button 
+             onClick={handlePopulate}
+             className="bg-[#1b1f2c] p-6 rounded-2xl border border-white/5 flex items-center gap-4 hover:bg-white/5 transition-all group"
+           >
+             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+               <span className="material-symbols-outlined">database</span>
+             </div>
+             <div className="text-left">
+               <h4 className="text-sm font-bold">Initialize System</h4>
+               <p className="text-[10px] opacity-40">Seed gesture library</p>
+             </div>
+           </button>
            <button 
              onClick={handleExportCSV}
              className="bg-[#1b1f2c] p-6 rounded-2xl border border-white/5 flex items-center gap-4 hover:bg-white/5 transition-all group"
@@ -362,7 +391,7 @@ export default function Admin() {
              </div>
              <div className="text-left">
                <h4 className="text-sm font-bold">Export CSV Summary</h4>
-               <p className="text-[10px] opacity-40">Download last 24h metrics</p>
+               <p className="text-[10px] opacity-40">Download metrics</p>
              </div>
            </button>
            <button 
@@ -386,7 +415,7 @@ export default function Admin() {
              </div>
              <div className="text-left">
                <h4 className="text-sm font-bold">Global Notification</h4>
-               <p className="text-[10px] opacity-40">Alert all connected nodes</p>
+               <p className="text-[10px] opacity-40">Alert all users</p>
              </div>
            </button>
         </div>
