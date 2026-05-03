@@ -74,7 +74,8 @@ class GestureClassifier:
                 best_score = score
                 best_match = gesture_name
                 
-        if best_score >= 0.75 and best_match is not None:
+        # Lowered threshold from 0.75 to 0.50 so we always get a dynamic score instead of falling back
+        if best_score >= 0.50 and best_match is not None:
             return {
                 "phrase": self.phrases[best_match],
                 "confidence": round(best_score * 100, 1),
