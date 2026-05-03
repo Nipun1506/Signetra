@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import GlobalAIAssistant from '../chat/GlobalAIAssistant'
+import NotificationDropdown from './NotificationDropdown'
 
 export const AppLayout = () => {
   const location = useLocation()
@@ -101,9 +102,7 @@ export const AppLayout = () => {
         <div className="flex items-center gap-6">
           {role !== 'user' && (
             <>
-              <Link to="/admin" title="System Alerts" className="text-[#c2c6d6] hover:text-white transition-colors flex items-center gap-1">
-                <span className="material-symbols-outlined">notifications</span>
-              </Link>
+              <NotificationDropdown />
               <Link to="/admin/docs" title="Help Documentation" className="text-[#c2c6d6] hover:text-white transition-colors flex items-center gap-1">
                 <span className="material-symbols-outlined">help</span>
               </Link>
