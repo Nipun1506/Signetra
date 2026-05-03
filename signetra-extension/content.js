@@ -99,8 +99,8 @@ function hideOverlay() {
 function connectWebSocket() {
   if (ws || !isEnabled) return;
   
-  // Targeting the Railway production backend
-  ws = new WebSocket('wss://signetra-production-95bb.up.railway.app/ws/detection');
+  // Targeting the Render production backend where Vercel is sending frames
+  ws = new WebSocket('wss://signetra-1.onrender.com/ws/detection');
   
   ws.onopen = () => {
     console.log('SIGNETRA WebSocket connected');
