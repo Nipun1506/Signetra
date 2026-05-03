@@ -166,22 +166,6 @@ export default function Practice() {
           <div className="p-2 bg-primary/20 rounded-lg text-primary cursor-pointer">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>back_hand</span>
           </div>
-          <div className="flex flex-col items-center gap-1 group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
-            <span className="material-symbols-outlined">speed</span>
-            <span className="text-[8px] font-bold uppercase tracking-tighter">Speed</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
-            <span className="material-symbols-outlined">auto_awesome</span>
-            <span className="text-[8px] font-bold uppercase tracking-tighter">Guidance</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
-            <span className="material-symbols-outlined">mic</span>
-            <span className="text-[8px] font-bold uppercase tracking-tighter">Voice</span>
-          </div>
-          <div className="flex flex-col items-center gap-1 group cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
-            <span className="material-symbols-outlined">keyboard</span>
-            <span className="text-[8px] font-bold uppercase tracking-tighter">Shortcuts</span>
-          </div>
         </aside>
 
         {/* Main Content */}
