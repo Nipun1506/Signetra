@@ -1,9 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { TUTORIALS, VIDEOS } from '../data/tutorials'
+import { getLearningProgress } from '../utils/history'
 
 export default function Learn() {
-  const [activeTab, setActiveTab] = React.useState<'tutorials' | 'videos'>('tutorials')
+  const [activeTab, setActiveTab] = useState<'tutorials' | 'videos'>('tutorials')
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    setProgress(getLearningProgress())
+  }, [])
 
   return (
     <div className="pt-24 px-10 pb-12 max-w-7xl mx-auto w-full">
@@ -95,10 +101,12 @@ export default function Learn() {
 
       {/* Progress FAB: Moved to left-bottom and updated z-index */}
       <div className="fixed bottom-10 left-[104px] z-40">
-        <button className="bg-gradient-to-br from-[#adc6ff] to-[#4d8eff] w-14 h-14 rounded-full shadow-2xl shadow-primary/30 flex items-center justify-center group relative border border-white/20">
-          <span className="material-symbols-outlined text-on-primary text-2xl group-hover:rotate-12 transition-transform">emoji_events</span>
-          <div className="absolute -top-1 -right-1 bg-on-background text-[#00285d] text-[9px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">72%</div>
-        </button>
+        <Link to="/history" title="View Learning Progress">
+          <button className="bg-gradient-to-br from-[#adc6ff] to-[#4d8eff] w-14 h-14 rounded-full shadow-2xl shadow-primary/30 flex items-center justify-center group relative border border-white/20 hover:scale-105 active:scale-95 transition-all">
+            <span className="material-symbols-outlined text-on-primary text-2xl group-hover:rotate-12 transition-transform">emoji_events</span>
+            <div className="absolute -top-1 -right-1 bg-on-background text-[#00285d] text-[9px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-primary">{progress}%</div>
+          </button>
+        </Link>
       </div>
     </div>
   )

@@ -76,3 +76,35 @@ export function logGestureHistory(gesturePhrase: string, confidence: number, pla
     console.warn("Failed to log history", err)
   }
 }
+
+export function getLearningProgress(): number {
+  try {
+    const rawData = localStorage.getItem('signetra_history')
+    if (!rawData) return 0
+    
+    const history: HistoryEntry[] = JSON.parse(rawData)
+    const uniqueGestures = new Set<string>()
+    
+    // Collect all unique gestures the user has successfully performed
+    history.forEach(entry => {
+      // Normalize to handle case differences
+      uniqueGestures.add(entry.gesture.toLowerCase())
+    })
+    
+    if (TUTORIALS.length === 0) return 0
+    
+    // Count how many tutorials have been completed
+    let completedCount = 0
+    TUTORIALS.forEach(tutorial => {
+      if (uniqueGestures.has(tutorial.title.toLowerCase()) || uniqueGestures.has(tutorial.phrase.toLowerCase())) {
+        completedCount++
+      }
+    })
+    
+    const percentage = Math.round((completedCount / TUTORIALS.length) * 100)
+    return Math.min(percentage, 100) // Cap at 100%
+  } catch (err) {
+    console.warn("Failed to calculate learning progress", err)
+    return 0
+  }
+}
