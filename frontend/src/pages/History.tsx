@@ -19,36 +19,18 @@ export default function History() {
   const [historyData, setHistoryData] = useState<HistoryEntry[]>([])
 
   useEffect(() => {
-    const fetchHistory = async () => {
+    const loadHistory = () => {
       try {
-        const token = localStorage.getItem('signetra_token');
-        const res = await fetch(`${API_BASE_URL}/api/history/all`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (!res.ok) throw new Error('Unauthorized');
-        const data = await res.json();
-        const mapped: HistoryEntry[] = data.map((item: any) => ({
-          id: String(item.id),
-          time: new Date(item.timestamp).toLocaleString(),
-          gesture: item.phrase,
-          icon: getIcon(item.phrase),
-          phrase: item.phrase,
-          confidenceStr: `${item.confidence}%`,
-          platform: item.platform,
-          duration: 'Real-time',
-          status: item.confidence >= 90 ? 'high' : item.confidence >= 70 ? 'med' : 'low',
-          rawConfidence: item.confidence
-        }));
-        
-        setHistoryData(mapped);
+        const rawData = localStorage.getItem('signetra_history')
+        if (rawData) {
+          setHistoryData(JSON.parse(rawData))
+        }
       } catch (err) {
-        console.error("Failed to fetch history", err);
+        console.error("Failed to load history from local storage", err);
       }
     };
 
-    fetchHistory();
+    loadHistory();
   }, []);
 
   const getIcon = (phrase: string) => {
