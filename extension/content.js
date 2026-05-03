@@ -22,12 +22,12 @@ document.body.appendChild(overlay);
 let ws = null;
 
 function connectWebsocket() {
-  chrome.storage.sync.get(['enabled'], (result) => {
-    if (result.enabled === false) return; // Opted out by default or disabled
-    
-    ws = new WebSocket("ws://localhost:8000/ws/detection");
-    
-    ws.onopen = () => {
+    chrome.storage.sync.get(['enabled'], (result) => {
+      if (result.enabled === false) return; // Opted out by default or disabled
+      
+      ws = new WebSocket("wss://signetra-1.onrender.com/ws/detection");
+      
+      ws.onopen = () => {
       console.log("SIGNETRA: Connected to local detection server");
     };
 
