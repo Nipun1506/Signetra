@@ -35,19 +35,43 @@ export default function Support() {
 
   const fetchTickets = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/support/tickets`);
-      setTickets(await res.json());
+      const token = localStorage.getItem('signetra_token');
+      const res = await fetch(`${API_BASE_URL}/api/support/tickets`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) throw new Error('Unauthorized or Server Error');
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setTickets(data);
+      } else {
+        console.warn("Tickets response is not an array:", data);
+        setTickets([]);
+      }
     } catch (err) {
       console.error("Failed to fetch tickets", err);
+      setTickets([]);
     }
   };
 
   const fetchReplies = async (ticketId: number) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/support/tickets/${ticketId}/replies`);
-      setReplies(await res.json());
+      const token = localStorage.getItem('signetra_token');
+      const res = await fetch(`${API_BASE_URL}/api/support/tickets/${ticketId}/replies`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setReplies(data);
+      } else {
+        setReplies([]);
+      }
     } catch (err) {
       console.error("Failed to fetch replies", err);
+      setReplies([]);
     }
   };
 
@@ -56,14 +80,19 @@ export default function Support() {
     setTicketStatus('sending');
     
     try {
-      await fetch(`${API_BASE_URL}/api/support/tickets`, {
+      const token = localStorage.getItem('signetra_token');
+      const res = await fetch(`${API_BASE_URL}/api/support/tickets`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           ...formData,
           admin_id: 'RA-9921'
         })
       });
+      if (!res.ok) throw new Error('Failed to create ticket');
       setTicketStatus('success');
       fetchTickets();
     } catch (err) {
@@ -76,9 +105,13 @@ export default function Support() {
     if (!replyText.trim() || !selectedTicket) return;
     setIsSendingReply(true);
     try {
+      const token = localStorage.getItem('signetra_token');
       await fetch(`${API_BASE_URL}/api/support/tickets/${selectedTicket.id}/replies`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           message: replyText,
           author: 'Engineering Support'
@@ -96,14 +129,17 @@ export default function Support() {
   const handleUpdateStatus = async (newStatus: any) => {
     if (!selectedTicket) return;
     try {
+      const token = localStorage.getItem('signetra_token');
       await fetch(`${API_BASE_URL}/api/support/tickets/${selectedTicket.id}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ status: newStatus })
       });
       setSelectedTicket({ ...selectedTicket, status: newStatus });
       fetchTickets();
-      // If moving away from current filter, maybe close drawer or just let it update
     } catch (err) {
       alert("Failed to update status");
     }
