@@ -1801,12 +1801,12 @@ document.body.appendChild(overlay);
 let ws = null;
 
 function connectWebsocket() {
-  chrome.storage.sync.get(['enabled'], (result) => {
-    if (result.enabled === false) return; // Opted out by default or disabled
-    
-    ws = new WebSocket("ws://localhost:8000/ws/detection");
-    
-    ws.onopen = () => {
+    chrome.storage.sync.get(['enabled'], (result) => {
+      if (result.enabled === false) return; // Opted out by default or disabled
+      
+      ws = new WebSocket("wss://signetra-1.onrender.com/ws/detection");
+      
+      ws.onopen = () => {
       console.log("SIGNETRA: Connected to local detection server");
     };
 
@@ -12494,8 +12494,8 @@ const IS_PROD = import.meta.env.PROD;
 // For Vercel/Netlify, you set these variables in the dashboard:
 // VITE_API_URL: https://your-backend.railway.app
 // VITE_WS_URL: wss://your-backend.railway.app
-export const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://signetra-1.onrender.com" : "http://localhost:10000");
-export const WS_BASE_URL = import.meta.env.VITE_WS_URL || (import.meta.env.PROD ? "wss://signetra-1.onrender.com" : "ws://localhost:10000");
+export const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://signetra-production-95bb.up.railway.app" : "http://localhost:10000");
+export const WS_BASE_URL = import.meta.env.VITE_WS_URL || (import.meta.env.PROD ? "wss://signetra-production-95bb.up.railway.app" : "ws://localhost:10000");
 
 export const config = {
   API_BASE_URL,
@@ -15128,10 +15128,26 @@ export default function Recognize() {
           return;
         }
 
+        // Handle Backend Auth/Processing Errors
+        if (data.error) {
+          console.error("WS backend error:", data.error);
+          setCameraError(`Connection Error: ${data.error}`);
+          return;
+        }
+
         // Only accept gestures that meet the user-defined minimum confidence threshold
         if (data.phrase && data.confidence >= minConfidence) {
           setCurrentGesture(data)
           confidenceValue.set(data.confidence)
+          
+          // Emit gesture for Chrome Extension Cross-Tab overlay
+          window.postMessage({ 
+            type: 'SIGNETRA_GESTURE', 
+            phrase: data.phrase, 
+            category: data.category || 'General', 
+            confidence: data.confidence 
+          }, '*');
+
           if (data.landmarks && canvasRef.current) {
             drawLandmarks(data.landmarks)
           }
@@ -22723,17 +22739,16 @@ async def websocket_detection(websocket: WebSocket):
             if not frame_b64:
                 continue
                 
-            # Protect MediaPipe: verify token before processing frames
-            try:
-                # Use a primitive cache for the current connection session
-                if not hasattr(websocket, "_token_verified") or websocket._token_verified != token:
-                    if not token:
-                        raise ValueError("No token")
-                    verify_token(token)
-                    websocket._token_verified = token
-            except Exception as e:
-                await websocket.send_text(json.dumps({"hand_detected": False, "error": f"Unauthorized feed: {str(e)}"}))
-                continue
+            # Protect MediaPipe: verify token before processing frames (allow guest mode)
+            if token:
+                try:
+                    # Use a primitive cache for the current connection session
+                    if not hasattr(websocket, "_token_verified") or websocket._token_verified != token:
+                        verify_token(token)
+                        websocket._token_verified = token
+                except Exception as e:
+                    await websocket.send_text(json.dumps({"hand_detected": False, "error": f"Unauthorized feed: {str(e)}"}))
+                    continue
 
             # Decode base64 frame to image
             try:
@@ -22781,9 +22796,9 @@ async def websocket_detection(websocket: WebSocket):
                     "hand_detected": True
                 }
 
-                await websocket.send_text(json.dumps(response))
+                await manager.broadcast(json.dumps(response))
             else:
-                await websocket.send_text(json.dumps({
+                await manager.broadcast(json.dumps({
                     "phrase": None,
                     "confidence": 0,
                     "landmarks": [],
