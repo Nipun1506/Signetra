@@ -300,19 +300,11 @@ export default function Practice() {
              </div>
            </div>
         </div>
-        <div className="flex items-center gap-10 border-l border-white/5 pl-10">
-           <div className="flex flex-col items-center gap-1 group cursor-pointer hover:text-primary transition-colors">
-              <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary">insert_chart</span>
-              <span className="text-[8px] font-bold uppercase tracking-tighter">Feedback</span>
-           </div>
-           <div className="flex flex-col items-center gap-1 group cursor-pointer hover:text-primary transition-colors">
-              <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary">settings_suggest</span>
-              <span className="text-[8px] font-bold uppercase tracking-tighter">Analysis</span>
-           </div>
-           <button className="bg-primary-container h-12 w-12 rounded-xl flex items-center justify-center group hover:scale-105 transition-all shadow-xl shadow-blue-500/20">
-              <span className="material-symbols-outlined text-on-primary-container group-hover:translate-x-1 transition-transform">arrow_forward</span>
-           </button>
-        </div>
+         <div className="flex items-center gap-10 border-l border-white/5 pl-10">
+            <button className="bg-primary-container h-12 w-12 rounded-xl flex items-center justify-center group hover:scale-105 transition-all shadow-xl shadow-blue-500/20">
+               <span className="material-symbols-outlined text-on-primary-container group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </button>
+         </div>
       </footer>
 
       {/* Mastery Pop Up Notification */}
