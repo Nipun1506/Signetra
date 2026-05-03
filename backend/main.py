@@ -65,8 +65,8 @@ app.add_middleware(
 mp_hands = mp.solutions.hands
 hands_detector = mp_hands.Hands(
     max_num_hands=1,
-    min_detection_confidence=0.7,
-    min_tracking_confidence=0.6,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.4,
     model_complexity=1
 )
 classifier = GestureClassifier()
@@ -114,85 +114,89 @@ def classify_gesture(landmarks) -> tuple[str, float]:
 
     lm = landmarks
 
+    # Calculate Palm Size for normalization (wrist to middle finger mcp)
+    palm_size = ((lm[0]['x'] - lm[9]['x'])**2 + (lm[0]['y'] - lm[9]['y'])**2)**0.5
+    if palm_size < 0.01: palm_size = 0.1 # Safety
+
     # Improved Helper: Finger state detection
-    def get_finger_state(tip, pip, mcp, wrist):
-        # Distance from wrist to tip vs wrist to mcp
-        d_tip = ((lm[tip]['x'] - lm[wrist]['x'])**2 + (lm[tip]['y'] - lm[wrist]['y'])**2)**0.5
-        d_mcp = ((lm[mcp]['x'] - lm[wrist]['x'])**2 + (lm[mcp]['y'] - lm[wrist]['y'])**2)**0.5
-        # Also check verticality
-        is_above = lm[tip]['y'] < lm[pip]['y'] - 0.02
-        return is_above and (d_tip > d_mcp * 1.1)
+    def get_finger_state(tip, pip, mcp):
+        # Tip must be significantly further from wrist than MCP
+        d_tip = ((lm[tip]['x'] - lm[0]['x'])**2 + (lm[tip]['y'] - lm[0]['y'])**2)**0.5
+        d_mcp = ((lm[mcp]['x'] - lm[0]['x'])**2 + (lm[mcp]['y'] - lm[0]['y'])**2)**0.5
+        is_extended = d_tip > d_mcp + (0.3 * palm_size)
+        is_above = lm[tip]['y'] < lm[pip]['y']
+        return is_extended or is_above
 
-    # Helper for tucked fingers (tightly folded)
-    def is_tucked(tip, mcp, wrist):
-        d_tip = ((lm[tip]['x'] - lm[wrist]['x'])**2 + (lm[tip]['y'] - lm[wrist]['y'])**2)**0.5
-        d_mcp = ((lm[mcp]['x'] - lm[wrist]['x'])**2 + (lm[mcp]['y'] - lm[wrist]['y'])**2)**0.5
-        return d_tip < d_mcp * 0.8 # Tip is inside the palm area
+    def is_tucked(tip, mcp):
+        d_tip = ((lm[tip]['x'] - lm[0]['x'])**2 + (lm[tip]['y'] - lm[0]['y'])**2)**0.5
+        d_mcp = ((lm[mcp]['x'] - lm[0]['x'])**2 + (lm[mcp]['y'] - lm[0]['y'])**2)**0.5
+        return d_tip < d_mcp # Tip is closer to wrist than its MCP
 
-    index_up  = get_finger_state(8, 6, 5, 0)
-    middle_up = get_finger_state(12, 10, 9, 0)
-    ring_up   = get_finger_state(16, 14, 13, 0)
-    pinky_up  = get_finger_state(20, 18, 17, 0)
+    index_up  = get_finger_state(8, 6, 5)
+    middle_up = get_finger_state(12, 10, 9)
+    ring_up   = get_finger_state(16, 14, 13)
+    pinky_up  = get_finger_state(20, 18, 17)
 
-    # Check for tightly tucked fingers
-    index_tucked  = is_tucked(8, 5, 0)
-    middle_tucked = is_tucked(12, 9, 0)
-    ring_tucked   = is_tucked(16, 13, 0)
-    pinky_tucked  = is_tucked(20, 17, 0)
+    index_tucked  = is_tucked(8, 5)
+    middle_tucked = is_tucked(12, 9)
+    ring_tucked   = is_tucked(16, 13)
+    pinky_tucked  = is_tucked(20, 17)
 
-    # OK Pinch distance check
-    dist_thumb_index = ((lm[4]['x'] - lm[8]['x'])**2 + (lm[4]['y'] - lm[8]['y'])**2)**0.5
+    # Thumb logic
+    thumb_tip = lm[4]
+    thumb_ip = lm[3]
+    thumb_mcp = lm[2]
+    
+    # Thumb out = distance between thumb tip and index MCP
+    dist_thumb_index_mcp = ((thumb_tip['x'] - lm[5]['x'])**2 + (thumb_tip['y'] - lm[5]['y'])**2)**0.5
+    thumb_out = dist_thumb_index_mcp > (0.6 * palm_size)
+    thumb_up = thumb_tip['y'] < thumb_mcp['y'] - (0.2 * palm_size)
 
-    # Thumb UP check (for Thumbs Up)
-    thumb_up = lm[4]['y'] < lm[2]['y'] and lm[4]['y'] < lm[5]['y']
-
-    # Thumb OUT check (for Water and I Love You)
-    def is_thumb_out():
-        return abs(lm[4]['x'] - lm[5]['x']) > 0.12 # Increased threshold for L-shape
-            
-    thumb_out = is_thumb_out()
+    # OK Pinch check
+    dist_thumb_index_tip = ((lm[4]['x'] - lm[8]['x'])**2 + (lm[4]['y'] - lm[8]['y'])**2)**0.5
+    is_ok_pinch = dist_thumb_index_tip < (0.4 * palm_size)
 
     # --- Stricter Recognition Rules ---
 
-    # 1. STOP — Open Palm (All 4 fingers UP, none tucked)
+    # 1. STOP — Open Palm
     if index_up and middle_up and ring_up and pinky_up:
         return ("STOP", 98, "General")
 
-    # 2. PLEASE — Hand on chest (Index, Middle, Ring UP; Pinky TUCKED)
+    # 2. PLEASE — Hand on chest style
     if index_up and middle_up and ring_up and pinky_tucked:
         return ("PLEASE", 95, "Social")
 
-    # 3. HELLO — Peace Sign (Index, Middle UP; Ring, Pinky TUCKED)
+    # 3. HELLO — Peace Sign
     if index_up and middle_up and ring_tucked and pinky_tucked:
         return ("HELLO", 94, "Greeting")
 
-    # 4. THANK YOU — OK Sign (Thumb-Index pinch, others UP)
-    if dist_thumb_index < 0.05 and middle_up and ring_up and pinky_up:
+    # 4. THANK YOU — OK Sign
+    if is_ok_pinch and middle_up and ring_up and pinky_up:
         return ("THANK YOU", 94, "Social")
 
-    # 5. I LOVE YOU — Rock On (Index, Pinky UP, Middle/Ring TUCKED, Thumb OUT)
+    # 5. I LOVE YOU — Rock On
     if index_up and pinky_up and middle_tucked and ring_tucked and thumb_out:
         return ("I LOVE YOU", 92, "Social")
 
-    # 6. WATER — L-Shape (Index UP, Thumb OUT, Middle/Ring/Pinky TUCKED)
+    # 6. WATER — L-Shape
     if index_up and thumb_out and middle_tucked and ring_tucked and pinky_tucked:
         return ("WATER", 90, "Needs")
 
-    # 7. NO — Point (Index UP, others TUCKED, thumb in)
+    # 7. NO — Point
     if index_up and middle_tucked and ring_tucked and pinky_tucked and not thumb_out:
         return ("NO", 88, "Negation")
 
-    # 8. SORRY — Pinky UP, others TUCKED
+    # 8. SORRY — Pinky Up only
     if pinky_up and index_tucked and middle_tucked and ring_tucked:
         return ("SORRY", 85, "Social")
 
-    # 9. YES — Thumbs Up (Thumb UP, all fingers TUCKED)
+    # 9. YES — Thumbs Up
     if thumb_up and index_tucked and middle_tucked and ring_tucked and pinky_tucked:
         return ("YES", 92, "Affirmation")
 
-    # 10. HELP — Closed Fist (All fingers TUCKED, thumb tucked)
-    if index_tucked and middle_tucked and ring_tucked and pinky_tucked:
-        return ("HELP", 80, "Urgent")
+    # 10. HELP — Closed Fist
+    if index_tucked and middle_tucked and ring_tucked and pinky_tucked and not thumb_up:
+        return ("HELP", 85, "Urgent")
 
     return ("UNKNOWN", 0, "Unknown")
 
