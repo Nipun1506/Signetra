@@ -237,6 +237,24 @@ def get_stats(db: Session = Depends(get_db), current_user: dict = Depends(get_cu
         "accuracy_rate": round(float(avg_conf), 1)
     }
 
+class HistoryCreate(BaseModel):
+    phrase: str
+    confidence: float
+    category: str
+    platform: str
+
+@app.post("/api/history")
+def add_history(data: HistoryCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    history_record = DetectionHistory(
+        phrase=data.phrase,
+        confidence=data.confidence,
+        category=data.category,
+        platform=data.platform
+    )
+    db.add(history_record)
+    db.commit()
+    return {"status": "success"}
+
 @app.get("/api/history/recent")
 def get_recent_history(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     # Get latest 5 detections

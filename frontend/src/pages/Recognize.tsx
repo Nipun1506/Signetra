@@ -199,7 +199,7 @@ export default function Recognize() {
           }
           // History persistence tracking
           if (data.phrase !== lastLoggedRef.current) {
-            logGestureHistory(data.phrase, data.confidence, source === 'webcam' ? 'Webcam' : 'iPhone')
+            logGestureHistory(data.phrase, data.confidence, source === 'webcam' ? 'Webcam' : 'iPhone', data.category || 'General')
             lastLoggedRef.current = data.phrase
           }
         } else {

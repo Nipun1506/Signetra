@@ -1,4 +1,5 @@
 import { TUTORIALS } from '../data/tutorials'
+import { API_BASE_URL } from '../config'
 
 export interface HistoryEntry {
   id: string;
@@ -13,7 +14,7 @@ export interface HistoryEntry {
   rawConfidence: number;
 }
 
-export function logGestureHistory(gesturePhrase: string, confidence: number, platform: string = 'Webcam') {
+export function logGestureHistory(gesturePhrase: string, confidence: number, platform: string = 'Webcam', category: string = 'General') {
   try {
     const rawData = localStorage.getItem('signetra_history')
     let history: HistoryEntry[] = rawData ? JSON.parse(rawData) : []
@@ -28,10 +29,12 @@ export function logGestureHistory(gesturePhrase: string, confidence: number, pla
     const now = new Date()
     const timeStr = now.toTimeString().split(' ')[0] // e.g., 14:23:05
     
+    const finalPhrase = tutorial ? tutorial.title : gesturePhrase;
+
     const newEntry: HistoryEntry = {
       id: crypto.randomUUID(),
       time: timeStr,
-      gesture: tutorial ? tutorial.title : gesturePhrase,
+      gesture: finalPhrase,
       icon: icon,
       phrase: `"${tutorial ? tutorial.phrase : gesturePhrase}"`,
       confidenceStr: `${Math.round(confidence)}%`,
@@ -50,6 +53,25 @@ export function logGestureHistory(gesturePhrase: string, confidence: number, pla
     }
     
     localStorage.setItem('signetra_history', JSON.stringify(history))
+
+    // ALSO sync to backend for global stats dashboard
+    const token = localStorage.getItem('signetra_token');
+    if (token) {
+        fetch(`${API_BASE_URL}/api/history`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                phrase: finalPhrase,
+                confidence: confidence,
+                category: category,
+                platform: platform
+            })
+        }).catch(err => console.warn("Failed to push history to backend", err));
+    }
+
   } catch (err) {
     console.warn("Failed to log history", err)
   }
