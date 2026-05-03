@@ -353,18 +353,21 @@ async def get_admin_stats(db: Session = Depends(get_db), current_user: dict = De
     pulse_map = {row.hour: row.count for row in pulse_raw}
     current_hour = datetime.now().hour
     pulse = []
-    # Take 7 samplings or just last 24? The UI likes 7-8 points. 
-    # Let's take 8 points (every 3 hours)
+    # Take 8 samples (every 3 hours)
     for i in range(7, -1, -1):
         target_h = (current_hour - (i * 3)) % 24
         target_h_str = f"{target_h:02d}"
-        pulse.append(pulse_map.get(target_h_str, random.randint(5, 15) if total == 0 else 0)) # Add slight noise if empty for visual
+        pulse.append(pulse_map.get(target_h_str, 0)) # Strictly real data
+
+    # Calculate actual system latency from last detection if available
+    # Note: We don't track processing time in the DB yet, so we return "Real-time"
+    pending_gestures = db.query(GestureTemplate).count() # Using total templates as a placeholder for 'Gestures in Library'
 
     return {
         "total_detections": f"{total:,}",
         "active_users": f"{active}",
-        "new_gestures": "15",
-        "system_latency": f"{random.randint(40, 48)}ms",
+        "new_gestures": f"{pending_gestures}",
+        "system_latency": "Real-time",
         "pulse": pulse,
         "popular_signs": popular_data
     }
