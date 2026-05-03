@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { API_BASE_URL } from '../config'
+import { getAchievementState } from '../utils/achievementSystem'
 
 interface Stats {
   gestures_today: number;
@@ -19,6 +20,7 @@ interface Activity {
 }
 
 export const Home = () => {
+  const achievements = getAchievementState()
   const [stats, setStats] = useState<Stats>({
     gestures_today: 0,
     total_learned: 0,
@@ -138,7 +140,19 @@ export const Home = () => {
       </section>
 
       {/* Stats Grid: Tonal Layering */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-16">
+        <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6 rounded-xl border-l-4 border-primary hover:scale-[1.02] transition-all">
+          <span className="material-symbols-outlined text-primary mb-4 block">military_tech</span>
+          <div className="text-3xl font-black text-on-surface leading-none mb-2">Level {achievements.level}</div>
+          <div className="text-[10px] font-bold text-primary tracking-widest uppercase mb-4">Mastery Rank</div>
+          <div className="flex flex-wrap gap-2">
+            {achievements.badges.filter(b => b.unlockedAt).map(b => (
+              <span key={b.id} title={b.name} className="material-symbols-outlined text-sm opacity-60">
+                {b.icon}
+              </span>
+            ))}
+          </div>
+        </div>
         <div className="bg-surface-container-low p-6 rounded-xl border-l-2 border-primary/20 hover:bg-surface-container transition-colors">
           <span className="material-symbols-outlined text-primary mb-4 block">gesture</span>
           <div className="text-3xl font-bold text-on-surface leading-none mb-2">{stats.gestures_today}</div>

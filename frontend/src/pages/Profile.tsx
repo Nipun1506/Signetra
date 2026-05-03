@@ -3,9 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import type { UserRole } from '../context/AuthContext'
+import { getAchievementState, getLevelProgress } from '../utils/achievementSystem'
 
 export default function Profile() {
   const { role, baseRole, setRole } = useAuth()
+  const achievements = getAchievementState()
+  const { progress, nextThreshold } = getLevelProgress(achievements.totalXP)
   const [isEditing, setIsEditing] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [newPassword, setNewPassword] = useState('')
@@ -257,6 +260,47 @@ export default function Profile() {
           {/* Sidebar Area */}
           <aside className="lg:col-span-4 space-y-8">
             
+            {/* Level & Achievements */}
+            <div className="bg-surface-container-low rounded-[1.5rem] p-6 border border-outline-variant/10 shadow-xl shadow-blue-500/5">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary">military_tech</span>
+                  <h3 className="text-lg font-bold tracking-tight text-white">Mastery Level</h3>
+                </div>
+                <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Level {achievements.level}</span>
+              </div>
+              
+              <div className="mb-8">
+                <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">
+                  <span>Progress to Next Rank</span>
+                  <span>{Math.floor(progress)}%</span>
+                </div>
+                <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    className="h-full bg-gradient-to-r from-primary to-[#4d8eff] shadow-[0_0_15px_rgba(173,198,255,0.3)]"
+                  />
+                </div>
+                <p className="text-[9px] text-on-surface-variant mt-2 text-right italic">{achievements.totalXP} / {nextThreshold} XP</p>
+              </div>
+
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-4">Badges Earned</p>
+                <div className="flex flex-wrap gap-3">
+                  {achievements.badges.map(badge => (
+                    <div 
+                      key={badge.id} 
+                      title={badge.unlockedAt ? `Unlocked on ${new Date(badge.unlockedAt).toLocaleDateString()}` : `Unlocks at Level ${badge.level}`}
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${badge.unlockedAt ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-surface-container-highest border-white/5 text-white/10 grayscale'}`}
+                    >
+                      <span className="material-symbols-outlined text-2xl">{badge.icon}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* Preferences */}
             <div className="bg-surface-container-low rounded-[1.5rem] p-6 border border-outline-variant/10 shadow-xl shadow-blue-500/5">
               <div className="flex items-center gap-3 mb-6">

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { logGestureHistory } from '../utils/history'
 import { TUTORIALS } from '../data/tutorials'
 import { WS_BASE_URL } from '../config'
+import { addXP } from '../utils/achievementSystem'
+import type { Badge } from '../utils/achievementSystem'
 
 export default function Practice() {
   const { gestureId } = useParams()
@@ -12,6 +14,8 @@ export default function Practice() {
   const [status, setStatus] = useState('CALIBRATING')
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [showLevelUp, setShowLevelUp] = useState(false)
+  const [unlockedBadge, setUnlockedBadge] = useState<Badge | null>(null)
+  const navigate = useNavigate()
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const wsRef = useRef<WebSocket | null>(null)
@@ -21,17 +25,23 @@ export default function Practice() {
   const currentTutorial = TUTORIALS.find(t => t.title.toLowerCase() === gestureId?.toLowerCase())
   const referenceImage = currentTutorial?.img || "https://lh3.googleusercontent.com/aida-public/AB6AXuA6vbUq3RJd73uTQ9kPz_EWd5KbmODzcqravX38ccCdA6h3GH8RqknID62VrC7XLy_o_CEsx4rUa5Vl1-jhvuUY_JUIAHlLMMvvOQPnAwsp9o2JAVpUT-pCmT-L5uhnbzLbFeAViu6308pJkxd99DMdODE2_aULlNMcWD5z9NPXybOhTc5Fud7uvWOOdWKgfpRP_gZl2i3FNi9HDpCSeHZofQsQahkfF754LpzdeAwy5Xa37mSqPXvW7O7p_g2Ah9fjWycOFOf0ngo"
 
-  // Trigger popup when high accuracy is met
+  // Trigger popup when high accuracy is met, but only for Level Ups
   useEffect(() => {
-    if (accuracy >= 85 && status === 'MOTION PERFECT' && !showLevelUp) {
-      setShowLevelUp(true)
+    if (accuracy >= 90 && status === 'MOTION PERFECT' && !showLevelUp) {
+      const { levelUp, newBadge } = addXP(50);
+      
+      if (levelUp) {
+        setShowLevelUp(true)
+        setUnlockedBadge(newBadge)
+        const timer = setTimeout(() => setShowLevelUp(false), 5000)
+        return () => clearTimeout(timer)
+      }
+
       if (gestureId) {
         logGestureHistory(gestureId, accuracy, 'Webcam (Practice)')
       }
-      const timer = setTimeout(() => setShowLevelUp(false), 4000)
-      return () => clearTimeout(timer)
     }
-  }, [accuracy, status])
+  }, [accuracy, status, gestureId])
 
   useEffect(() => {
     if (isActive) {
@@ -330,17 +340,17 @@ export default function Practice() {
             exit={{ opacity: 0, y: -20, scale: 0.9 }}
             className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-[#0a0e1a]/90 backdrop-blur-xl p-4 pr-8 rounded-[2rem] border border-emerald-500/30 flex items-center gap-6 shadow-[0_10px_50px_rgba(16,185,129,0.15)]"
           >
-             <div className="relative w-12 h-12 flex items-center justify-center text-emerald-500">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-20" />
-                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="100 100" />
-                </svg>
-                <span className="absolute text-sm font-bold material-symbols-outlined">emoji_events</span>
-             </div>
-             <div>
-                <p className="text-[10px] uppercase font-bold text-emerald-500 tracking-[0.2em] mb-0.5">Mastery Achieved</p>
-                <p className="text-lg font-bold text-white tracking-tight">Level Promoted!</p>
-             </div>
+              <div className="relative w-12 h-12 flex items-center justify-center text-emerald-500">
+                 <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                   <circle cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" strokeWidth="3" className="opacity-20" />
+                   <circle cx="18" cy="18" r="15.915" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="100 100" />
+                 </svg>
+                 <span className="absolute text-sm font-bold material-symbols-outlined">{unlockedBadge?.icon || 'emoji_events'}</span>
+              </div>
+              <div>
+                 <p className="text-[10px] uppercase font-bold text-emerald-500 tracking-[0.2em] mb-0.5">{unlockedBadge ? 'New Badge Unlocked!' : 'Mastery Achieved'}</p>
+                 <p className="text-lg font-bold text-white tracking-tight">{unlockedBadge ? unlockedBadge.name : 'Level Promoted!'}</p>
+              </div>
           </motion.div>
         )}
       </AnimatePresence>
