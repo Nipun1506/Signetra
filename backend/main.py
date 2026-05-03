@@ -65,8 +65,8 @@ app.add_middleware(
 mp_hands = mp.solutions.hands
 hands_detector = mp_hands.Hands(
     max_num_hands=1,
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.4,
+    min_detection_confidence=0.4,
+    min_tracking_confidence=0.3,
     model_complexity=1
 )
 classifier = GestureClassifier()
@@ -144,17 +144,18 @@ def classify_gesture(landmarks) -> tuple[str, float]:
 
     # Thumb logic
     thumb_tip = lm[4]
-    thumb_ip = lm[3]
     thumb_mcp = lm[2]
     
     # Thumb out = distance between thumb tip and index MCP
     dist_thumb_index_mcp = ((thumb_tip['x'] - lm[5]['x'])**2 + (thumb_tip['y'] - lm[5]['y'])**2)**0.5
-    thumb_out = dist_thumb_index_mcp > (0.6 * palm_size)
-    thumb_up = thumb_tip['y'] < thumb_mcp['y'] - (0.2 * palm_size)
+    thumb_out = dist_thumb_index_mcp > (0.45 * palm_size)
+    
+    # Stricter Thumb UP: Must be clearly higher than the primary knuckles
+    thumb_up = thumb_tip['y'] < min(lm[5]['y'], lm[9]['y'], lm[13]['y'], lm[17]['y']) - (0.05 * palm_size)
 
     # OK Pinch check
     dist_thumb_index_tip = ((lm[4]['x'] - lm[8]['x'])**2 + (lm[4]['y'] - lm[8]['y'])**2)**0.5
-    is_ok_pinch = dist_thumb_index_tip < (0.4 * palm_size)
+    is_ok_pinch = dist_thumb_index_tip < (0.35 * palm_size)
 
     # --- Stricter Recognition Rules ---
 
@@ -186,15 +187,16 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     if index_up and middle_tucked and ring_tucked and pinky_tucked and not thumb_out:
         return ("NO", 88, "Negation")
 
-    # 8. SORRY — Pinky Up only
+    # 8. SORRY — Pinky Up only (Must be significantly higher than all other fingertips)
     if pinky_up and index_tucked and middle_tucked and ring_tucked:
-        return ("SORRY", 85, "Social")
+        if lm[20]['y'] < min(lm[8]['y'], lm[12]['y'], lm[16]['y']) - (0.1 * palm_size):
+            return ("SORRY", 90, "Social")
 
-    # 9. YES — Thumbs Up
+    # 9. YES — Thumbs Up (Uses the new stricter thumb_up check)
     if thumb_up and index_tucked and middle_tucked and ring_tucked and pinky_tucked:
-        return ("YES", 92, "Affirmation")
+        return ("YES", 95, "Affirmation")
 
-    # 10. HELP — Closed Fist
+    # 10. HELP — Closed Fist (Thumb is NOT clearly up)
     if index_tucked and middle_tucked and ring_tucked and pinky_tucked and not thumb_up:
         return ("HELP", 85, "Urgent")
 
