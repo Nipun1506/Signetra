@@ -401,7 +401,7 @@ export default function Support() {
                        <div className="grid grid-cols-2 gap-6">
                           <div className="space-y-2">
                              <label className="text-[10px] font-bold uppercase tracking-widest opacity-30">User ID</label>
-                             <input type="text" value={role === 'lead_admin' ? 'LEAD-9921' : isAdmin ? 'RA-9921' : 'USR-SIGNETRA'} readOnly className="w-full bg-black/20 border border-white/5 rounded-xl px-6 py-4 text-xs font-mono opacity-60" />
+                             <input type="text" value="USR-SIGNETRA" readOnly className="w-full bg-black/20 border border-white/5 rounded-xl px-6 py-4 text-xs font-mono opacity-60" />
                           </div>
                           <div className="space-y-2">
                              <label className="text-[10px] font-bold uppercase tracking-widest opacity-30">Priority</label>
