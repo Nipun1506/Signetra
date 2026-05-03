@@ -7,7 +7,7 @@ import { API_BASE_URL } from '../config'
 const STATS_MAP = [
   { key: 'total_detections', label: 'Total Detections', icon: 'analytics', color: 'text-primary' },
   { key: 'active_users', label: 'Active Users', icon: 'group', color: 'text-blue-400' },
-  { key: 'new_gestures', label: 'New Gestures', icon: 'gesture', color: 'text-amber-500' },
+  { key: 'new_gestures', label: 'Total Gestures', icon: 'gesture', color: 'text-amber-500' },
   { key: 'system_latency', label: 'System Latency', icon: 'timer', color: 'text-rose-500' },
 ]
 
@@ -444,7 +444,7 @@ export default function Admin() {
                   {liveStats ? liveStats[stat.key] : '---'}
                 </h3>
                 <p className="text-[10px] font-medium opacity-50">
-                  {stat.key === 'active_users' ? 'Currently online' : stat.key === 'new_gestures' ? 'Pending verification' : stat.key === 'system_latency' ? 'Optimal range' : '+12.4%'}
+                  {stat.key === 'active_users' ? 'Currently online' : stat.key === 'new_gestures' ? 'In gesture library' : stat.key === 'system_latency' ? 'Optimal range' : '+12.4%'}
                 </p>
              </div>
            ))}
