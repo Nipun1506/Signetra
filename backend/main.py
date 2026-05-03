@@ -114,73 +114,85 @@ def classify_gesture(landmarks) -> tuple[str, float]:
 
     lm = landmarks
 
-    # Helper: is fingertip above its PIP joint? (lower y = higher on screen)
-    def finger_up(tip_idx, pip_idx):
-        return lm[tip_idx]['y'] < lm[pip_idx]['y']
+    # Improved Helper: Finger state detection
+    def get_finger_state(tip, pip, mcp, wrist):
+        # Distance from wrist to tip vs wrist to mcp
+        d_tip = ((lm[tip]['x'] - lm[wrist]['x'])**2 + (lm[tip]['y'] - lm[wrist]['y'])**2)**0.5
+        d_mcp = ((lm[mcp]['x'] - lm[wrist]['x'])**2 + (lm[mcp]['y'] - lm[wrist]['y'])**2)**0.5
+        # Also check verticality
+        is_above = lm[tip]['y'] < lm[pip]['y'] - 0.02
+        return is_above and (d_tip > d_mcp * 1.1)
 
-    index_up  = finger_up(8, 6)
-    middle_up = finger_up(12, 10)
-    ring_up   = finger_up(16, 14)
-    pinky_up  = finger_up(20, 18)
+    # Helper for tucked fingers (tightly folded)
+    def is_tucked(tip, mcp, wrist):
+        d_tip = ((lm[tip]['x'] - lm[wrist]['x'])**2 + (lm[tip]['y'] - lm[wrist]['y'])**2)**0.5
+        d_mcp = ((lm[mcp]['x'] - lm[wrist]['x'])**2 + (lm[mcp]['y'] - lm[wrist]['y'])**2)**0.5
+        return d_tip < d_mcp * 0.8 # Tip is inside the palm area
 
-    # 1. OK Pinch distance check
+    index_up  = get_finger_state(8, 6, 5, 0)
+    middle_up = get_finger_state(12, 10, 9, 0)
+    ring_up   = get_finger_state(16, 14, 13, 0)
+    pinky_up  = get_finger_state(20, 18, 17, 0)
+
+    # Check for tightly tucked fingers
+    index_tucked  = is_tucked(8, 5, 0)
+    middle_tucked = is_tucked(12, 9, 0)
+    ring_tucked   = is_tucked(16, 13, 0)
+    pinky_tucked  = is_tucked(20, 17, 0)
+
+    # OK Pinch distance check
     dist_thumb_index = ((lm[4]['x'] - lm[8]['x'])**2 + (lm[4]['y'] - lm[8]['y'])**2)**0.5
 
-    # 2. Thumb UP check (for Thumbs Up, thumb tip is highest vertically)
-    thumb_up = lm[4]['y'] < lm[3]['y'] and lm[4]['y'] < lm[6]['y']
+    # Thumb UP check (for Thumbs Up)
+    thumb_up = lm[4]['y'] < lm[2]['y'] and lm[4]['y'] < lm[5]['y']
 
-    # 3. Thumb OUT check (for Water and I Love You)
+    # Thumb OUT check (for Water and I Love You)
     def is_thumb_out():
-        is_right = lm[5]['x'] < lm[17]['x']
-        margin = 0.02 # Add margin for decisiveness
-        if is_right:
-            return lm[4]['x'] < lm[3]['x'] - margin
-        else:
-            return lm[4]['x'] > lm[3]['x'] + margin
+        return abs(lm[4]['x'] - lm[5]['x']) > 0.12 # Increased threshold for L-shape
             
     thumb_out = is_thumb_out()
 
-    # --- Rule-based ASL approximations ---
+    # --- Stricter Recognition Rules ---
 
-    # 6. THANK YOU — OK Pinch
-    if dist_thumb_index < 0.06 and middle_up and ring_up and pinky_up:
-        return ("THANK YOU", 92, "Social")
-
-    # 1. STOP — Open Palm
+    # 1. STOP — Open Palm (All 4 fingers UP, none tucked)
     if index_up and middle_up and ring_up and pinky_up:
-        return ("STOP", 90, "General")
+        return ("STOP", 98, "General")
 
-    # 9. PLEASE — Scout Salute
-    if index_up and middle_up and ring_up and not pinky_up:
-        return ("PLEASE", 85, "Social")
+    # 2. PLEASE — Hand on chest (Index, Middle, Ring UP; Pinky TUCKED)
+    if index_up and middle_up and ring_up and pinky_tucked:
+        return ("PLEASE", 95, "Social")
 
-    # 5. HELLO — Peace Sign
-    if index_up and middle_up and not ring_up and not pinky_up:
-        return ("HELLO", 88, "Greeting")
+    # 3. HELLO — Peace Sign (Index, Middle UP; Ring, Pinky TUCKED)
+    if index_up and middle_up and ring_tucked and pinky_tucked:
+        return ("HELLO", 94, "Greeting")
 
-    # 8. I LOVE YOU — Rock On (ILY)
-    if index_up and not middle_up and not ring_up and pinky_up and thumb_out:
-        return ("I LOVE YOU", 89, "Social")
+    # 4. THANK YOU — OK Sign (Thumb-Index pinch, others UP)
+    if dist_thumb_index < 0.05 and middle_up and ring_up and pinky_up:
+        return ("THANK YOU", 94, "Social")
 
-    # 10. WATER — L-Shape
-    if index_up and not middle_up and not ring_up and not pinky_up and thumb_out:
-        return ("WATER", 84, "Needs")
+    # 5. I LOVE YOU — Rock On (Index, Pinky UP, Middle/Ring TUCKED, Thumb OUT)
+    if index_up and pinky_up and middle_tucked and ring_tucked and thumb_out:
+        return ("I LOVE YOU", 92, "Social")
 
-    # 4. NO — Hook (curled index finger or isolated index without thumb)
-    if index_up and not middle_up and not ring_up and not pinky_up and not thumb_out:
-        return ("NO", 83, "Negation")
+    # 6. WATER — L-Shape (Index UP, Thumb OUT, Middle/Ring/Pinky TUCKED)
+    if index_up and thumb_out and middle_tucked and ring_tucked and pinky_tucked:
+        return ("WATER", 90, "Needs")
 
-    # 7. SORRY — Pinky Swear
-    if not index_up and not middle_up and not ring_up and pinky_up:
-        return ("SORRY", 82, "Social")
+    # 7. NO — Point (Index UP, others TUCKED, thumb in)
+    if index_up and middle_tucked and ring_tucked and pinky_tucked and not thumb_out:
+        return ("NO", 88, "Negation")
 
-    # 3. YES — Thumbs Up
-    if not index_up and not middle_up and not ring_up and not pinky_up and thumb_up:
-        return ("YES", 88, "Affirmation")
+    # 8. SORRY — Pinky UP, others TUCKED
+    if pinky_up and index_tucked and middle_tucked and ring_tucked:
+        return ("SORRY", 85, "Social")
 
-    # 2. HELP — Closed Fist
-    if not index_up and not middle_up and not ring_up and not pinky_up and not thumb_up:
-        return ("HELP", 85, "Urgent")
+    # 9. YES — Thumbs Up (Thumb UP, all fingers TUCKED)
+    if thumb_up and index_tucked and middle_tucked and ring_tucked and pinky_tucked:
+        return ("YES", 92, "Affirmation")
+
+    # 10. HELP — Closed Fist (All fingers TUCKED, thumb tucked)
+    if index_tucked and middle_tucked and ring_tucked and pinky_tucked:
+        return ("HELP", 80, "Urgent")
 
     return ("UNKNOWN", 0, "Unknown")
 
@@ -524,24 +536,25 @@ async def websocket_detection(websocket: WebSocket):
                 lm_raw = [[lm.x, lm.y, lm.z] for lm in hand.landmark]
                 lm_pairs = [[lm.x, lm.y] for lm in hand.landmark]
 
-                # Classification 1: Rule-based (legacy/fallback)
+                # Classification logic: Prioritize Hand-Crafted Rules for speed and accuracy
+                # only use the database templates as a fallback for custom gestures.
                 rule_phrase, rule_confidence, rule_category = classify_gesture(lm_list_frontend)
                 
-                # Classification 2: Template-based (modern)
-                template_result = classifier.classify(lm_raw)
-                
-                if template_result:
-                    # Always prefer the dynamic template result for realistic accuracy
-                    phrase = template_result["phrase"]
-                    confidence = template_result["confidence"]
-                    category = template_result["category"]
-                else:
-                    # Fallback to legacy rule-based system
+                if rule_phrase != "UNKNOWN" and rule_confidence > 70:
                     phrase = rule_phrase
-                    # Add a slight dynamic jitter to the hardcoded rule confidence to make it look realistic
-                    import random
-                    confidence = rule_confidence + round(random.uniform(-3.2, 2.5), 1) if rule_confidence > 0 else 0
+                    confidence = rule_confidence
                     category = rule_category
+                else:
+                    # Fallback to Template-based matching
+                    template_result = classifier.classify(lm_raw)
+                    if template_result and template_result["confidence"] > 80:
+                        phrase = template_result["phrase"]
+                        confidence = template_result["confidence"]
+                        category = template_result["category"]
+                    else:
+                        phrase = rule_phrase # Still fallback to the best rule even if low confidence
+                        confidence = rule_confidence
+                        category = rule_category
 
                 response = {
                     "phrase": phrase if phrase != "UNKNOWN" else None,

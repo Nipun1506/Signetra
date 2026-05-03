@@ -35,42 +35,41 @@ export default function Login() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    
+    // Check if this is the static admin account for local dev only
+    const isAdminEmail = email === 'nipunnaikwadi15@gmail.com' && password === 'nipun0001';
+    
+    if (isAdminEmail) {
+       // Since there's no backend endpoint for static login, we warn the user 
+       // but still allow it for UI testing. For live data, they must use Google.
+       console.warn("Static admin login used. Live metrics may be unavailable without a real token.");
+       const superProfile = {
+          fullName: "System Admin (Local)",
+          email: email,
+          role: "Administrator",
+          baseRole: "Administrator",
+          avatarUrl: "https://ui-avatars.com/api/?name=Admin&background=random"
+       };
+       localStorage.setItem('signetra_profile', JSON.stringify(superProfile));
+       localStorage.removeItem('signetra_token'); // Clear old token to avoid 401 loop
+       setRole('admin');
+       navigate('/');
+       setIsLoading(false);
+       return;
+    }
+
+    // Normal user mock login
     setTimeout(() => {
-      // Specific Admin/Lead injections
-      const leadEmails = ['nipunnaikwadi131270@gmail.com', 'nikitasharmaji00@gmail.com', 'saurabhyadavtly18.58@gmail.com', 'Purvasatav07@gmail.com'];
-      const isAdminEmail = email === 'nipunnaikwadi15@gmail.com' && password === 'nipun0001';
-      
-      if (leadEmails.includes(email) || isAdminEmail) {
-        const isLead = leadEmails.includes(email);
-        const roleStr = isLead ? "Lead Administrator" : "Administrator";
-        
-        const superProfile = {
-           fullName: "Nipun Naikwadi",
-           email: email,
-           age: 20,
-           gender: "Male",
-           phoneNumber: "Skipped (Admin)",
-           avatarUrl: "https://ui-avatars.com/api/?name=Nipun+Naikwadi&background=random",
-           role: roleStr,
-           baseRole: roleStr
-        };
-        localStorage.setItem('signetra_profile', JSON.stringify(superProfile));
-        setRole(isLead ? 'lead_admin' : 'admin');
-      } else {
-        // Fallback for random mock users
-        const mockProfile = {
-           fullName: "Demo User",
-           email: email || "demo@example.com",
-           age: 25,
-           gender: "Not Specified",
-           phoneNumber: "123-456-7890",
-           avatarUrl: "https://ui-avatars.com/api/?name=Demo+User&background=random",
-           role: "Standard User",
-           baseRole: "Standard User"
-        };
-        localStorage.setItem('signetra_profile', JSON.stringify(mockProfile));
-        setRole('user');
-      }
+      const mockProfile = {
+         fullName: "Demo User",
+         email: email || "demo@example.com",
+         role: "Standard User",
+         baseRole: "Standard User",
+         avatarUrl: "https://ui-avatars.com/api/?name=User&background=random"
+      };
+      localStorage.setItem('signetra_profile', JSON.stringify(mockProfile));
+      localStorage.removeItem('signetra_token');
+      setRole('user');
       navigate('/')
     }, 1500)
   }
