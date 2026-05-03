@@ -263,7 +263,7 @@ export default function Practice() {
       </div>
 
       {/* Bottom AI Feedback Bar */}
-      <footer className="fixed bottom-0 w-full h-20 border-t border-white/5 bg-[#0f131f] flex items-center px-10 gap-12 z-50">
+      <footer className="fixed bottom-0 left-0 w-[calc(100%-96px)] h-20 border-t border-r border-white/5 bg-[#0f131f] flex items-center px-10 gap-12 z-50 rounded-tr-[2rem] shadow-[20px_0_40px_rgba(0,0,0,0.4)]">
         <div className="flex-1 flex items-center gap-6">
            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
              <span className="material-symbols-outlined text-primary text-xl">psychology</span>
