@@ -183,7 +183,7 @@ export default function Recognize() {
           
           // Emit gesture for Chrome Extension Cross-Tab overlay
           window.postMessage({ 
-            type: 'SIGNETRA_GESTURE', 
+            type: 'SIGNETRA_DETECTION', 
             phrase: data.phrase, 
             category: data.category || 'General', 
             confidence: data.confidence 

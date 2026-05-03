@@ -1,21 +1,26 @@
 {
   "manifest_version": 3,
   "name": "SIGNETRA Overlay",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Real-time sign language subtitles for Zoom and WhatsApp",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "host_permissions": [
-    "https://app.zoom.us/*", 
-    "https://web.whatsapp.com/*"
+    "https://app.zoom.us/*",
+    "https://web.whatsapp.com/*",
+    "https://signetra-git-main-nipun1506s-projects.vercel.app/*"
   ],
-  "content_scripts": [{
-    "matches": [
-      "https://app.zoom.us/*", 
-      "https://web.whatsapp.com/*"
-    ],
-    "js": ["content.js"],
-    "run_at": "document_idle"
-  }],
+  "content_scripts": [
+    {
+      "matches": ["https://app.zoom.us/*", "https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://signetra-git-main-nipun1506s-projects.vercel.app/*"],
+      "js": ["signetra_bridge.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "action": { "default_popup": "popup.html" },
   "background": { "service_worker": "background.js" }
 }

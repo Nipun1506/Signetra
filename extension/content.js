@@ -1,81 +1,47 @@
-let hideTimer = null;
-
+// Create the subtitle overlay
 const overlay = document.createElement("div");
 overlay.id = "signetra-overlay";
-overlay.style.position = "fixed";
-overlay.style.bottom = "60px";
-overlay.style.left = "50%";
-overlay.style.transform = "translateX(-50%)";
-overlay.style.background = "rgba(0,0,0,0.82)";
-overlay.style.color = "white";
-overlay.style.fontSize = "22px";
-overlay.style.fontFamily = "Inter, sans-serif";
-overlay.style.padding = "12px 32px";
-overlay.style.borderRadius = "14px";
-overlay.style.zIndex = "99999";
-overlay.style.display = "none";
-overlay.style.opacity = "0";
-overlay.style.transition = "opacity 0.3s ease";
-overlay.style.border = "1px solid rgba(59,130,246,0.5)";
+overlay.style.cssText = `
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.82);
+  color: white;
+  font-size: 22px;
+  font-family: Inter, sans-serif;
+  padding: 12px 32px;
+  border-radius: 14px;
+  z-index: 99999;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border: 1px solid rgba(59,130,246,0.5);
+  pointer-events: none;
+`;
 document.body.appendChild(overlay);
 
-let ws = null;
+let hideTimer = null;
 
-function connectWebsocket() {
-    chrome.storage.sync.get(['enabled'], (result) => {
-      if (result.enabled === false) return; // Opted out by default or disabled
-      
-      ws = new WebSocket("wss://signetra-1.onrender.com/ws/detection");
-      
-      ws.onopen = () => {
-      console.log("SIGNETRA: Connected to local detection server");
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.phrase && data.confidence) {
-        overlay.textContent = `${data.phrase} • ${data.confidence}%`;
-        overlay.style.display = "block";
-        requestAnimationFrame(() => {
-          overlay.style.opacity = "1";
-        });
-        
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => {
-          overlay.style.opacity = "0";
-          setTimeout(() => {
-            overlay.style.display = "none";
-          }, 300);
-        }, 4000);
-      }
-    };
-
-    ws.onclose = () => {
-      console.log("SIGNETRA: Disconnected from local server. Reconnecting in 3s...");
-      setTimeout(connectWebsocket, 3000);
-    };
-    
-    ws.onerror = (e) => {
-      ws.close();
-    };
-  });
+function showSubtitle(phrase, confidence) {
+  overlay.textContent = `${phrase} • ${Math.round(confidence)}%`;
+  overlay.style.display = "block";
+  requestAnimationFrame(() => { overlay.style.opacity = "1"; });
+  
+  clearTimeout(hideTimer);
+  hideTimer = setTimeout(() => {
+    overlay.style.opacity = "0";
+    setTimeout(() => { overlay.style.display = "none"; }, 300);
+  }, 4000);
 }
 
-// Check if extension is enabled before connecting
-chrome.storage.sync.get({ enabled: true }, (items) => {
-  if (items.enabled) {
-    connectWebsocket();
+// Listen for messages from the Signetra web app tab
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "SIGNETRA_DETECTION") {
+    chrome.storage.sync.get({ enabled: true }, (items) => {
+      if (items.enabled) showSubtitle(message.phrase, message.confidence);
+    });
   }
 });
 
-// Listen for storage changes from popup
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  if (changes.enabled) {
-    if (changes.enabled.newValue) {
-      connectWebsocket();
-    } else if (ws) {
-      ws.close();
-      overlay.style.display = "none";
-    }
-  }
-});
+console.log("SIGNETRA: Subtitle overlay ready on", window.location.hostname);
