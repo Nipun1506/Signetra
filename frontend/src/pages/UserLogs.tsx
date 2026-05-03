@@ -221,7 +221,7 @@ export default function UserLogs() {
                 <th className="px-8 py-4 font-bold">Timestamp</th>
                 <th className="px-8 py-4 font-bold">Status</th>
                 <th className="px-8 py-4 font-bold">Event Message</th>
-                <th className="px-8 py-4 font-bold">Origin</th>
+                <th className="px-8 py-4 font-bold">Authorized By</th>
               </tr>
             </thead>
             <tbody>
@@ -237,7 +237,7 @@ export default function UserLogs() {
                     {log.status || 'INFO'}
                   </td>
                   <td className="px-8 py-4 font-medium italic opacity-80">{log.event || 'System Event'}</td>
-                  <td className="px-8 py-4 opacity-50 font-mono">NODE_US_EAST</td>
+                  <td className="px-8 py-4 opacity-50 font-mono">{log.user || 'SYSTEM'}</td>
                 </tr>
               ))}
               {(!logs || logs.length === 0) && !loading && (

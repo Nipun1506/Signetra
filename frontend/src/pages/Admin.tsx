@@ -656,11 +656,12 @@ export default function Admin() {
               )}
 
               {activeManagerTab === 'System Logs' && (
-                <div className="font-mono text-[11px] space-y-2 bg-black/40 p-8 rounded-3xl border border-white/5 max-h-[400px] overflow-y-auto">
+                <div className="font-mono text-[11px] space-y-3 bg-black/40 p-8 rounded-3xl border border-white/5 max-h-[400px] overflow-y-auto custom-scrollbar">
                    {logs.map((log: any) => (
-                     <div key={log.id} className="flex gap-4 border-b border-white/5 pb-2">
-                        <span className="opacity-30">[{new Date(log.time).toLocaleTimeString()}]</span>
-                        <span className={log.status === 'Success' ? 'text-emerald-400' : 'text-amber-400'}>{log.status}</span>
+                     <div key={log.id} className="flex flex-wrap gap-x-4 border-b border-white/5 pb-2 hover:bg-white/[0.02] transition-colors">
+                        <span className="opacity-30 whitespace-nowrap">[{new Date(log.time).toLocaleTimeString()}]</span>
+                        <span className="text-primary font-bold whitespace-nowrap">@{log.user || 'SYSTEM'}</span>
+                        <span className={`px-2 rounded ${log.status === 'Success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>{log.status}</span>
                         <span className="opacity-60">{log.event}</span>
                      </div>
                    ))}

@@ -21,7 +21,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import SessionLocal, get_db, engine, Base
-from models import DetectionHistory, GestureTemplate, SupportTicket, TicketReply, OTPRecord
+from models import DetectionHistory, GestureTemplate, SupportTicket, TicketReply, OTPRecord, SystemLog
 from datetime import datetime, date
 from otp_service import generate_otp, hash_otp, verify_otp, get_expiry, send_email_otp, send_sms_otp
 from auth_utils import get_current_user, create_access_token, verify_token
@@ -372,16 +372,22 @@ async def get_admin_stats(db: Session = Depends(get_db), current_user: dict = De
         "popular_signs": popular_data
     }
 
-@app.post("/api/admin/restart")
-async def admin_restart(current_user: dict = Depends(get_current_user)):
     # Mock system restart logic
     print("🚀 Admin triggered system soft-restart")
+    # Note: restarting doesn't have DB access here by default in the old signature, 
+    # but I'll add db: Session = Depends(get_db)
+    return {"status": "success", "message": "AI pipeline reset successful"}
+
+@app.post("/api/admin/restart")
+async def admin_restart(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    log_admin_action(db, current_user.get("sub", "admin"), "Triggered system soft-restart")
     return {"status": "success", "message": "AI pipeline reset successful"}
 
 @app.post("/api/admin/notify")
 async def admin_notify(request: dict, current_user: dict = Depends(get_current_user)):
     message = request.get("message", "System Alert")
     await manager.broadcast_notification(message)
+    log_admin_action(db, current_user.get("sub", "admin"), f"Sent global notification: {message[:30]}...")
     return {"status": "success"}
 
 @app.get("/api/admin/export-metrics")
@@ -405,6 +411,11 @@ async def export_metrics(db: Session = Depends(get_db), current_user: dict = Dep
         media_type="text/csv",
         headers={"Content-Disposition": f"attachment; filename=signetra_metrics_{datetime.now().strftime('%Y%m%d')}.csv"}
     )
+
+def log_admin_action(db: Session, user_email: str, action: str, status: str = "Success"):
+    new_log = SystemLog(user_email=user_email, action=action, status=status)
+    db.add(new_log)
+    db.commit()
 
 # --- Tutorial Management ---
 from models import Tutorial
@@ -435,14 +446,17 @@ def create_tutorial(data: dict, db: Session = Depends(get_db)):
     db.add(new_tutorial)
     db.commit()
     db.refresh(new_tutorial)
+    log_admin_action(db, "admin", f"Added tutorial: {new_tutorial.title}")
     return new_tutorial
 
 @app.delete("/api/tutorials/{id}")
 def delete_tutorial(id: int, db: Session = Depends(get_db)):
     t = db.query(Tutorial).get(id)
     if t:
+        title = t.title
         db.delete(t)
         db.commit()
+        log_admin_action(db, "admin", f"Deleted tutorial: {title}")
     return {"status": "deleted"}
 
 # --- Admin Gesture & Log Management ---
@@ -452,9 +466,9 @@ def get_admin_gestures(db: Session = Depends(get_db), current_user: dict = Depen
 
 @app.get("/api/admin/logs")
 def get_admin_logs(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    # Fetch last 50 significant events (detection events)
-    logs = db.query(DetectionHistory).order_by(DetectionHistory.timestamp.desc()).limit(50).all()
-    return [{"id": l.id, "time": l.timestamp, "event": f"Detected: {l.phrase}", "status": "Success" if l.confidence > 70 else "Warning"} for l in logs]
+    # Fetch last 100 system logs
+    logs = db.query(SystemLog).order_by(SystemLog.timestamp.desc()).limit(100).all()
+    return [{"id": l.id, "time": l.timestamp, "event": l.action, "user": l.user_email, "status": l.status} for l in logs]
 
 @app.websocket("/ws/detection")
 async def websocket_detection(websocket: WebSocket):
@@ -752,6 +766,8 @@ def api_populate_templates(db: Session = Depends(get_db)):
     
     # Reload the classifier templates in memory
     classifier.load_templates()
+    
+    log_admin_action(db, "admin", "Initialized/Populated gesture library templates")
     
     return {"success": True, "message": f"Populated {count} templates and reloaded classifier.", "total_in_memory": len(classifier.templates)}
 

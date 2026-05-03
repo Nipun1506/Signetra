@@ -69,3 +69,11 @@ class OTPRecord(Base):
     attempts = Column(Integer, default=0)  # to prevent brute force
     expires_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class SystemLog(Base):
+    __tablename__ = "system_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_email = Column(String)
+    action = Column(String)
+    status = Column(String, default="Success")
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
