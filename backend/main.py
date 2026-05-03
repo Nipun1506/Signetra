@@ -65,7 +65,7 @@ app.add_middleware(
 mp_hands = mp.solutions.hands
 hands_detector = mp_hands.Hands(
     max_num_hands=1,
-    min_detection_confidence=0.4,
+    min_detection_confidence=0.6,
     min_tracking_confidence=0.3,
     model_complexity=1
 )
