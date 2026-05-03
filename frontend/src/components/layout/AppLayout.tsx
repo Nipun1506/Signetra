@@ -100,6 +100,9 @@ export const AppLayout = () => {
       {/* TopNavBar Integration */}
       <header className="fixed top-0 left-20 right-0 h-16 z-40 bg-[#0a0e1a]/80 backdrop-blur-xl flex justify-end items-center px-8 shadow-sm border-b border-white/5 transition-all duration-300">
         <div className="flex items-center gap-6">
+          <Link to="/support" title="Technical Support" className="text-[#c2c6d6] hover:text-white transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined">support_agent</span>
+          </Link>
           {role !== 'user' && (
             <>
               <NotificationDropdown />

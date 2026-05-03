@@ -96,6 +96,7 @@ export default function App() {
         <Route path="/whatsapp" element={<WhatsAppIntegration />} />
         <Route path="/history" element={<History />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/support" element={<Support />} />
         <Route path="/practice/:gestureId" element={<Practice />} />
         <Route path="/profile" element={<Profile />} />
 
@@ -103,7 +104,6 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/docs" element={<AdminDocumentation />} />
-          <Route path="/admin/support" element={<Support />} />
           <Route path="/admin/logs" element={<UserLogs />} />
         </Route>
       </Route>

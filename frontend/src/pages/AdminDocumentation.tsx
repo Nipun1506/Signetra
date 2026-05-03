@@ -128,18 +128,7 @@ export default function AdminDocumentation() {
               </div>
            </motion.div>
 
-           <div className="bg-white/5 p-10 rounded-[3rem] border border-white/5">
-              <h3 className="text-sm font-bold uppercase tracking-widest opacity-40 mb-6">Support Channels</h3>
-              <p className="text-xs leading-relaxed opacity-60 mb-8">
-                 Need custom AI gesture training? Contact our precision engineering team.
-              </p>
-              <button 
-                onClick={() => navigate('/admin/support')}
-                className="w-full py-4 bg-white text-[#001a42] rounded-2xl font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-transform"
-              >
-                Open Support Ticket
-              </button>
-           </div>
+
         </div>
       </div>
     </div>

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../config'
+import { useAuth } from '../context/AuthContext'
 
 export default function Support() {
   const navigate = useNavigate();
+  const { role } = useAuth();
   const [ticketStatus, setTicketStatus] = useState<'idle' | 'sending' | 'success'>('idle');
   const [tickets, setTickets] = useState<any[]>([]);
   const [formData, setFormData] = useState({ subject: '', description: '', priority: 'Medium - UX Issue' });
@@ -173,75 +175,77 @@ export default function Support() {
         className="max-w-6xl mx-auto flex items-center gap-6 mb-12"
       >
         <button 
-          onClick={() => navigate('/admin')}
+          onClick={() => navigate(role === 'admin' ? '/admin' : '/')}
           className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/10 transition-all group"
         >
           <span className="material-symbols-outlined text-xl opacity-40 group-hover:opacity-100 transition-opacity">arrow_back</span>
         </button>
         <div>
            <h1 className="text-4xl font-black uppercase tracking-tighter">Support Hub</h1>
-           <p className="text-xs opacity-40 uppercase tracking-[0.3em] mt-1">Global Response Center</p>
+           <p className="text-xs opacity-40 uppercase tracking-[0.3em] mt-1">{role === 'admin' ? 'Global Response Center' : 'Technical & UX Support'}</p>
         </div>
       </motion.div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left Column: Diagnostics */}
-        <div className="lg:col-span-5 space-y-8">
-           <motion.div 
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             className="bg-[#1b2235] rounded-[3rem] p-10 border border-white/5 shadow-2xl relative overflow-hidden"
-           >
-              <div className="absolute top-0 right-0 p-8 opacity-10">
-                 <span className="material-symbols-outlined text-6xl">network_check</span>
-              </div>
-              <h3 className="text-sm font-bold uppercase tracking-widest text-primary mb-8">System Health Diagnostics</h3>
-              <div className="space-y-6">
-                 {healthChecks.map((check) => (
-                   <div key={check.label} className="bg-[#0a0e1a] p-5 rounded-2xl border border-white/5 flex justify-between items-center">
-                      <div>
-                         <p className="text-[10px] uppercase tracking-widest opacity-40 mb-1">{check.label}</p>
-                         <p className={`text-xs font-bold ${check.color}`}>{check.status}</p>
-                      </div>
-                      <div className="text-right">
-                         <p className="text-[8px] uppercase tracking-widest opacity-20 mb-1">Latency</p>
-                         <p className="text-xs font-mono opacity-60">{check.latency}</p>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-           </motion.div>
+        {/* Left Column: Diagnostics (Only for Admin) */}
+        {role === 'admin' && (
+          <div className="lg:col-span-5 space-y-8">
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               className="bg-[#1b2235] rounded-[3rem] p-10 border border-white/5 shadow-2xl relative overflow-hidden"
+             >
+                <div className="absolute top-0 right-0 p-8 opacity-10">
+                   <span className="material-symbols-outlined text-6xl">network_check</span>
+                </div>
+                <h3 className="text-sm font-bold uppercase tracking-widest text-primary mb-8">System Health Diagnostics</h3>
+                <div className="space-y-6">
+                   {healthChecks.map((check) => (
+                     <div key={check.label} className="bg-[#0a0e1a] p-5 rounded-2xl border border-white/5 flex justify-between items-center">
+                        <div>
+                           <p className="text-[10px] uppercase tracking-widest opacity-40 mb-1">{check.label}</p>
+                           <p className={`text-xs font-bold ${check.color}`}>{check.status}</p>
+                        </div>
+                        <div className="text-right">
+                           <p className="text-[8px] uppercase tracking-widest opacity-20 mb-1">Latency</p>
+                           <p className="text-xs font-mono opacity-60">{check.latency}</p>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+             </motion.div>
 
-           <div className="bg-white/5 rounded-[2.5rem] p-10 border border-white/5">
-              <h3 className="text-sm font-bold uppercase tracking-widest opacity-40 mb-6">Common Solutions</h3>
-              <div className="space-y-4">
-                 <details className="group cursor-pointer">
-                    <summary className="text-xs font-bold list-none flex justify-between items-center py-2">
-                       Camera Not Detected?
-                       <span className="material-symbols-outlined text-sm transition-transform group-open:rotate-180">expand_more</span>
-                    </summary>
-                    <p className="text-[10px] opacity-40 leading-relaxed pt-2">Ensure the backend index `0` matches your active camera device in the `.env` configuration.</p>
-                 </details>
-                 <details className="group cursor-pointer border-t border-white/5 pt-4">
-                    <summary className="text-xs font-bold list-none flex justify-between items-center py-2">
-                       Latency Issues?
-                       <span className="material-symbols-outlined text-sm transition-transform group-open:rotate-180">expand_more</span>
-                    </summary>
-                    <p className="text-[10px] opacity-40 leading-relaxed pt-2">Verify that no other processes are utilizing the GPU. Signetra relies on localized MediaPipe inference.</p>
-                 </details>
-              </div>
-           </div>
-        </div>
+             <div className="bg-white/5 rounded-[2.5rem] p-10 border border-white/5">
+                <h3 className="text-sm font-bold uppercase tracking-widest opacity-40 mb-6">Common Solutions</h3>
+                <div className="space-y-4">
+                   <details className="group cursor-pointer">
+                      <summary className="text-xs font-bold list-none flex justify-between items-center py-2">
+                         Camera Not Detected?
+                         <span className="material-symbols-outlined text-sm transition-transform group-open:rotate-180">expand_more</span>
+                      </summary>
+                      <p className="text-[10px] opacity-40 leading-relaxed pt-2">Ensure the backend index `0` matches your active camera device in the `.env` configuration.</p>
+                   </details>
+                   <details className="group cursor-pointer border-t border-white/5 pt-4">
+                      <summary className="text-xs font-bold list-none flex justify-between items-center py-2">
+                         Latency Issues?
+                         <span className="material-symbols-outlined text-sm transition-transform group-open:rotate-180">expand_more</span>
+                      </summary>
+                      <p className="text-[10px] opacity-40 leading-relaxed pt-2">Verify that no other processes are utilizing the GPU. Signetra relies on localized MediaPipe inference.</p>
+                   </details>
+                </div>
+             </div>
+          </div>
+        )}
 
         {/* Right Column: Ticket Form */}
-        <div className="lg:col-span-7 space-y-8">
+        <div className={`${role === 'admin' ? 'lg:col-span-7' : 'lg:col-span-12'} space-y-8`}>
            <motion.div 
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
              className="bg-white/[0.02] backdrop-blur-xl rounded-[3rem] p-12 border border-white/5 shadow-2xl flex flex-col"
            >
               <div className="mb-10 text-center">
-                 <h2 className="text-2xl font-bold mb-2">Request Technical Support</h2>
+                 <h2 className="text-2xl font-bold mb-2">{role === 'admin' ? 'Request Technical Support' : 'Submit a Support Ticket'}</h2>
                  <p className="text-xs opacity-40 uppercase tracking-widest">Typical response time: &lt; 2 Hours</p>
               </div>
 
@@ -255,8 +259,8 @@ export default function Support() {
                   >
                      <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                           <label className="text-[10px] font-bold uppercase tracking-widest opacity-30">Admin ID</label>
-                           <input type="text" value="RA-9921" readOnly className="w-full bg-black/20 border border-white/5 rounded-xl px-6 py-4 text-xs font-mono opacity-60" />
+                           <label className="text-[10px] font-bold uppercase tracking-widest opacity-30">User ID</label>
+                           <input type="text" value={role === 'admin' ? 'RA-9921' : 'USR-SIGNETRA'} readOnly className="w-full bg-black/20 border border-white/5 rounded-xl px-6 py-4 text-xs font-mono opacity-60" />
                         </div>
                         <div className="space-y-2">
                            <label className="text-[10px] font-bold uppercase tracking-widest opacity-30">Priority</label>
@@ -329,68 +333,70 @@ export default function Support() {
               </AnimatePresence>
            </motion.div>
 
-           {/* Administrative Ticket Inbox */}
-           <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             className="bg-[#1b2235] rounded-[3rem] p-10 border border-white/5 shadow-2xl overflow-hidden"
-           >
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-primary">Ticket Inbox (Master Admin View)</h3>
-                <span className="text-[10px] font-mono opacity-40">{tickets.length} Global Tasks</span>
-              </div>
+           {/* Administrative Ticket Inbox (Only for Admin) */}
+           {role === 'admin' && (
+             <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="bg-[#1b2235] rounded-[3rem] p-10 border border-white/5 shadow-2xl overflow-hidden"
+             >
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-primary">Ticket Inbox (Master Admin View)</h3>
+                  <span className="text-[10px] font-mono opacity-40">{tickets.length} Global Tasks</span>
+                </div>
 
-              {/* Status Filter Tabs */}
-              <div className="flex gap-2 mb-8 bg-black/20 p-1 rounded-2xl border border-white/5">
-                 {(['Open', 'Pending', 'Resolved'] as const).map(tab => (
-                   <button 
-                     key={tab}
-                     onClick={() => setActiveTab(tab)}
-                     className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === tab ? 'bg-white/10 text-white shadow-xl shadow-black/20' : 'opacity-30 hover:opacity-100'}`}
-                   >
-                     {tab}
-                     <span className={`px-2 py-0.5 rounded-md text-[8px] ${activeTab === tab ? 'bg-primary text-black' : 'bg-white/5'}`}>
-                        {counts[tab]}
-                     </span>
-                   </button>
-                 ))}
-              </div>
+                {/* Status Filter Tabs */}
+                <div className="flex gap-2 mb-8 bg-black/20 p-1 rounded-2xl border border-white/5">
+                   {(['Open', 'Pending', 'Resolved'] as const).map(tab => (
+                     <button 
+                       key={tab}
+                       onClick={() => setActiveTab(tab)}
+                       className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === tab ? 'bg-white/10 text-white shadow-xl shadow-black/20' : 'opacity-30 hover:opacity-100'}`}
+                     >
+                       {tab}
+                       <span className={`px-2 py-0.5 rounded-md text-[8px] ${activeTab === tab ? 'bg-primary text-black' : 'bg-white/5'}`}>
+                          {counts[tab]}
+                       </span>
+                     </button>
+                   ))}
+                </div>
 
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                 {filteredTickets.map((t) => (
-                   <div 
-                     key={t.id} 
-                     onClick={() => setSelectedTicket(t)}
-                     className="bg-[#0a0e1a] p-6 rounded-2xl border border-white/5 hover:border-primary/40 transition-all cursor-pointer group"
-                   >
-                      <div className="flex justify-between items-start mb-4">
-                         <div>
-                            <h4 className="text-xs font-bold mb-1 group-hover:text-primary transition-colors">{t.subject}</h4>
-                            <p className="text-[10px] opacity-40">{new Date(t.created_at).toLocaleString()}</p>
-                         </div>
-                         <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${getPriorityColor(t.priority)}`}>
-                            {t.priority.split(' - ')[0]}
-                         </span>
-                      </div>
-                      <p className="text-[11px] opacity-60 leading-relaxed bg-white/5 p-4 rounded-xl italic line-clamp-2">
-                         "{t.description}"
-                      </p>
-                      <div className="mt-4 flex items-center justify-between">
-                         <span className="text-[9px] font-bold opacity-30 uppercase">Origin: {t.admin_id}</span>
-                         <span className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-widest ${getStatusColor(t.status).split(' ')[0]}`}>
-                            <div className={`w-1.5 h-1.5 rounded-full ${getStatusColor(t.status).split(' ')[1].replace('bg-', '')}`} />
-                            {t.status}
-                         </span>
-                      </div>
-                   </div>
-                 ))}
-                 {filteredTickets.length === 0 && (
-                   <div className="py-20 text-center opacity-20 uppercase tracking-widest text-xs">
-                      No {activeTab.toLowerCase()} tickets found
-                   </div>
-                 )}
-              </div>
-           </motion.div>
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                   {filteredTickets.map((t) => (
+                     <div 
+                       key={t.id} 
+                       onClick={() => setSelectedTicket(t)}
+                       className="bg-[#0a0e1a] p-6 rounded-2xl border border-white/5 hover:border-primary/40 transition-all cursor-pointer group"
+                     >
+                        <div className="flex justify-between items-start mb-4">
+                           <div>
+                              <h4 className="text-xs font-bold mb-1 group-hover:text-primary transition-colors">{t.subject}</h4>
+                              <p className="text-[10px] opacity-40">{new Date(t.created_at).toLocaleString()}</p>
+                           </div>
+                           <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${getPriorityColor(t.priority)}`}>
+                              {t.priority.split(' - ')[0]}
+                           </span>
+                        </div>
+                        <p className="text-[11px] opacity-60 leading-relaxed bg-white/5 p-4 rounded-xl italic line-clamp-2">
+                           "{t.description}"
+                        </p>
+                        <div className="mt-4 flex items-center justify-between">
+                           <span className="text-[9px] font-bold opacity-30 uppercase">Origin: {t.admin_id}</span>
+                           <span className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-widest ${getStatusColor(t.status).split(' ')[0]}`}>
+                              <div className={`w-1.5 h-1.5 rounded-full ${getStatusColor(t.status).split(' ')[1].replace('bg-', '')}`} />
+                              {t.status}
+                           </span>
+                        </div>
+                     </div>
+                   ))}
+                   {filteredTickets.length === 0 && (
+                     <div className="py-20 text-center opacity-20 uppercase tracking-widest text-xs">
+                        No {activeTab.toLowerCase()} tickets found
+                     </div>
+                   )}
+                </div>
+             </motion.div>
+           )}
         </div>
       </div>
 

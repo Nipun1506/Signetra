@@ -267,7 +267,7 @@ export default function Admin() {
                  <span className="material-symbols-outlined text-lg group-hover:text-primary transition-colors">help</span>
                  <span className="text-xs font-medium">Documentation</span>
               </div>
-              <div onClick={() => navigate('/admin/support')} className="flex items-center gap-4 px-4 py-2 text-on-surface-variant hover:text-white transition-colors cursor-pointer group">
+              <div onClick={() => navigate('/support')} className="flex items-center gap-4 px-4 py-2 text-on-surface-variant hover:text-white transition-colors cursor-pointer group">
                  <span className="material-symbols-outlined text-lg group-hover:text-primary transition-colors">support</span>
                  <span className="text-xs font-medium">Support</span>
               </div>
