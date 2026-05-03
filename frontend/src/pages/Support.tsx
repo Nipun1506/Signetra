@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 export default function Support() {
   const navigate = useNavigate();
   const { role } = useAuth();
+  const isAdmin = role === 'admin' || role === 'lead_admin';
   const [ticketStatus, setTicketStatus] = useState<'idle' | 'sending' | 'success'>('idle');
   const [tickets, setTickets] = useState<any[]>([]);
   const [formData, setFormData] = useState({ subject: '', description: '', priority: 'Medium - UX Issue' });
@@ -175,20 +176,20 @@ export default function Support() {
         className="max-w-6xl mx-auto flex items-center gap-6 mb-12"
       >
         <button 
-          onClick={() => navigate(role === 'admin' ? '/admin' : '/')}
+          onClick={() => navigate(isAdmin ? '/admin' : '/')}
           className="w-12 h-12 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center hover:bg-white/10 transition-all group"
         >
           <span className="material-symbols-outlined text-xl opacity-40 group-hover:opacity-100 transition-opacity">arrow_back</span>
         </button>
         <div>
            <h1 className="text-4xl font-black uppercase tracking-tighter">Support Hub</h1>
-           <p className="text-xs opacity-40 uppercase tracking-[0.3em] mt-1">{role === 'admin' ? 'Global Response Center' : 'Technical & UX Support'}</p>
+           <p className="text-xs opacity-40 uppercase tracking-[0.3em] mt-1">{isAdmin ? 'Global Response Center' : 'Technical & UX Support'}</p>
         </div>
       </motion.div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Admin Dashboard Layout */}
-        {role === 'admin' ? (
+        {isAdmin ? (
           <>
             {/* Left Column: Diagnostics & System Stats */}
             <div className="lg:col-span-4 space-y-8">
@@ -400,7 +401,7 @@ export default function Support() {
                        <div className="grid grid-cols-2 gap-6">
                           <div className="space-y-2">
                              <label className="text-[10px] font-bold uppercase tracking-widest opacity-30">User ID</label>
-                             <input type="text" value="USR-SIGNETRA" readOnly className="w-full bg-black/20 border border-white/5 rounded-xl px-6 py-4 text-xs font-mono opacity-60" />
+                             <input type="text" value={role === 'lead_admin' ? 'LEAD-9921' : isAdmin ? 'RA-9921' : 'USR-SIGNETRA'} readOnly className="w-full bg-black/20 border border-white/5 rounded-xl px-6 py-4 text-xs font-mono opacity-60" />
                           </div>
                           <div className="space-y-2">
                              <label className="text-[10px] font-bold uppercase tracking-widest opacity-30">Priority</label>
