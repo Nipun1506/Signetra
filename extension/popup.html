@@ -2,20 +2,11 @@
 <html>
 <head>
   <style>
-    body {
-      width: 250px;
-      padding: 16px;
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #0A0E1A;
-      color: white;
-    }
+    body { width: 250px; padding: 16px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0A0E1A; color: white; }
     h2 { margin-top: 0; font-size: 18px; color: #3B82F6; }
     .status { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 14px; color: #94A3B8; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 8px #22C55E; }
     .setting { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    
-    /* Toggle Switch */
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1E2535; transition: .4s; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); }
@@ -27,9 +18,9 @@
 <body>
   <h2>SIGNETRA Overlay</h2>
   <div class="status">
-    <div class="dot"></div> Working
+    <div class="dot" id="statusDot"></div>
+    <span id="statusText">Working</span>
   </div>
-  
   <div class="setting">
     <span>Enable Overlay</span>
     <label class="switch">
@@ -37,23 +28,6 @@
       <span class="slider"></span>
     </label>
   </div>
-  
-  <script>
-    const toggle = document.getElementById("toggleEnabled");
-    chrome.storage.sync.get({ enabled: true }, (items) => {
-      toggle.checked = items.enabled;
-    });
-    toggle.addEventListener("change", (e) => {
-      chrome.storage.sync.set({ enabled: e.target.checked });
-      const dot = document.querySelector('.dot');
-      if (e.target.checked) {
-        dot.style.background = '#22C55E';
-        dot.style.boxShadow = '0 0 8px #22C55E';
-      } else {
-        dot.style.background = '#EF4444';
-        dot.style.boxShadow = '0 0 8px #EF4444';
-      }
-    });
-  </script>
+  <script src="popup.js"></script>
 </body>
 </html>

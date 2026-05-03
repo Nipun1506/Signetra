@@ -13,6 +13,7 @@ PROJECT DIRECTORY STRUCTURE
     .env.example
     dump_context.py
     extension/
+        popup.js
         background.js
         popup.html
         manifest.json
@@ -1674,6 +1675,38 @@ DETECTION_COOLDOWN=2.0
 
 
 ================================================================================
+FILE: ./extension/popup.js
+================================================================================
+
+const toggle = document.getElementById("toggleEnabled");
+const dot = document.getElementById("statusDot");
+const statusText = document.getElementById("statusText");
+
+chrome.storage.sync.get({ enabled: true }, (items) => {
+  toggle.checked = items.enabled;
+  updateDot(items.enabled);
+});
+
+toggle.addEventListener("change", (e) => {
+  const enabled = e.target.checked;
+  chrome.storage.sync.set({ enabled });
+  updateDot(enabled);
+});
+
+function updateDot(enabled) {
+  if (enabled) {
+    dot.style.background = '#22C55E';
+    dot.style.boxShadow = '0 0 8px #22C55E';
+    statusText.textContent = 'Working';
+  } else {
+    dot.style.background = '#EF4444';
+    dot.style.boxShadow = '0 0 8px #EF4444';
+    statusText.textContent = 'Disabled';
+  }
+}
+
+
+================================================================================
 FILE: ./extension/background.js
 ================================================================================
 
@@ -1704,20 +1737,11 @@ FILE: ./extension/popup.html
 <html>
 <head>
   <style>
-    body {
-      width: 250px;
-      padding: 16px;
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #0A0E1A;
-      color: white;
-    }
+    body { width: 250px; padding: 16px; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0A0E1A; color: white; }
     h2 { margin-top: 0; font-size: 18px; color: #3B82F6; }
     .status { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 14px; color: #94A3B8; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 8px #22C55E; }
     .setting { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    
-    /* Toggle Switch */
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #1E2535; transition: .4s; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); }
@@ -1729,9 +1753,9 @@ FILE: ./extension/popup.html
 <body>
   <h2>SIGNETRA Overlay</h2>
   <div class="status">
-    <div class="dot"></div> Working
+    <div class="dot" id="statusDot"></div>
+    <span id="statusText">Working</span>
   </div>
-  
   <div class="setting">
     <span>Enable Overlay</span>
     <label class="switch">
@@ -1739,24 +1763,7 @@ FILE: ./extension/popup.html
       <span class="slider"></span>
     </label>
   </div>
-  
-  <script>
-    const toggle = document.getElementById("toggleEnabled");
-    chrome.storage.sync.get({ enabled: true }, (items) => {
-      toggle.checked = items.enabled;
-    });
-    toggle.addEventListener("change", (e) => {
-      chrome.storage.sync.set({ enabled: e.target.checked });
-      const dot = document.querySelector('.dot');
-      if (e.target.checked) {
-        dot.style.background = '#22C55E';
-        dot.style.boxShadow = '0 0 8px #22C55E';
-      } else {
-        dot.style.background = '#EF4444';
-        dot.style.boxShadow = '0 0 8px #EF4444';
-      }
-    });
-  </script>
+  <script src="popup.js"></script>
 </body>
 </html>
 
@@ -1768,13 +1775,14 @@ FILE: ./extension/manifest.json
 {
   "manifest_version": 3,
   "name": "SIGNETRA Overlay",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Real-time sign language subtitles for Zoom and WhatsApp",
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "host_permissions": [
     "https://app.zoom.us/*",
     "https://web.whatsapp.com/*",
-    "https://signetra-git-main-nipun1506s-projects.vercel.app/*"
+    "https://signetra-git-main-nipun1506s-projects.vercel.app/*",
+    "https://signetra-ebon.vercel.app/*"
   ],
   "content_scripts": [
     {
@@ -1783,7 +1791,10 @@ FILE: ./extension/manifest.json
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://signetra-git-main-nipun1506s-projects.vercel.app/*"],
+      "matches": [
+        "https://signetra-git-main-nipun1506s-projects.vercel.app/*",
+        "https://signetra-ebon.vercel.app/*"
+      ],
       "js": ["signetra_bridge.js"],
       "run_at": "document_idle"
     }
