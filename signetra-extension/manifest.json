@@ -4,12 +4,19 @@
   "version": "1.0.0",
   "description": "Real-time sign language subtitles for Zoom and WhatsApp calls",
   "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["https://app.zoom.us/*", "https://web.whatsapp.com/*"],
-  "content_scripts": [{
-    "matches": ["https://app.zoom.us/*", "https://web.whatsapp.com/*"],
-    "js": ["content.js"],
-    "run_at": "document_idle"
-  }],
+  "host_permissions": ["https://app.zoom.us/*", "https://web.whatsapp.com/*", "*://*.vercel.app/*", "http://localhost/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://app.zoom.us/*", "https://web.whatsapp.com/*"],
+      "js": ["zoom_content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.vercel.app/*", "http://localhost/*"],
+      "js": ["vercel_content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {"16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png"}

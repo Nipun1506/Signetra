@@ -1,7 +1,5 @@
-let ws = null;
 let overlay = null;
 let hideTimeout = null;
-let reconnectInterval = null;
 let isEnabled = true;
 
 // Determine platform
@@ -12,18 +10,12 @@ const platformKey = isZoom ? 'zoom_enabled' : 'whatsapp_enabled';
 function initStorage() {
   chrome.storage.sync.get([platformKey], (result) => {
     isEnabled = result[platformKey] !== false;
-    if (isEnabled) {
-      connectWebSocket();
-    }
   });
 
   chrome.storage.onChanged.addListener((changes) => {
     if (changes[platformKey]) {
       isEnabled = changes[platformKey].newValue;
-      if (isEnabled) {
-        connectWebSocket();
-      } else {
-        disconnectWebSocket();
+      if (!isEnabled) {
         hideOverlay();
       }
     }
@@ -96,57 +88,22 @@ function hideOverlay() {
   }
 }
 
-function connectWebSocket() {
-  if (ws || !isEnabled) return;
-  
-  // Targeting the Railway production backend where Vercel is sending frames
-  ws = new WebSocket('wss://signetra-production-95bb.up.railway.app/ws/detection');
-  
-  ws.onopen = () => {
-    console.log('SIGNETRA WebSocket connected');
-    showOverlay('SIGNETRA Connected', 'system', null);
-    if (reconnectInterval) {
-      clearInterval(reconnectInterval);
-      reconnectInterval = null;
-    }
-  };
-  
-  ws.onmessage = (event) => {
-    if (!isEnabled) return;
-    try {
-      const data = JSON.parse(event.data);
-      if (data.phrase && data.phrase !== 'UNKNOWN') {
-        showOverlay(data.phrase, data.category || 'General', data.confidence);
-      }
-    } catch (e) {
-      console.error('SIGNETRA Parse Error', e);
-    }
-  };
-  
-  ws.onclose = () => {
-    ws = null;
-    if (isEnabled && !reconnectInterval) {
-      reconnectInterval = setInterval(connectWebSocket, 3000);
-    }
-  };
-  
-  ws.onerror = () => {
-    ws.close();
-  };
-}
+// Listen for gestures forwarded from the Vercel tab
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!isEnabled) return;
 
-function disconnectWebSocket() {
-  if (ws) {
-    ws.close();
-    ws = null;
+  if (message.type === 'SIGNETRA_GESTURE') {
+    if (message.phrase && message.phrase !== 'UNKNOWN') {
+      showOverlay(message.phrase, message.category || 'General', message.confidence);
+    }
   }
-}
+});
 
+// Clean up
 window.addEventListener('beforeunload', () => {
-  disconnectWebSocket();
   if (hideTimeout) clearTimeout(hideTimeout);
-  if (reconnectInterval) clearInterval(reconnectInterval);
 });
 
 // Start
 initStorage();
+console.log('SIGNETRA Cross-Tab Overlay Script Loaded');

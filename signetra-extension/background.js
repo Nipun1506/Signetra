@@ -26,4 +26,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     return true;
   }
+
+  // Route gestures from Vercel to Zoom/WhatsApp tabs
+  if (request.type === 'SIGNETRA_GESTURE') {
+    chrome.tabs.query({url: ["*://*.zoom.us/*", "*://*.whatsapp.com/*"]}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, request);
+      });
+    });
+  }
 });

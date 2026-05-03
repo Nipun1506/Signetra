@@ -180,6 +180,15 @@ export default function Recognize() {
         if (data.phrase && data.confidence >= minConfidence) {
           setCurrentGesture(data)
           confidenceValue.set(data.confidence)
+          
+          // Emit gesture for Chrome Extension Cross-Tab overlay
+          window.postMessage({ 
+            type: 'SIGNETRA_GESTURE', 
+            phrase: data.phrase, 
+            category: data.category || 'General', 
+            confidence: data.confidence 
+          }, '*');
+
           if (data.landmarks && canvasRef.current) {
             drawLandmarks(data.landmarks)
           }
