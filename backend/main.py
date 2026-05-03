@@ -455,17 +455,16 @@ async def websocket_detection(websocket: WebSocket):
             if not frame_b64:
                 continue
                 
-            # Protect MediaPipe: verify token before processing frames
-            try:
-                # Use a primitive cache for the current connection session
-                if not hasattr(websocket, "_token_verified") or websocket._token_verified != token:
-                    if not token:
-                        raise ValueError("No token")
-                    verify_token(token)
-                    websocket._token_verified = token
-            except Exception as e:
-                await websocket.send_text(json.dumps({"hand_detected": False, "error": f"Unauthorized feed: {str(e)}"}))
-                continue
+            # Protect MediaPipe: verify token before processing frames (allow guest mode)
+            if token:
+                try:
+                    # Use a primitive cache for the current connection session
+                    if not hasattr(websocket, "_token_verified") or websocket._token_verified != token:
+                        verify_token(token)
+                        websocket._token_verified = token
+                except Exception as e:
+                    await websocket.send_text(json.dumps({"hand_detected": False, "error": f"Unauthorized feed: {str(e)}"}))
+                    continue
 
             # Decode base64 frame to image
             try:

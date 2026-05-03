@@ -169,6 +169,13 @@ export default function Recognize() {
           return;
         }
 
+        // Handle Backend Auth/Processing Errors
+        if (data.error) {
+          console.error("WS backend error:", data.error);
+          setCameraError(`Connection Error: ${data.error}`);
+          return;
+        }
+
         // Only accept gestures that meet the user-defined minimum confidence threshold
         if (data.phrase && data.confidence >= minConfidence) {
           setCurrentGesture(data)
