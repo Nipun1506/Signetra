@@ -14,7 +14,7 @@ const STATS_MAP = [
 const SIDEBAR_LINKS: { label: string; icon: string; action?: string; path?: string }[] = [
   { label: 'Main Dashboard', icon: 'dashboard', action: 'dashboard' },
   { label: 'Tutorial Manager', icon: 'video_library', action: 'YouTube Manager' },
-  { label: 'User Logs', icon: 'assignment', action: 'System Logs' },
+  { label: 'User Logs', icon: 'assignment', path: '/admin/logs' },
 ]
 
 const HAND_CONNECTIONS = [
