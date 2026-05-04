@@ -12,8 +12,12 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  
-  // Forgot Password State
+  const [errorLine, setErrorLine] = useState('')
+
+  // 2-Step Login State
+  const [loginStep, setLoginStep] = useState<1|2>(1)  // 1=credentials, 2=otp
+  const [loginOtp, setLoginOtp] = useState('')
+  const [otpResendCooldown, setOtpResendCooldown] = useState(0)
   const [showForgotModal, setShowForgotModal] = useState(false)
   const [forgotStep, setForgotStep] = useState(1)
   const [forgotContact, setForgotContact] = useState('')
@@ -32,47 +36,75 @@ export default function Login() {
     return types >= 2;
   }
   
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    
-    // Check if this is the static admin account for local dev only
-    const isAdminEmail = email === 'nipunnaikwadi15@gmail.com' && password === 'nipun0001';
-    
-    if (isAdminEmail) {
-       // Since there's no backend endpoint for static login, we warn the user 
-       // but still allow it for UI testing. For live data, they must use Google.
-       console.warn("Static admin login used. Live metrics may be unavailable without a real token.");
-       const superProfile = {
-          fullName: "System Admin (Local)",
-          email: email,
-          role: "Administrator",
-          baseRole: "Administrator",
-          avatarUrl: "https://ui-avatars.com/api/?name=Admin&background=random"
-       };
-       localStorage.setItem('signetra_profile', JSON.stringify(superProfile));
-       localStorage.removeItem('signetra_token'); // Clear old token to avoid 401 loop
-       setRole('admin');
-       navigate('/');
-       setIsLoading(false);
-       return;
-    }
-
-    // Normal user mock login
-    setTimeout(() => {
-      const mockProfile = {
-         fullName: "Demo User",
-         email: email || "demo@example.com",
-         role: "Standard User",
-         baseRole: "Standard User",
-         avatarUrl: "https://ui-avatars.com/api/?name=User&background=random"
-      };
-      localStorage.setItem('signetra_profile', JSON.stringify(mockProfile));
-      localStorage.removeItem('signetra_token');
-      setRole('user');
-      navigate('/')
-    }, 1500)
+  const startOtpCooldown = () => {
+    setOtpResendCooldown(60)
+    const interval = setInterval(() => {
+      setOtpResendCooldown((prev) => { if (prev <= 1) { clearInterval(interval); return 0 } return prev - 1 })
+    }, 1000)
   }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrorLine('')
+    setIsLoading(true)
+
+    try {
+      // Step 1: Verify credentials and send OTP
+      if (loginStep === 1) {
+        const res = await fetch(`${API_BASE_URL}/api/auth/login_init`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        })
+        const data = await res.json()
+        if (res.ok && data.success) {
+          setLoginStep(2)
+          startOtpCooldown()
+        } else {
+          setErrorLine(data.detail || 'Login failed. Please check your credentials.')
+        }
+      }
+      // Step 2: Verify OTP and get JWT
+      else {
+        const res = await fetch(`${API_BASE_URL}/api/auth/login_verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, email_otp: loginOtp })
+        })
+        const data = await res.json()
+        if (res.ok && data.success) {
+          localStorage.setItem('signetra_token', data.access_token)
+          localStorage.setItem('signetra_profile', JSON.stringify(data.profile))
+          const roleKey = data.profile.role === 'Administrator' ? 'admin' : (data.profile.role === 'Lead Administrator' ? 'lead_admin' : 'user')
+          setRole(roleKey)
+          navigate('/')
+        } else {
+          setErrorLine(data.detail || 'Invalid verification code.')
+        }
+      }
+    } catch (err) {
+      setErrorLine('Network error. Could not reach the authentication server.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleResendLoginOtp = async () => {
+    if (otpResendCooldown > 0) return
+    setIsLoading(true)
+    setErrorLine('')
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login_init`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+      const data = await res.json()
+      if (res.ok && data.success) startOtpCooldown()
+      else setErrorLine(data.detail || 'Failed to resend code.')
+    } catch { setErrorLine('Network error.') } finally { setIsLoading(false) }
+  }
+
 
   const handleGoogleAuth = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -156,11 +188,20 @@ export default function Login() {
           className="bg-surface-container-low border border-white/10 rounded-[2rem] p-8 shadow-2xl backdrop-blur-xl"
         >
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-white tracking-tight">Welcome Back</h2>
-            <p className="text-sm text-on-surface-variant mt-1">Enter your credentials to access the platform.</p>
+            <h2 className="text-xl font-bold text-white tracking-tight">
+              {loginStep === 1 ? 'Welcome Back' : 'Verify Your Identity'}
+            </h2>
+            <p className="text-sm text-on-surface-variant mt-1">
+              {loginStep === 1 ? 'Enter your credentials to access the platform.' : 'Enter the 6-digit code sent to your email.'}
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-5">
+
+          <AnimatePresence mode="wait">
+          {/* STEP 1: Credentials */}
+          {loginStep === 1 && (
+            <motion.div key="creds" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold uppercase tracking-widest text-[#adc6ff] ml-1">Email Address</label>
               <div className="relative">
@@ -170,7 +211,7 @@ export default function Login() {
                   autoComplete="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setErrorLine('') }}
                   placeholder="name@domain.com"
                   className="w-full bg-[#1b1f2c] border border-white/5 rounded-xl text-white py-3.5 pl-11 pr-4 focus:ring-2 focus:ring-[#4d8eff] focus:border-transparent transition-all outline-none placeholder:text-white/20 text-sm"
                 />
@@ -186,7 +227,7 @@ export default function Login() {
                   autoComplete="current-password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); setErrorLine('') }}
                   placeholder="••••••••"
                   className="w-full bg-[#1b1f2c] border border-white/5 rounded-xl text-white py-3.5 pl-11 pr-4 focus:ring-2 focus:ring-[#4d8eff] focus:border-transparent transition-all outline-none placeholder:text-white/20 text-sm tracking-widest"
                 />
@@ -207,18 +248,86 @@ export default function Login() {
                </button>
             </div>
 
+            {errorLine && (
+              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">error</span>{errorLine}
+              </motion.div>
+            )}
+
             <button 
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#4d8eff] to-[#adc6ff] text-[#001a42] font-bold py-3.5 rounded-xl hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-lg shadow-blue-500/20 disabled:opacity-50 mt-4"
+              className="w-full bg-gradient-to-r from-[#4d8eff] to-[#adc6ff] text-[#001a42] font-bold py-3.5 rounded-xl hover:opacity-90 transition-opacity flex justify-center items-center gap-2 shadow-lg shadow-blue-500/20 disabled:opacity-50 mt-2"
             >
               {isLoading ? (
                 <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-[#001a42]/30 border-t-[#001a42] rounded-full" />
-              ) : (
-                'Sign In'
-              )}
+              ) : 'Sign In'}
             </button>
-          </form>
+            </motion.div>
+          )}
+
+          {/* STEP 2: OTP Verification */}
+          {loginStep === 2 && (
+            <motion.div key="otp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex gap-4">
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <span className="material-symbols-outlined">security</span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white mb-1">Verification Required</h4>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    A 6-digit code was sent to <strong className="text-white">{email}</strong>. Enter it below to complete sign-in.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 ml-1">Verification Code</label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  required
+                  value={loginOtp}
+                  onChange={(e) => { setLoginOtp(e.target.value.replace(/\D/g, '')); setErrorLine('') }}
+                  placeholder="000000"
+                  className="w-full bg-[#1b1f2c] border border-white/5 rounded-xl text-white py-4 px-4 focus:ring-2 focus:ring-emerald-400/50 outline-none font-mono text-center tracking-[0.5em] text-lg"
+                />
+              </div>
+
+              {errorLine && (
+                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">error</span>{errorLine}
+                </motion.div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleResendLoginOtp}
+                disabled={otpResendCooldown > 0 || isLoading}
+                className="w-full text-center text-xs text-on-surface-variant hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {otpResendCooldown > 0 ? `Resend code in ${otpResendCooldown}s` : "Didn't receive the code? Resend"}
+              </button>
+
+              <div className="flex gap-3">
+                <button type="button" onClick={() => { setLoginStep(1); setLoginOtp(''); setErrorLine(''); }} className="w-12 bg-white/5 hover:bg-white/10 text-white flex items-center justify-center rounded-xl transition-all">
+                  <span className="material-symbols-outlined">arrow_back</span>
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading || loginOtp.length !== 6}
+                  className="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-400 transition-all shadow-lg text-sm flex justify-center items-center gap-2 disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+                  ) : <><span className="material-symbols-outlined text-sm">verified_user</span>Verify & Sign In</>}
+                </button>
+              </div>
+            </motion.div>
+          )}
+          </AnimatePresence>
+
+        </form>
 
           <div className="mt-8 flex items-center gap-4">
              <div className="flex-1 h-px bg-white/5"></div>

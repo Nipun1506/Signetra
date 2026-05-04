@@ -149,32 +149,29 @@ export default function Register() {
     setErrorLine('')
 
     try {
-      const res = await fetch(`${API_URL}/api/otp/verify`, {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          full_name: formData.fullName,
+          age: parseInt(formData.age, 10),
+          gender: formData.gender,
           email: formData.email,
+          password: formData.password,
           email_otp: formData.emailOTP,
-          purpose: 'register'
         })
       })
       const data = await res.json()
 
-      if (res.ok && data.verified) {
-        // OTP verified — create account
-        setRole('user')
-        const newProfile = {
-          firstName: formData.fullName.split(' ')[0] || formData.fullName,
-          lastName: formData.fullName.split(' ').slice(1).join(' ') || '',
-          email: formData.email,
-          role: 'Standard User',
-          joinDate: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-          avatarUrl: ''
-        }
-        localStorage.setItem('signetra_profile', JSON.stringify(newProfile))
+      if (res.ok && data.success) {
+        // Store real JWT token and profile from backend
+        localStorage.setItem('signetra_token', data.access_token)
+        localStorage.setItem('signetra_profile', JSON.stringify(data.profile))
+        const roleKey = data.profile.role === 'Administrator' ? 'admin' : (data.profile.role === 'Lead Administrator' ? 'lead_admin' : 'user')
+        setRole(roleKey)
         navigate('/')
       } else {
-        setErrorLine(data.detail || 'Verification failed. Please check your codes.')
+        setErrorLine(data.detail || 'Registration failed. Please check your verification code.')
         setIsLoading(false)
       }
     } catch (err) {

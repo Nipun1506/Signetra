@@ -21,11 +21,18 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import SessionLocal, get_db, engine, Base
-from models import DetectionHistory, GestureTemplate, SupportTicket, TicketReply, OTPRecord, SystemLog
+from models import DetectionHistory, GestureTemplate, SupportTicket, TicketReply, OTPRecord, SystemLog, User
 from datetime import datetime, date
 from otp_service import generate_otp, hash_otp, verify_otp, get_expiry, send_email_otp, send_sms_otp
 from auth_utils import get_current_user, create_access_token, verify_token
 from gesture_classifier import GestureClassifier
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Admin / Lead emails (pre-defined roles)
+ADMIN_EMAILS = {'nipunnaikwadi15@gmail.com'}
+LEAD_EMAILS = {'nipunnaikwadi131270@gmail.com', 'nikitasharmaji00@gmail.com', 'saurabhyadavtly18.58@gmail.com', 'Purvasatav07@gmail.com'}
 
 # Initialize Database
 Base.metadata.create_all(bind=engine)
@@ -717,31 +724,178 @@ class GoogleAuthRequest(BaseModel):
     token: str
 
 @app.post("/api/auth/google")
-def google_auth(req: GoogleAuthRequest):
+def google_auth(req: GoogleAuthRequest, db: Session = Depends(get_db)):
     """Verifies Google access token and returns user profile."""
-    # Hit Google's userinfo endpoint
-    # The frontend @react-oauth/google hook returns an access_token by default.
     user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
     headers = {"Authorization": f"Bearer {req.token}"}
-    
     response = requests.get(user_info_url, headers=headers)
-    
     if not response.ok:
         raise HTTPException(status_code=401, detail="Invalid or expired Google Token")
-    
     profile = response.json()
-    
-    # Normally here, you would sync this profile with your database:
-    # 1. Lookup user by profile["email"]
-    # 2. If not found, create new UserRecord
-    # 3. Create active session token
-    
-    # For now, we return success and pass the trusted profile to the frontend
-    access_token = create_access_token(data={"sub": profile.get("email")})
+    email = profile.get("email", "")
+
+    # Upsert user in DB so Google-auth users also get a record
+    existing = db.query(User).filter(User.email == email).first()
+    if not existing:
+        role = "Administrator" if email in ADMIN_EMAILS else ("Lead Administrator" if email in LEAD_EMAILS else "Standard User")
+        new_user = User(email=email, password_hash="google_oauth", full_name=profile.get("name", ""), role=role)
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        existing = new_user
+
+    access_token = create_access_token(data={"sub": email, "role": existing.role})
+    return {"success": True, "access_token": access_token, "profile": profile}
+
+
+# =====================================================================
+# Email / Password Auth Endpoints
+# =====================================================================
+
+class RegisterRequest(BaseModel):
+    full_name: str
+    age: int
+    gender: str
+    email: str
+    password: str
+    email_otp: str
+
+class LoginInitRequest(BaseModel):
+    email: str
+    password: str
+
+class LoginVerifyRequest(BaseModel):
+    email: str
+    email_otp: str
+
+@app.post("/api/auth/register")
+def register_user(req: RegisterRequest, db: Session = Depends(get_db)):
+    """Verify OTP, hash password, and create a new user account."""
+    # 1. Check no existing user with this email
+    if db.query(User).filter(User.email == req.email).first():
+        raise HTTPException(status_code=409, detail="An account with this email already exists. Please log in.")
+
+    # 2. Verify OTP
+    record = (
+        db.query(OTPRecord)
+        .filter(OTPRecord.email == req.email, OTPRecord.purpose == "register", OTPRecord.verified == 0)
+        .order_by(OTPRecord.created_at.desc())
+        .first()
+    )
+    if not record:
+        raise HTTPException(status_code=404, detail="No pending OTP found. Please request a new verification code.")
+    if datetime.utcnow() > record.expires_at:
+        raise HTTPException(status_code=410, detail="OTP has expired. Please request a new one.")
+    if not verify_otp(record.email_otp_hash, req.email_otp):
+        record.attempts += 1
+        if record.attempts >= 5:
+            db.delete(record)
+        db.commit()
+        raise HTTPException(status_code=400, detail=f"Invalid verification code. {5 - record.attempts} attempts remaining.")
+
+    # 3. Mark OTP verified
+    record.verified = 1
+    db.commit()
+
+    # 4. Create user with hashed password
+    role = "Administrator" if req.email in ADMIN_EMAILS else ("Lead Administrator" if req.email in LEAD_EMAILS else "Standard User")
+    new_user = User(
+        email=req.email,
+        password_hash=pwd_context.hash(req.password),
+        full_name=req.full_name,
+        age=req.age,
+        gender=req.gender,
+        role=role,
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    # 5. Return JWT so user is immediately logged in
+    access_token = create_access_token(data={"sub": new_user.email, "role": new_user.role})
     return {
         "success": True,
         "access_token": access_token,
-        "profile": profile
+        "profile": {
+            "fullName": new_user.full_name,
+            "email": new_user.email,
+            "role": new_user.role,
+            "avatarUrl": f"https://ui-avatars.com/api/?name={new_user.full_name.replace(' ', '+')}&background=4d8eff&color=fff"
+        }
+    }
+
+
+@app.post("/api/auth/login_init")
+def login_init(req: LoginInitRequest, db: Session = Depends(get_db)):
+    """Verify email + password, then send a login OTP."""
+    # 1. Find user
+    user = db.query(User).filter(User.email == req.email).first()
+    if not user or user.password_hash == "google_oauth":
+        raise HTTPException(status_code=401, detail="No account found with this email. Please register first.")
+
+    # 2. Verify password
+    if not pwd_context.verify(req.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
+
+    # 3. Cooldown check
+    last_otp = db.query(OTPRecord).filter(OTPRecord.email == req.email, OTPRecord.purpose == "login").order_by(OTPRecord.created_at.desc()).first()
+    if last_otp and (datetime.utcnow() - last_otp.created_at).total_seconds() < 60:
+        raise HTTPException(status_code=429, detail="Please wait 60 seconds before requesting another code.")
+
+    # 4. Generate and send OTP
+    otp_code = generate_otp()
+    otp_record = OTPRecord(
+        email=req.email,
+        phone=None,
+        email_otp_hash=hash_otp(otp_code),
+        phone_otp_hash=None,
+        purpose="login",
+        expires_at=get_expiry(),
+    )
+    db.add(otp_record)
+    db.commit()
+    send_email_otp(req.email, otp_code)
+
+    return {"success": True, "require_otp": True, "message": "Verification code sent to your email."}
+
+
+@app.post("/api/auth/login_verify")
+def login_verify(req: LoginVerifyRequest, db: Session = Depends(get_db)):
+    """Verify the login OTP and return a JWT access token."""
+    # 1. Find pending OTP
+    record = (
+        db.query(OTPRecord)
+        .filter(OTPRecord.email == req.email, OTPRecord.purpose == "login", OTPRecord.verified == 0)
+        .order_by(OTPRecord.created_at.desc())
+        .first()
+    )
+    if not record:
+        raise HTTPException(status_code=404, detail="No pending OTP found. Please start login again.")
+    if datetime.utcnow() > record.expires_at:
+        raise HTTPException(status_code=410, detail="OTP has expired. Please start login again.")
+    if not verify_otp(record.email_otp_hash, req.email_otp):
+        record.attempts += 1
+        if record.attempts >= 5:
+            db.delete(record)
+        db.commit()
+        raise HTTPException(status_code=400, detail=f"Invalid code. {5 - record.attempts} attempts remaining.")
+
+    # 2. Mark verified
+    record.verified = 1
+    db.commit()
+
+    # 3. Fetch user profile and return JWT
+    user = db.query(User).filter(User.email == req.email).first()
+    access_token = create_access_token(data={"sub": user.email, "role": user.role})
+    return {
+        "success": True,
+        "access_token": access_token,
+        "profile": {
+            "fullName": user.full_name,
+            "email": user.email,
+            "role": user.role,
+            "avatarUrl": f"https://ui-avatars.com/api/?name={user.full_name.replace(' ', '+')}&background=4d8eff&color=fff"
+        }
     }
 
 @app.post("/api/admin/populate")
