@@ -5,10 +5,10 @@ import { useAuth } from '../context/AuthContext'
 import { API_BASE_URL } from '../config'
 
 const STATS_MAP = [
-  { key: 'total_detections', label: 'Total Detections', icon: 'analytics', color: 'text-primary' },
-  { key: 'active_users', label: 'Active Users', icon: 'group', color: 'text-blue-400' },
-  { key: 'new_gestures', label: 'Total Gestures', icon: 'gesture', color: 'text-amber-500' },
-  { key: 'system_latency', label: 'System Latency', icon: 'timer', color: 'text-rose-500' },
+  { key: 'total_detections', label: 'Total Detections', icon: 'analytics', color: 'text-primary', sub: 'Logged in history' },
+  { key: 'active_users', label: 'Active Users', icon: 'group', color: 'text-blue-400', sub: 'Live connections' },
+  { key: 'new_gestures', label: 'Unique Gestures', icon: 'gesture', color: 'text-amber-500', sub: 'Distinct types used' },
+  { key: 'system_latency', label: 'System Latency', icon: 'timer', color: 'text-rose-500', sub: 'Processing speed' },
 ]
 
 const SIDEBAR_LINKS: { label: string; icon: string; action?: string; path?: string }[] = [

@@ -355,13 +355,16 @@ async def get_admin_stats(db: Session = Depends(get_db), current_user: dict = De
     from datetime import datetime, timedelta
     from sqlalchemy import func
     
-    # Total Detections
+    # Total Detections — all rows in history
     total = db.query(DetectionHistory).count()
     
-    # Active Users
+    # Active Users — live WebSocket connections
     active = len(manager.active_connections)
     
-    # Popular Signs (Top 4)
+    # Total Unique Gesture Types detected (from history, not template library)
+    unique_gestures = db.query(DetectionHistory.phrase).distinct().count()
+    
+    # Popular Signs (Top 4 from history)
     popular = db.query(
         DetectionHistory.phrase, 
         func.count(DetectionHistory.id).label('count')
@@ -380,30 +383,19 @@ async def get_admin_stats(db: Session = Depends(get_db), current_user: dict = De
     pulse_map = {row.hour: row.count for row in pulse_raw}
     current_hour = datetime.now().hour
     pulse = []
-    # Take 8 samples (every 3 hours)
     for i in range(7, -1, -1):
         target_h = (current_hour - (i * 3)) % 24
         target_h_str = f"{target_h:02d}"
-        pulse.append(pulse_map.get(target_h_str, 0)) # Strictly real data
-
-    # Calculate actual system latency from last detection if available
-    # Note: We don't track processing time in the DB yet, so we return "Real-time"
-    pending_gestures = db.query(GestureTemplate).count() # Using total templates as a placeholder for 'Gestures in Library'
+        pulse.append(pulse_map.get(target_h_str, 0))
 
     return {
         "total_detections": f"{total:,}",
         "active_users": f"{active}",
-        "new_gestures": f"{pending_gestures}",
+        "new_gestures": f"{unique_gestures}",  # Unique gesture types from history
         "system_latency": "Real-time",
         "pulse": pulse,
         "popular_signs": popular_data
     }
-
-    # Mock system restart logic
-    print("🚀 Admin triggered system soft-restart")
-    # Note: restarting doesn't have DB access here by default in the old signature, 
-    # but I'll add db: Session = Depends(get_db)
-    return {"status": "success", "message": "AI pipeline reset successful"}
 
 @app.post("/api/admin/restart")
 async def admin_restart(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
