@@ -166,25 +166,25 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     d_thumb_mcp = ((thumb_mcp['x'] - lm[0]['x'])**2 + (thumb_mcp['y'] - lm[0]['y'])**2)**0.5
     thumb_not_tucked = d_thumb_tip > d_thumb_mcp + (0.1 * palm_size)
 
-    # --- Stricter Recognition Rules ---
+    # --- Recognition Rules ---
 
-    # 1. STOP — Open Palm
-    if index_up and middle_up and ring_up and pinky_up:
-        return ("STOP", 98, "General")
-
-    # 2. PLEASE — Hand on chest style
-    if index_up and middle_up and ring_up and pinky_tucked:
-        return ("PLEASE", 95, "Social")
-
-    # 3. HELLO — Peace Sign
-    if index_up and middle_up and ring_tucked and pinky_tucked:
-        return ("HELLO", 94, "Greeting")
-
-    # 4. THANK YOU — OK Sign
+    # 1. THANK YOU — OK Pinch (checked FIRST to prevent STOP from firing when pinching)
     if is_ok_pinch and middle_up and ring_up and pinky_up:
         return ("THANK YOU", 94, "Social")
 
-    # 5. I LOVE YOU — Rock On (lenient thumb: not tucked, not necessarily fully extended)
+    # 2. STOP — Open Palm (must NOT have an OK pinch)
+    if index_up and middle_up and ring_up and pinky_up and not is_ok_pinch:
+        return ("STOP", 98, "General")
+
+    # 3. PLEASE — Index, Middle, Ring up; Pinky tucked
+    if index_up and middle_up and ring_up and pinky_tucked:
+        return ("PLEASE", 95, "Social")
+
+    # 4. HELLO — Peace Sign (Index + Middle up, Ring + Pinky tucked)
+    if index_up and middle_up and ring_tucked and pinky_tucked:
+        return ("HELLO", 94, "Greeting")
+
+    # 5. I LOVE YOU — Rock On (lenient thumb)
     if index_up and pinky_up and middle_tucked and ring_tucked and thumb_not_tucked:
         return ("I LOVE YOU", 92, "Social")
 
