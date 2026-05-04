@@ -158,7 +158,7 @@ def classify_gesture(landmarks) -> tuple[str, float]:
 
     # OK Pinch check
     dist_thumb_index_tip = ((lm[4]['x'] - lm[8]['x'])**2 + (lm[4]['y'] - lm[8]['y'])**2)**0.5
-    is_ok_pinch = dist_thumb_index_tip < (0.35 * palm_size)
+    is_ok_pinch = dist_thumb_index_tip < (0.25 * palm_size)  # Tight threshold — genuine pinch only
 
     # Thumb not tucked = thumb tip is simply further from wrist than thumb MCP
     # This is lenient — catches bent, angled, or partially extended thumbs
@@ -168,15 +168,15 @@ def classify_gesture(landmarks) -> tuple[str, float]:
 
     # --- Recognition Rules ---
 
-    # 1. THANK YOU — OK Pinch (checked FIRST to prevent STOP from firing when pinching)
+    # 1. THANK YOU — OK Pinch (checked FIRST — tight 0.25 threshold so only genuine pinch triggers)
     if is_ok_pinch and middle_up and ring_up and pinky_up:
         return ("THANK YOU", 94, "Social")
 
-    # 2. STOP — Open Palm (must NOT have an OK pinch)
-    if index_up and middle_up and ring_up and pinky_up and not is_ok_pinch:
+    # 2. STOP — Open Palm (THANK YOU already handled, no extra guard needed)
+    if index_up and middle_up and ring_up and pinky_up:
         return ("STOP", 98, "General")
 
-    # 3. PLEASE — Index, Middle, Ring up; Pinky NOT up (slightly bent to fully tucked)
+    # 3. PLEASE — 3 fingers up, pinky bent/down
     if index_up and middle_up and ring_up and not pinky_up:
         return ("PLEASE", 95, "Social")
 
