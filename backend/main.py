@@ -143,16 +143,18 @@ def classify_gesture(landmarks) -> tuple[str, float]:
 
     # Thumb logic
     thumb_tip = lm[4]
+    thumb_ip  = lm[3]   # Interphalangeal joint (between tip and MCP)
     thumb_mcp = lm[2]
-    
+
     # Thumb out = distance between thumb tip and index MCP
     dist_thumb_index_mcp = ((thumb_tip['x'] - lm[5]['x'])**2 + (thumb_tip['y'] - lm[5]['y'])**2)**0.5
     thumb_out = dist_thumb_index_mcp > (0.45 * palm_size)
-    
-    # Stricter Thumb UP: Must be significantly higher than ALL other landmarks
-    # and significantly above its own base joints.
-    thumb_up = thumb_tip['y'] < min(lm[5]['y'], lm[9]['y'], lm[13]['y'], lm[17]['y']) - (0.15 * palm_size) \
-               and thumb_tip['y'] < thumb_ip['y'] - (0.05 * palm_size)
+
+    # Thumb UP: tip must be clearly higher than ALL knuckle rows AND above its own IP joint
+    thumb_up = (
+        thumb_tip['y'] < min(lm[5]['y'], lm[9]['y'], lm[13]['y'], lm[17]['y']) - (0.15 * palm_size)
+        and thumb_tip['y'] < thumb_ip['y'] - (0.05 * palm_size)
+    )
 
     # OK Pinch check
     dist_thumb_index_tip = ((lm[4]['x'] - lm[8]['x'])**2 + (lm[4]['y'] - lm[8]['y'])**2)**0.5
