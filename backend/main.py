@@ -65,7 +65,7 @@ app.add_middleware(
 mp_hands = mp.solutions.hands
 hands_detector = mp_hands.Hands(
     max_num_hands=1,
-    min_detection_confidence=0.6,
+    min_detection_confidence=0.4,
     min_tracking_confidence=0.3,
     model_complexity=1
 )
@@ -118,24 +118,23 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     palm_size = ((lm[0]['x'] - lm[9]['x'])**2 + (lm[0]['y'] - lm[9]['y'])**2)**0.5
     if palm_size < 0.01: palm_size = 0.1 # Safety
 
-    # Improved Helper: Finger state detection
-    def get_finger_state(tip, pip, mcp):
-        # Tip must be significantly further from wrist than MCP
+    # Improved Helper: Finger state detection (Rotation Agnostic)
+    def get_finger_state(tip, mcp):
+        # Distance from wrist to tip vs wrist to mcp
         d_tip = ((lm[tip]['x'] - lm[0]['x'])**2 + (lm[tip]['y'] - lm[0]['y'])**2)**0.5
         d_mcp = ((lm[mcp]['x'] - lm[0]['x'])**2 + (lm[mcp]['y'] - lm[0]['y'])**2)**0.5
-        is_extended = d_tip > d_mcp + (0.3 * palm_size)
-        is_above = lm[tip]['y'] < lm[pip]['y']
-        return is_extended or is_above
+        # If tip is significantly further from wrist than the knuckle, it's extended
+        return d_tip > d_mcp + (0.2 * palm_size)
 
     def is_tucked(tip, mcp):
         d_tip = ((lm[tip]['x'] - lm[0]['x'])**2 + (lm[tip]['y'] - lm[0]['y'])**2)**0.5
         d_mcp = ((lm[mcp]['x'] - lm[0]['x'])**2 + (lm[mcp]['y'] - lm[0]['y'])**2)**0.5
-        return d_tip < d_mcp # Tip is closer to wrist than its MCP
+        return d_tip < d_mcp + (0.05 * palm_size) # Tip is near or inside the knuckle line
 
-    index_up  = get_finger_state(8, 6, 5)
-    middle_up = get_finger_state(12, 10, 9)
-    ring_up   = get_finger_state(16, 14, 13)
-    pinky_up  = get_finger_state(20, 18, 17)
+    index_up  = get_finger_state(8, 5)
+    middle_up = get_finger_state(12, 9)
+    ring_up   = get_finger_state(16, 13)
+    pinky_up  = get_finger_state(20, 17)
 
     index_tucked  = is_tucked(8, 5)
     middle_tucked = is_tucked(12, 9)
