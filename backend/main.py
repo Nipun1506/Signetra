@@ -57,6 +57,7 @@ PREDEFINED_ACCOUNTS = [
 ]
 
 def seed_predefined_users():
+    import traceback
     db = SessionLocal()
     try:
         for account in PREDEFINED_ACCOUNTS:
@@ -69,10 +70,14 @@ def seed_predefined_users():
                     role=account["role"],
                 )
                 db.add(new_user)
-                print(f"[Seed] Created {account['role']} account: {account['email']}")
+                print(f"[Seed] ✅ Created {account['role']} account: {account['email']}")
+            else:
+                print(f"[Seed] ℹ️  Account already exists: {account['email']} (role: {existing.role})")
         db.commit()
+        print("[Seed] Done.")
     except Exception as e:
-        print(f"[Seed] Error seeding users: {e}")
+        print(f"[Seed] ❌ Error: {e}")
+        traceback.print_exc()
     finally:
         db.close()
 
@@ -85,6 +90,12 @@ app = FastAPI()
 @app.get("/health")
 def read_root():
     return {"message": "Signetra API is Live!", "status": "Healthy"}
+
+@app.post("/api/admin/seed")
+def trigger_seed():
+    """Manually trigger the predefined account seed. Use when startup seed may have failed."""
+    seed_predefined_users()
+    return {"message": "Seed complete. Check server logs for details."}
 
 # Allow specific Vite frontend ports to connect
 origins = [
