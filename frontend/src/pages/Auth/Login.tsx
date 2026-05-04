@@ -18,6 +18,7 @@ export default function Login() {
   const [loginStep, setLoginStep] = useState<1|2>(1)  // 1=credentials, 2=otp
   const [loginOtp, setLoginOtp] = useState('')
   const [otpResendCooldown, setOtpResendCooldown] = useState(0)
+  const [showPassword, setShowPassword] = useState(false)
   const [showForgotModal, setShowForgotModal] = useState(false)
   const [forgotStep, setForgotStep] = useState(1)
   const [forgotContact, setForgotContact] = useState('')
@@ -243,14 +244,23 @@ export default function Login() {
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">lock</span>
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setErrorLine('') }}
                   placeholder="••••••••"
-                  className="w-full bg-[#1b1f2c] border border-white/5 rounded-xl text-white py-3.5 pl-11 pr-4 focus:ring-2 focus:ring-[#4d8eff] focus:border-transparent transition-all outline-none placeholder:text-white/20 text-sm tracking-widest"
+                  className="w-full bg-[#1b1f2c] border border-white/5 rounded-xl text-white py-3.5 pl-11 pr-12 focus:ring-2 focus:ring-[#4d8eff] focus:border-transparent transition-all outline-none placeholder:text-white/20 text-sm tracking-widest"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-white transition-colors outline-none"
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
               </div>
             </div>
 
