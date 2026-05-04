@@ -150,9 +150,9 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     dist_thumb_index_mcp = ((thumb_tip['x'] - lm[5]['x'])**2 + (thumb_tip['y'] - lm[5]['y'])**2)**0.5
     thumb_out = dist_thumb_index_mcp > (0.45 * palm_size)
 
-    # Thumb UP: tip must be clearly higher than ALL knuckle rows AND above its own IP joint
+    # Thumb UP: tip must be very clearly higher than ALL knuckle rows AND above its own IP joint
     thumb_up = (
-        thumb_tip['y'] < min(lm[5]['y'], lm[9]['y'], lm[13]['y'], lm[17]['y']) - (0.15 * palm_size)
+        thumb_tip['y'] < min(lm[5]['y'], lm[9]['y'], lm[13]['y'], lm[17]['y']) - (0.20 * palm_size)
         and thumb_tip['y'] < thumb_ip['y'] - (0.05 * palm_size)
     )
 
@@ -205,8 +205,8 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     if thumb_up and index_tucked and middle_tucked and ring_tucked and pinky_tucked:
         return ("YES", 95, "Affirmation")
 
-    # 10. HELP — Closed Fist (Thumb is NOT clearly up)
-    if index_tucked and middle_tucked and ring_tucked and pinky_tucked and not thumb_up:
+    # 10. HELP — Closed Fist (thumb can be anywhere — YES already caught above)
+    if index_tucked and middle_tucked and ring_tucked and pinky_tucked:
         return ("HELP", 85, "Urgent")
 
     return ("UNKNOWN", 0, "Unknown")
