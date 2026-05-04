@@ -830,12 +830,15 @@ def login_init(req: LoginInitRequest, db: Session = Depends(get_db)):
     """Verify email + password, then send a login OTP."""
     # 1. Find user
     user = db.query(User).filter(User.email == req.email).first()
-    if not user or user.password_hash == "google_oauth":
-        raise HTTPException(status_code=401, detail="No account found with this email. Please register first.")
+    if not user:
+        raise HTTPException(status_code=401, detail="Email address not found. Please register an account first.")
+    
+    if user.password_hash == "google_oauth":
+        raise HTTPException(status_code=401, detail="This account is linked with Google. Please use the 'Sign in with Google' button.")
 
     # 2. Verify password
     if not pwd_context.verify(req.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
+        raise HTTPException(status_code=401, detail="Incorrect password. Please double-check and try again.")
 
     # 3. Cooldown check
     last_otp = db.query(OTPRecord).filter(OTPRecord.email == req.email, OTPRecord.purpose == "login").order_by(OTPRecord.created_at.desc()).first()
