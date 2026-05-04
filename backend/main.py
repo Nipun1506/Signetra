@@ -176,8 +176,8 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     if index_up and middle_up and ring_up and pinky_up and not is_ok_pinch:
         return ("STOP", 98, "General")
 
-    # 3. PLEASE — Index, Middle, Ring up; Pinky tucked
-    if index_up and middle_up and ring_up and pinky_tucked:
+    # 3. PLEASE — Index, Middle, Ring up; Pinky NOT up (slightly bent to fully tucked)
+    if index_up and middle_up and ring_up and not pinky_up:
         return ("PLEASE", 95, "Social")
 
     # 4. HELLO — Peace Sign (Index + Middle up, Ring + Pinky tucked)
