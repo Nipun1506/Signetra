@@ -158,7 +158,7 @@ export default function Recognize() {
       }, 200)
     }
 
-    let watchdog: NodeJS.Timeout | null = null;
+    let watchdog: any = null;
     const resetWatchdog = () => {
       if (watchdog) clearTimeout(watchdog);
       watchdog = setTimeout(() => {
