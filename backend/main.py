@@ -148,7 +148,7 @@ def classify_gesture(landmarks) -> tuple[str, float]:
 
     # Thumb out = distance between thumb tip and index MCP
     dist_thumb_index_mcp = ((thumb_tip['x'] - lm[5]['x'])**2 + (thumb_tip['y'] - lm[5]['y'])**2)**0.5
-    thumb_out = dist_thumb_index_mcp > (0.45 * palm_size)
+    thumb_out = dist_thumb_index_mcp > (0.60 * palm_size)  # Must be a clear L-shape, not just slight splay
 
     # Thumb UP: tip must be very clearly higher than ALL knuckle rows AND above its own IP joint
     thumb_up = (
@@ -188,13 +188,13 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     if index_up and pinky_up and middle_tucked and ring_tucked and thumb_not_tucked:
         return ("I LOVE YOU", 92, "Social")
 
-    # 6. WATER — L-Shape (strict thumb_out required)
+    # 6. NO — Point (index up, others tucked, thumb NOT clearly extended)
+    if index_up and middle_tucked and ring_tucked and pinky_tucked and not thumb_out:
+        return ("NO", 90, "Negation")
+
+    # 7. WATER — L-Shape (index up, thumb clearly extended sideways)
     if index_up and thumb_out and middle_tucked and ring_tucked and pinky_tucked:
         return ("WATER", 90, "Needs")
-
-    # 7. NO — Point
-    if index_up and middle_tucked and ring_tucked and pinky_tucked and not thumb_out:
-        return ("NO", 88, "Negation")
 
     # 8. SORRY — Pinky Up only (Must be significantly higher than all other fingertips)
     if pinky_up and index_tucked and middle_tucked and ring_tucked:
