@@ -160,6 +160,12 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     dist_thumb_index_tip = ((lm[4]['x'] - lm[8]['x'])**2 + (lm[4]['y'] - lm[8]['y'])**2)**0.5
     is_ok_pinch = dist_thumb_index_tip < (0.35 * palm_size)
 
+    # Thumb not tucked = thumb tip is simply further from wrist than thumb MCP
+    # This is lenient — catches bent, angled, or partially extended thumbs
+    d_thumb_tip = ((thumb_tip['x'] - lm[0]['x'])**2 + (thumb_tip['y'] - lm[0]['y'])**2)**0.5
+    d_thumb_mcp = ((thumb_mcp['x'] - lm[0]['x'])**2 + (thumb_mcp['y'] - lm[0]['y'])**2)**0.5
+    thumb_not_tucked = d_thumb_tip > d_thumb_mcp + (0.1 * palm_size)
+
     # --- Stricter Recognition Rules ---
 
     # 1. STOP — Open Palm
@@ -178,11 +184,11 @@ def classify_gesture(landmarks) -> tuple[str, float]:
     if is_ok_pinch and middle_up and ring_up and pinky_up:
         return ("THANK YOU", 94, "Social")
 
-    # 5. I LOVE YOU — Rock On
-    if index_up and pinky_up and middle_tucked and ring_tucked and thumb_out:
+    # 5. I LOVE YOU — Rock On (lenient thumb: not tucked, not necessarily fully extended)
+    if index_up and pinky_up and middle_tucked and ring_tucked and thumb_not_tucked:
         return ("I LOVE YOU", 92, "Social")
 
-    # 6. WATER — L-Shape
+    # 6. WATER — L-Shape (strict thumb_out required)
     if index_up and thumb_out and middle_tucked and ring_tucked and pinky_tucked:
         return ("WATER", 90, "Needs")
 
