@@ -158,7 +158,21 @@ export default function Recognize() {
       }, 200)
     }
 
+    let watchdog: NodeJS.Timeout | null = null;
+    const resetWatchdog = () => {
+      if (watchdog) clearTimeout(watchdog);
+      watchdog = setTimeout(() => {
+        setCurrentGesture(null);
+        confidenceValue.set(0);
+        if (canvasRef.current) {
+          const ctx = canvasRef.current.getContext('2d');
+          ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        }
+      }, 1500); // 1.5s timeout for "stuck" states
+    };
+
     wsRef.current.onmessage = (event) => {
+      resetWatchdog();
       try {
         const data = JSON.parse(event.data)
         
@@ -176,6 +190,14 @@ export default function Recognize() {
           return;
         }
 
+        // Display hand skeleton even if phrase is unknown (shows system is alive)
+        if (data.landmarks && canvasRef.current) {
+          drawLandmarks(data.landmarks)
+        } else if (!data.hand_detected && canvasRef.current) {
+          const ctx = canvasRef.current.getContext('2d')
+          ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+        }
+
         // Only accept gestures that meet the user-defined minimum confidence threshold
         if (data.phrase && data.confidence >= minConfidence) {
           setCurrentGesture(data)
@@ -189,9 +211,6 @@ export default function Recognize() {
             confidence: data.confidence 
           }, '*');
 
-          if (data.landmarks && canvasRef.current) {
-            drawLandmarks(data.landmarks)
-          }
           // Client-side speech using Web Speech API
           if ((mode === 'speech' || mode === 'text-speech') && data.phrase !== lastSpokenRef.current) {
             speakPhrase(data.phrase)
@@ -203,17 +222,16 @@ export default function Recognize() {
             lastLoggedRef.current = data.phrase
           }
         } else {
-          // No hand detected — clear display
-          if (canvasRef.current) {
-            const ctx = canvasRef.current.getContext('2d')
-            ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
-          }
+          // Hand detected but confidence too low or no phrase — just clear phrase but keep skeleton
+          setCurrentGesture(null)
+          confidenceValue.set(0)
         }
       } catch (e) {}
     }
 
     wsRef.current.onclose = () => {
       if (frameIntervalRef.current) clearInterval(frameIntervalRef.current)
+      if (watchdog) clearTimeout(watchdog)
     }
   }
 

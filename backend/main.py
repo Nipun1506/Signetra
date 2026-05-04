@@ -571,9 +571,9 @@ async def websocket_detection(websocket: WebSocket):
                     "hand_detected": True
                 }
 
-                await manager.broadcast(json.dumps(response))
+                await websocket.send_text(json.dumps(response))
             else:
-                await manager.broadcast(json.dumps({
+                await websocket.send_text(json.dumps({
                     "phrase": None,
                     "confidence": 0,
                     "landmarks": [],
