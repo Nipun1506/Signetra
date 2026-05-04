@@ -43,6 +43,22 @@ export default function Login() {
     }, 1000)
   }
 
+  const parseErrorMessage = async (res: Response): Promise<string> => {
+    try {
+      const data = await res.json()
+      const detail = data?.detail
+      // Filter out meaningless HTTP default messages
+      if (!detail || detail === 'Not Found' || detail === 'Internal Server Error' || detail === 'Bad Request') {
+        if (res.status === 404) return 'The authentication service is temporarily unavailable. Please try again later.'
+        if (res.status === 500) return 'A server error occurred. Please try again later.'
+        return 'Login failed. Please check your credentials and try again.'
+      }
+      return detail
+    } catch {
+      return 'Unexpected server response. Please try again.'
+    }
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorLine('')
@@ -56,12 +72,12 @@ export default function Login() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         })
-        const data = await res.json()
-        if (res.ok && data.success) {
-          setLoginStep(2)
-          startOtpCooldown()
+        if (res.ok) {
+          const data = await res.json()
+          if (data.success) { setLoginStep(2); startOtpCooldown() }
+          else setErrorLine(data.detail || 'Login failed. Please check your credentials.')
         } else {
-          setErrorLine(data.detail || 'Login failed. Please check your credentials.')
+          setErrorLine(await parseErrorMessage(res))
         }
       }
       // Step 2: Verify OTP and get JWT
@@ -71,15 +87,19 @@ export default function Login() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, email_otp: loginOtp })
         })
-        const data = await res.json()
-        if (res.ok && data.success) {
-          localStorage.setItem('signetra_token', data.access_token)
-          localStorage.setItem('signetra_profile', JSON.stringify(data.profile))
-          const roleKey = data.profile.role === 'Administrator' ? 'admin' : (data.profile.role === 'Lead Administrator' ? 'lead_admin' : 'user')
-          setRole(roleKey)
-          navigate('/')
+        if (res.ok) {
+          const data = await res.json()
+          if (data.success) {
+            localStorage.setItem('signetra_token', data.access_token)
+            localStorage.setItem('signetra_profile', JSON.stringify(data.profile))
+            const roleKey = data.profile.role === 'Administrator' ? 'admin' : (data.profile.role === 'Lead Administrator' ? 'lead_admin' : 'user')
+            setRole(roleKey)
+            navigate('/')
+          } else {
+            setErrorLine(data.detail || 'Invalid verification code.')
+          }
         } else {
-          setErrorLine(data.detail || 'Invalid verification code.')
+          setErrorLine(await parseErrorMessage(res))
         }
       }
     } catch (err) {
