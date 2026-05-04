@@ -37,6 +37,47 @@ LEAD_EMAILS = {'nipunnaikwadi131270@gmail.com', 'nikitasharmaji00@gmail.com', 's
 # Initialize Database
 Base.metadata.create_all(bind=engine)
 
+# -----------------------------------------------------------------------
+# Startup seed — ensures predefined admin/lead accounts always exist.
+# Safe to run on every restart: only creates if the account doesn't exist.
+# -----------------------------------------------------------------------
+PREDEFINED_ACCOUNTS = [
+    {
+        "email": "nipunnaikwadi15@gmail.com",
+        "password": "nipun0001",
+        "full_name": "Nipun Naikwadi",
+        "role": "Administrator",
+    },
+    {
+        "email": "nipunnaikwadi131270@gmail.com",
+        "password": "nipun0001",
+        "full_name": "Nipun Naikwadi",
+        "role": "Lead Administrator",
+    },
+]
+
+def seed_predefined_users():
+    db = SessionLocal()
+    try:
+        for account in PREDEFINED_ACCOUNTS:
+            existing = db.query(User).filter(User.email == account["email"]).first()
+            if not existing:
+                new_user = User(
+                    email=account["email"],
+                    password_hash=pwd_context.hash(account["password"]),
+                    full_name=account["full_name"],
+                    role=account["role"],
+                )
+                db.add(new_user)
+                print(f"[Seed] Created {account['role']} account: {account['email']}")
+        db.commit()
+    except Exception as e:
+        print(f"[Seed] Error seeding users: {e}")
+    finally:
+        db.close()
+
+seed_predefined_users()
+
 app = FastAPI()
 
 @app.get("/")
