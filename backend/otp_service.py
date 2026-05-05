@@ -80,61 +80,15 @@ def _build_email_html(otp_code: str) -> str:
 
 
 def send_email_otp(to_email: str, otp_code: str) -> bool:
-    """Send OTP email via Resend API (primary) or Gmail SMTP (fallback).
+    """Send OTP email via Gmail SMTP.
     Always logs the OTP to the console for Railway log visibility."""
     
-    # Always log OTP to server console — visible in Railway/Render logs
+    # Always log OTP to server console — visible in Railway Deploy Logs
     print(f"[OTP-LOG] Code for {to_email}: {otp_code}")
 
     html_body = _build_email_html(otp_code)
 
-    # --- Strategy 1: Resend API (reliable from cloud servers) ---
-    if RESEND_API_KEY:
-        try:
-            response = requests.post(
-                "https://api.resend.com/emails",
-                headers={
-                    "Authorization": f"Bearer {RESEND_API_KEY}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "from": "Signetra <onboarding@resend.dev>",
-                    "to": [to_email],
-                    "subject": f"Signetra – Your Verification Code: {otp_code}",
-                    "html": html_body,
-                },
-                timeout=10,
-            )
-            if response.status_code in (200, 201):
-                print(f"[OTP] Email sent via Resend to {to_email}")
-                return True
-            else:
-                print(f"[OTP-WARN] Resend failed ({response.status_code}): {response.text} — trying Gmail fallback")
-        except Exception as e:
-            print(f"[OTP-WARN] Resend error: {e} — trying Gmail fallback")
-
-    # --- Strategy 2: Brevo SMTP (free, no domain required, 300/day) ---
-    if BREVO_SMTP_LOGIN and BREVO_SMTP_PASSWORD:
-        try:
-            # FROM must be a verified sender in Brevo — use GMAIL_EMAIL (signetracare@gmail.com)
-            brevo_from = GMAIL_EMAIL if GMAIL_EMAIL else BREVO_SMTP_LOGIN
-            msg = MIMEMultipart("alternative")
-            msg["Subject"] = f"Signetra – Your Verification Code: {otp_code}"
-            msg["From"] = f"Signetra <{brevo_from}>"
-            msg["To"] = to_email
-            msg.attach(MIMEText(html_body, "html"))
-
-            with smtplib.SMTP("smtp-relay.brevo.com", 587, timeout=15) as server:
-                server.starttls()
-                server.login(BREVO_SMTP_LOGIN, BREVO_SMTP_PASSWORD)
-                server.sendmail(brevo_from, to_email, msg.as_string())
-
-            print(f"[OTP] Email sent via Brevo to {to_email}")
-            return True
-        except Exception as e:
-            print(f"[OTP-WARN] Brevo failed for {to_email}: {e} — trying Gmail fallback")
-
-    # --- Strategy 3: Gmail SMTP fallback ---
+    # --- Gmail SMTP ---
     if GMAIL_EMAIL and GMAIL_APP_PASSWORD:
         try:
             msg = MIMEMultipart("alternative")
@@ -143,7 +97,7 @@ def send_email_otp(to_email: str, otp_code: str) -> bool:
             msg["To"] = to_email
             msg.attach(MIMEText(html_body, "html"))
 
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=15) as server:
                 server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
                 server.sendmail(GMAIL_EMAIL, to_email, msg.as_string())
 
