@@ -20,6 +20,8 @@ from datetime import datetime, timedelta
 RESEND_API_KEY    = os.getenv("RESEND_API_KEY", "").strip()
 GMAIL_EMAIL       = os.getenv("GMAIL_EMAIL", "").strip()
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "").replace(" ", "").strip()
+BREVO_SMTP_LOGIN  = os.getenv("BREVO_SMTP_LOGIN", "").strip()
+BREVO_SMTP_PASSWORD = os.getenv("BREVO_SMTP_PASSWORD", "").strip()
 TWILIO_ACCOUNT_SID  = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
 TWILIO_AUTH_TOKEN   = os.getenv("TWILIO_AUTH_TOKEN", "").strip()
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "").strip()
@@ -111,7 +113,26 @@ def send_email_otp(to_email: str, otp_code: str) -> bool:
         except Exception as e:
             print(f"[OTP-WARN] Resend error: {e} — trying Gmail fallback")
 
-    # --- Strategy 2: Gmail SMTP fallback ---
+    # --- Strategy 2: Brevo SMTP (free, no domain required, 300/day) ---
+    if BREVO_SMTP_LOGIN and BREVO_SMTP_PASSWORD:
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = f"Signetra – Your Verification Code: {otp_code}"
+            msg["From"] = f"Signetra <{BREVO_SMTP_LOGIN}>"
+            msg["To"] = to_email
+            msg.attach(MIMEText(html_body, "html"))
+
+            with smtplib.SMTP("smtp-relay.brevo.com", 587, timeout=15) as server:
+                server.starttls()
+                server.login(BREVO_SMTP_LOGIN, BREVO_SMTP_PASSWORD)
+                server.sendmail(BREVO_SMTP_LOGIN, to_email, msg.as_string())
+
+            print(f"[OTP] Email sent via Brevo to {to_email}")
+            return True
+        except Exception as e:
+            print(f"[OTP-WARN] Brevo failed for {to_email}: {e} — trying Gmail fallback")
+
+    # --- Strategy 3: Gmail SMTP fallback ---
     if GMAIL_EMAIL and GMAIL_APP_PASSWORD:
         try:
             msg = MIMEMultipart("alternative")
