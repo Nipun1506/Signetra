@@ -1,7 +1,7 @@
 """
 Signetra OTP Service
 ====================
-Handles OTP generation, hashing, email dispatch (Gmail SMTP),
+Handles OTP generation, hashing, email dispatch (Resend API / Gmail SMTP fallback),
 and SMS dispatch (Twilio or dev-mode console logging).
 """
 
@@ -9,6 +9,7 @@ import os
 import random
 import hashlib
 import smtplib
+import requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -16,13 +17,12 @@ from datetime import datetime, timedelta
 # ---------------------------------------------------------------------------
 # Configuration (loaded from environment / .env)
 # ---------------------------------------------------------------------------
-GMAIL_EMAIL = os.getenv("GMAIL_EMAIL", "").strip()
-# App Passwords from Google often come with spaces; we remove them for SMTP safety
+RESEND_API_KEY    = os.getenv("RESEND_API_KEY", "").strip()
+GMAIL_EMAIL       = os.getenv("GMAIL_EMAIL", "").strip()
 GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "").replace(" ", "").strip()
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "").strip()
+TWILIO_ACCOUNT_SID  = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
+TWILIO_AUTH_TOKEN   = os.getenv("TWILIO_AUTH_TOKEN", "").strip()
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER", "").strip()
-# Default to True ONLY if we are clearly in a local dev environment
 OTP_DEV_MODE = os.getenv("OTP_DEV_MODE", "false").lower() == "true"
 OTP_EXPIRY_MINUTES = int(os.getenv("OTP_EXPIRY_MINUTES", "5"))
 
@@ -78,29 +78,60 @@ def _build_email_html(otp_code: str) -> str:
 
 
 def send_email_otp(to_email: str, otp_code: str) -> bool:
-    """Send the OTP to the given email via Gmail SMTP."""
-    if not GMAIL_EMAIL or not GMAIL_APP_PASSWORD:
-        print(f"[OTP-DEV] Email OTP for {to_email}: {otp_code}  (Gmail not configured)")
-        return True
+    """Send OTP email via Resend API (primary) or Gmail SMTP (fallback).
+    Always logs the OTP to the console for Railway log visibility."""
+    
+    # Always log OTP to server console — visible in Railway/Render logs
+    print(f"[OTP-LOG] Code for {to_email}: {otp_code}")
 
-    try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"Signetra – Your Verification Code: {otp_code}"
-        msg["From"] = f"Signetra <{GMAIL_EMAIL}>"
-        msg["To"] = to_email
+    html_body = _build_email_html(otp_code)
 
-        html_body = _build_email_html(otp_code)
-        msg.attach(MIMEText(html_body, "html"))
+    # --- Strategy 1: Resend API (reliable from cloud servers) ---
+    if RESEND_API_KEY:
+        try:
+            response = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "from": "Signetra <onboarding@resend.dev>",
+                    "to": [to_email],
+                    "subject": f"Signetra – Your Verification Code: {otp_code}",
+                    "html": html_body,
+                },
+                timeout=10,
+            )
+            if response.status_code in (200, 201):
+                print(f"[OTP] Email sent via Resend to {to_email}")
+                return True
+            else:
+                print(f"[OTP-WARN] Resend failed ({response.status_code}): {response.text} — trying Gmail fallback")
+        except Exception as e:
+            print(f"[OTP-WARN] Resend error: {e} — trying Gmail fallback")
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
-            server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
-            server.sendmail(GMAIL_EMAIL, to_email, msg.as_string())
+    # --- Strategy 2: Gmail SMTP fallback ---
+    if GMAIL_EMAIL and GMAIL_APP_PASSWORD:
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = f"Signetra – Your Verification Code: {otp_code}"
+            msg["From"] = f"Signetra <{GMAIL_EMAIL}>"
+            msg["To"] = to_email
+            msg.attach(MIMEText(html_body, "html"))
 
-        print(f"[OTP] Email sent to {to_email}")
-        return True
-    except Exception as e:
-        print(f"[OTP-ERROR] Failed to send email to {to_email}: {e}")
-        return False
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+                server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
+                server.sendmail(GMAIL_EMAIL, to_email, msg.as_string())
+
+            print(f"[OTP] Email sent via Gmail to {to_email}")
+            return True
+        except Exception as e:
+            print(f"[OTP-ERROR] Gmail failed for {to_email}: {e}")
+            return False
+
+    print(f"[OTP-DEV] No email provider configured. OTP={otp_code} logged above.")
+    return True
 
 
 # ---------------------------------------------------------------------------
