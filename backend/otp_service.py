@@ -116,16 +116,18 @@ def send_email_otp(to_email: str, otp_code: str) -> bool:
     # --- Strategy 2: Brevo SMTP (free, no domain required, 300/day) ---
     if BREVO_SMTP_LOGIN and BREVO_SMTP_PASSWORD:
         try:
+            # FROM must be a verified sender in Brevo — use GMAIL_EMAIL (signetracare@gmail.com)
+            brevo_from = GMAIL_EMAIL if GMAIL_EMAIL else BREVO_SMTP_LOGIN
             msg = MIMEMultipart("alternative")
             msg["Subject"] = f"Signetra – Your Verification Code: {otp_code}"
-            msg["From"] = f"Signetra <{BREVO_SMTP_LOGIN}>"
+            msg["From"] = f"Signetra <{brevo_from}>"
             msg["To"] = to_email
             msg.attach(MIMEText(html_body, "html"))
 
             with smtplib.SMTP("smtp-relay.brevo.com", 587, timeout=15) as server:
                 server.starttls()
                 server.login(BREVO_SMTP_LOGIN, BREVO_SMTP_PASSWORD)
-                server.sendmail(BREVO_SMTP_LOGIN, to_email, msg.as_string())
+                server.sendmail(brevo_from, to_email, msg.as_string())
 
             print(f"[OTP] Email sent via Brevo to {to_email}")
             return True
