@@ -911,7 +911,14 @@ def login_init(req: LoginInitRequest, db: Session = Depends(get_db)):
     db.commit()
     send_email_otp(req.email, otp_code)
 
-    return {"success": True, "require_otp": True, "message": "Verification code sent to your email."}
+    response_data = {"success": True, "require_otp": True, "message": "Verification code sent to your email."}
+    
+    # If in dev mode, include the raw OTP in the response to help debug email delivery
+    otp_dev_mode = os.getenv("OTP_DEV_MODE", "false").lower() == "true"
+    if otp_dev_mode:
+        response_data["debug_otp"] = otp_code
+
+    return response_data
 
 
 @app.post("/api/auth/login_verify")

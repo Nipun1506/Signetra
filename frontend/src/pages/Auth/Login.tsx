@@ -19,6 +19,7 @@ export default function Login() {
   const [loginOtp, setLoginOtp] = useState('')
   const [otpResendCooldown, setOtpResendCooldown] = useState(0)
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(true)
   const [showForgotModal, setShowForgotModal] = useState(false)
   const [forgotStep, setForgotStep] = useState(1)
   const [forgotContact, setForgotContact] = useState('')
@@ -36,7 +37,15 @@ export default function Login() {
     if (/[^a-zA-Z0-9]/.test(pwd)) types++;
     return types >= 2;
   }
-  
+  // Load remembered email
+  useEffect(() => {
+    const remembered = localStorage.getItem('signetra_remembered_email')
+    if (remembered) {
+      setEmail(remembered)
+      setRememberMe(true)
+    }
+  }, [])
+
   const startOtpCooldown = () => {
     setOtpResendCooldown(60)
     const interval = setInterval(() => {
@@ -95,6 +104,13 @@ export default function Login() {
             localStorage.setItem('signetra_profile', JSON.stringify(data.profile))
             const roleKey = data.profile.role === 'Administrator' ? 'admin' : (data.profile.role === 'Lead Administrator' ? 'lead_admin' : 'user')
             setRole(roleKey)
+
+            if (rememberMe) {
+              localStorage.setItem('signetra_remembered_email', email)
+            } else {
+              localStorage.removeItem('signetra_remembered_email')
+            }
+
             navigate('/')
           } else {
             setErrorLine(data.detail || 'Invalid verification code.')
@@ -266,7 +282,12 @@ export default function Login() {
 
             <div className="flex items-center justify-between pt-1">
                <label className="flex items-center gap-2 cursor-pointer group">
-                 <input type="checkbox" className="rounded-md border-white/10 bg-[#1b1f2c] text-primary focus:ring-primary w-4 h-4 cursor-pointer" />
+                 <input 
+                   type="checkbox" 
+                   checked={rememberMe}
+                   onChange={(e) => setRememberMe(e.target.checked)}
+                   className="rounded-md border-white/10 bg-[#1b1f2c] text-primary focus:ring-primary w-4 h-4 cursor-pointer" 
+                 />
                  <span className="text-xs text-on-surface-variant group-hover:text-white transition-colors">Remember me</span>
                </label>
                <button 
