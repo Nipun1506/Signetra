@@ -18,6 +18,7 @@ class User(Base):
 class DetectionHistory(Base):
     __tablename__ = "detection_history"
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=True, index=True)  # Linked to User.id; nullable for legacy rows
     phrase = Column(String, index=True)
     confidence = Column(Float)
     category = Column(String)

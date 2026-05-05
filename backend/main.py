@@ -38,6 +38,22 @@ LEAD_EMAILS = {'nipunnaikwadi131270@gmail.com', 'nikitasharmaji00@gmail.com', 's
 # Initialize Database
 Base.metadata.create_all(bind=engine)
 
+# Safe migration: add user_id to detection_history if it was deployed without it
+def _migrate_add_user_id():
+    from database import engine as _engine
+    with _engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE detection_history ADD COLUMN user_id INTEGER"))
+            print("[MIGRATION] Added user_id column to detection_history")
+        except Exception:
+            pass  # Column already exists — that's fine
+
+try:
+    from sqlalchemy import text
+    _migrate_add_user_id()
+except Exception as _e:
+    print(f"[MIGRATION] Skipped: {_e}")
+
 # -----------------------------------------------------------------------
 # Startup seed — ensures predefined admin/lead accounts always exist.
 # Safe to run on every restart: only creates if the account doesn't exist.
@@ -304,19 +320,29 @@ manager = ConnectionManager()
 @app.get("/api/stats")
 def get_stats(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     today_start = datetime.combine(date.today(), datetime.min.time())
-    
-    # Gestures recognized today
-    gestures_today = db.query(DetectionHistory).filter(DetectionHistory.timestamp >= today_start).count()
-    
-    # Total signs learned (Templates count)
+
+    # Resolve the current user's integer ID
+    user = db.query(User).filter(User.email == current_user.get("sub")).first()
+    uid = user.id if user else None
+
+    # Filter history by this user
+    user_history = db.query(DetectionHistory).filter(DetectionHistory.user_id == uid)
+
+    # Gestures recognized today (this user only)
+    gestures_today = user_history.filter(DetectionHistory.timestamp >= today_start).count()
+
+    # Total signs learned (Templates count — global, not per-user)
     total_learned = db.query(GestureTemplate).count()
-    
-    # Active sessions
+
+    # Active sessions (global WebSocket connections)
     active_sessions = len(manager.active_connections)
-    
-    # Accuracy rate (avg confidence of today's detections)
-    avg_conf = db.query(func.avg(DetectionHistory.confidence)).filter(DetectionHistory.timestamp >= today_start).scalar() or 0
-    
+
+    # Accuracy rate (avg confidence of this user's detections today)
+    avg_conf = db.query(func.avg(DetectionHistory.confidence)).filter(
+        DetectionHistory.user_id == uid,
+        DetectionHistory.timestamp >= today_start
+    ).scalar() or 0
+
     return {
         "gestures_today": gestures_today,
         "total_learned": total_learned,
@@ -332,7 +358,10 @@ class HistoryCreate(BaseModel):
 
 @app.post("/api/history")
 def add_history(data: HistoryCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    # Resolve user ID so we can attach the detection to the right user
+    user = db.query(User).filter(User.email == current_user.get("sub")).first()
     history_record = DetectionHistory(
+        user_id=user.id if user else None,
         phrase=data.phrase,
         confidence=data.confidence,
         category=data.category,
@@ -344,14 +373,20 @@ def add_history(data: HistoryCreate, db: Session = Depends(get_db), current_user
 
 @app.get("/api/history/recent")
 def get_recent_history(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    # Get latest 5 detections
-    history = db.query(DetectionHistory).order_by(DetectionHistory.timestamp.desc()).limit(5).all()
+    user = db.query(User).filter(User.email == current_user.get("sub")).first()
+    uid = user.id if user else None
+    history = db.query(DetectionHistory).filter(
+        DetectionHistory.user_id == uid
+    ).order_by(DetectionHistory.timestamp.desc()).limit(5).all()
     return history
 
 @app.get("/api/history/all")
 def get_all_history(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    # Get all detections sorted by time
-    history = db.query(DetectionHistory).order_by(DetectionHistory.timestamp.desc()).all()
+    user = db.query(User).filter(User.email == current_user.get("sub")).first()
+    uid = user.id if user else None
+    history = db.query(DetectionHistory).filter(
+        DetectionHistory.user_id == uid
+    ).order_by(DetectionHistory.timestamp.desc()).all()
     return history
 
 class TicketCreate(BaseModel):

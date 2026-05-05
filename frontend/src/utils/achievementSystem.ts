@@ -24,34 +24,63 @@ const BADGES: Badge[] = [
 
 const LEVEL_THRESHOLDS = [0, 250, 750, 1500, 3000, 6000];
 
+/**
+ * Returns a user-specific localStorage key so every user gets their own
+ * achievements, XP, and badges — even on a shared device or browser.
+ */
+function getUserKey(baseKey: string): string {
+  try {
+    // Prefer the stored profile email (most stable identifier)
+    const profile = localStorage.getItem('signetra_profile');
+    if (profile) {
+      const parsed = JSON.parse(profile);
+      const email: string = parsed.email || '';
+      if (email) {
+        // Use base64-encoded email slice as a compact, safe key suffix
+        return `${baseKey}_${btoa(email).slice(0, 16)}`;
+      }
+    }
+    // Fallback: tail of the JWT token (changes on each login but acceptable)
+    const token = localStorage.getItem('signetra_token');
+    if (token) return `${baseKey}_${token.slice(-16)}`;
+  } catch {
+    // ignore parse errors
+  }
+  return baseKey; // unauthenticated fallback
+}
+
 export const getAchievementState = (): AchievementState => {
-  const saved = localStorage.getItem('signetra_achievements');
+  const key = getUserKey('signetra_achievements');
+  const saved = localStorage.getItem(key);
   if (saved) {
     try {
       const state = JSON.parse(saved);
-      // Merge with default badges to handle new additions
-      state.badges = BADGES.map(b => {
+      // Merge with default badges to handle new badge additions
+      state.badges = BADGES.map((b: Badge) => {
         const found = state.badges.find((sb: any) => sb.id === b.id);
         return found ? { ...b, unlockedAt: found.unlockedAt } : b;
       });
       return state;
     } catch (e) {
-      console.error("Failed to parse achievements", e);
+      console.error('Failed to parse achievements', e);
     }
   }
   return {
     totalXP: 0,
     level: 1,
-    badges: BADGES.map(b => b.level === 1 ? { ...b, unlockedAt: new Date().toISOString() } : b),
-    lastLevelUp: null
+    badges: BADGES.map(b => (b.level === 1 ? { ...b, unlockedAt: new Date().toISOString() } : b)),
+    lastLevelUp: null,
   };
 };
 
 export const saveAchievementState = (state: AchievementState) => {
-  localStorage.setItem('signetra_achievements', JSON.stringify(state));
+  const key = getUserKey('signetra_achievements');
+  localStorage.setItem(key, JSON.stringify(state));
 };
 
-export const addXP = (amount: number): { state: AchievementState, levelUp: boolean, newBadge: Badge | null } => {
+export const addXP = (
+  amount: number
+): { state: AchievementState; levelUp: boolean; newBadge: Badge | null } => {
   const state = getAchievementState();
   const oldLevel = state.level;
   state.totalXP += amount;
@@ -72,9 +101,9 @@ export const addXP = (amount: number): { state: AchievementState, levelUp: boole
   if (levelUp) {
     state.level = newLevel;
     state.lastLevelUp = Date.now();
-    
+
     // Unlock new badges for this level
-    state.badges = state.badges.map(b => {
+    state.badges = state.badges.map((b: Badge) => {
       if (b.level <= newLevel && !b.unlockedAt) {
         newBadge = b;
         return { ...b, unlockedAt: new Date().toISOString() };
@@ -98,12 +127,12 @@ export const getLevelProgress = (xp: number) => {
   }
 
   const currentThreshold = LEVEL_THRESHOLDS[currentLevel - 1];
-  const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || (currentThreshold * 2);
+  const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || currentThreshold * 2;
   const progress = ((xp - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
 
   return {
     level: currentLevel,
     progress: Math.min(100, Math.max(0, progress)),
-    nextThreshold
+    nextThreshold,
   };
 };

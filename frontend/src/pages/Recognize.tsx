@@ -3,6 +3,21 @@ import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from
 import { logGestureHistory } from '../utils/history'
 import { WS_BASE_URL } from '../config'
 
+/** Per-user localStorage key so settings are isolated between accounts. */
+function getUserKey(baseKey: string): string {
+  try {
+    const profile = localStorage.getItem('signetra_profile');
+    if (profile) {
+      const parsed = JSON.parse(profile);
+      const email: string = parsed.email || '';
+      if (email) return `${baseKey}_${btoa(email).slice(0, 16)}`;
+    }
+    const token = localStorage.getItem('signetra_token');
+    if (token) return `${baseKey}_${token.slice(-16)}`;
+  } catch { /* ignore */ }
+  return baseKey;
+}
+
 const GESTURES = [
   { id: '1', phrase: 'STOP', category: 'General', combo: '⌘ S', icon: 'back_hand' },
   { id: '2', phrase: 'HELP', category: 'Urgent', combo: '⌘ H', icon: 'sports_mma' },
@@ -31,7 +46,7 @@ export default function Recognize() {
   const [adminNotification, setAdminNotification] = useState<string | null>(null)
 
   useEffect(() => {
-    const saved = localStorage.getItem('signetra_settings');
+    const saved = localStorage.getItem(getUserKey('signetra_settings'));
     if (saved) {
       const settings = JSON.parse(saved);
       setMinConfidence(settings.confidenceThreshold || 75);
@@ -41,7 +56,7 @@ export default function Recognize() {
   }, []);
 
   const getConstraints = () => {
-    const saved = localStorage.getItem('signetra_settings');
+    const saved = localStorage.getItem(getUserKey('signetra_settings'));
     const settings = saved ? JSON.parse(saved) : {};
     
     const resMap: Record<string, { w: number, h: number }> = {

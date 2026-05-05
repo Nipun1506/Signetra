@@ -11,9 +11,24 @@ const DEFAULT_SETTINGS = {
   outputResolution: '720p'
 };
 
+/** Per-user localStorage key so settings are isolated between accounts. */
+function getUserKey(baseKey: string): string {
+  try {
+    const profile = localStorage.getItem('signetra_profile');
+    if (profile) {
+      const parsed = JSON.parse(profile);
+      const email: string = parsed.email || '';
+      if (email) return `${baseKey}_${btoa(email).slice(0, 16)}`;
+    }
+    const token = localStorage.getItem('signetra_token');
+    if (token) return `${baseKey}_${token.slice(-16)}`;
+  } catch { /* ignore */ }
+  return baseKey;
+}
+
 export default function Settings() {
   const [settings, setSettings] = useState(() => {
-    const saved = localStorage.getItem('signetra_settings');
+    const saved = localStorage.getItem(getUserKey('signetra_settings'));
     return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
   });
 
@@ -42,7 +57,7 @@ export default function Settings() {
   };
 
   const saveSettings = () => {
-    localStorage.setItem('signetra_settings', JSON.stringify(settings));
+    localStorage.setItem(getUserKey('signetra_settings'), JSON.stringify(settings));
     setHasChanges(false);
     alert('Settings saved successfully!');
   };
@@ -50,7 +65,7 @@ export default function Settings() {
   const resetDefaults = () => {
     if (confirm('Are you sure you want to reset all settings to default?')) {
       setSettings(DEFAULT_SETTINGS);
-      localStorage.setItem('signetra_settings', JSON.stringify(DEFAULT_SETTINGS));
+      localStorage.setItem(getUserKey('signetra_settings'), JSON.stringify(DEFAULT_SETTINGS));
       setHasChanges(false);
     }
   };
