@@ -23,6 +23,7 @@ from sqlalchemy import func
 from database import SessionLocal, get_db, engine, Base
 from models import DetectionHistory, GestureTemplate, SupportTicket, TicketReply, OTPRecord, SystemLog, User
 from datetime import datetime, date
+import threading
 from otp_service import generate_otp, hash_otp, verify_otp, get_expiry, send_email_otp, send_sms_otp
 from auth_utils import get_current_user, create_access_token, verify_token
 from gesture_classifier import GestureClassifier
@@ -909,7 +910,9 @@ def login_init(req: LoginInitRequest, db: Session = Depends(get_db)):
     )
     db.add(otp_record)
     db.commit()
-    send_email_otp(req.email, otp_code)
+
+    # Send email in a background thread so the API responds immediately
+    threading.Thread(target=send_email_otp, args=(req.email, otp_code), daemon=True).start()
 
     response_data = {"success": True, "require_otp": True, "message": "Verification code sent to your email."}
     

@@ -92,7 +92,7 @@ def send_email_otp(to_email: str, otp_code: str) -> bool:
         html_body = _build_email_html(otp_code)
         msg.attach(MIMEText(html_body, "html"))
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
             server.login(GMAIL_EMAIL, GMAIL_APP_PASSWORD)
             server.sendmail(GMAIL_EMAIL, to_email, msg.as_string())
 
