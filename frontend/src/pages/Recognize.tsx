@@ -201,6 +201,13 @@ export default function Recognize() {
         // Handle Backend Auth/Processing Errors
         if (data.error) {
           console.error("WS backend error:", data.error);
+          // If the server rejects our token (expired or invalid), clear it and redirect to login
+          if (data.error.includes("401") || data.error.toLowerCase().includes("unauthorized")) {
+            localStorage.removeItem('signetra_token');
+            localStorage.removeItem('signetra_profile');
+            window.location.href = '/login?reason=session_expired';
+            return;
+          }
           setCameraError(`Connection Error: ${data.error}`);
           return;
         }

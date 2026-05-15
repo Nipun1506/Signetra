@@ -10,11 +10,33 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/** Decode JWT payload (no signature verification) and check expiry. */
+function isTokenExpired(token: string | null): boolean {
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp ? Date.now() / 1000 > payload.exp : false;
+  } catch {
+    return true; // malformed token → treat as expired
+  }
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRoleState] = useState<UserRole>('none'); 
   const [baseRole, setBaseRoleState] = useState<UserRole>('none');
 
   useEffect(() => {
+    const token = localStorage.getItem('signetra_token');
+
+    // If token is missing or expired, wipe the session so the user is prompted to re-login
+    if (isTokenExpired(token)) {
+      localStorage.removeItem('signetra_token');
+      localStorage.removeItem('signetra_profile');
+      setRoleState('none');
+      setBaseRoleState('none');
+      return;
+    }
+
     const savedProfile = localStorage.getItem('signetra_profile');
     if (savedProfile) {
       try {
@@ -44,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setBaseRoleState('none');
     }
   }, []);
+
 
   const setRole = (newRole: UserRole) => {
     setRoleState(newRole);

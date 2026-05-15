@@ -37,12 +37,17 @@ export default function Login() {
     if (/[^a-zA-Z0-9]/.test(pwd)) types++;
     return types >= 2;
   }
-  // Load remembered email
+  // Load remembered email + detect session-expiry redirect
   useEffect(() => {
     const remembered = localStorage.getItem('signetra_remembered_email')
     if (remembered) {
       setEmail(remembered)
       setRememberMe(true)
+    }
+    // Show friendly message when redirected here due to an expired token
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reason') === 'session_expired') {
+      setErrorLine('Your session has expired. Please log in again.');
     }
   }, [])
 
