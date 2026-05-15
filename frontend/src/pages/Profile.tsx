@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import type { UserRole } from '../context/AuthContext'
 import { getAchievementState, getLevelProgress } from '../utils/achievementSystem'
+import { API_BASE_URL } from '../config'
 
 export default function Profile() {
   const { role, baseRole, setRole } = useAuth()
@@ -17,21 +18,38 @@ export default function Profile() {
   const [twoFAInput, setTwoFAInput] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // Load exact user profile from local storage to ensure each user sees their own
+  // Load profile: start from localStorage, then refresh from backend DB
   const [profileData, setProfileData] = useState(() => {
     const saved = localStorage.getItem('signetra_profile')
     if (saved) return JSON.parse(saved)
     return {
-      firstName: 'Nipun',
+      firstName: '',
       lastName: '',
-      email: 'nipun@signetra.local',
-      role: 'Lead Administrator',
-      joinDate: 'April 22, 2026',
-      avatarUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
-      age: 20,
-      gender: 'Male'
+      email: '',
+      role: 'Standard User',
+      joinDate: '',
+      avatarUrl: '',
+      age: '',
+      gender: 'Not Specified'
     }
   })
+
+  // Fetch fresh profile data from the backend on every mount
+  useEffect(() => {
+    const token = localStorage.getItem('signetra_token')
+    if (!token) return
+    fetch(`${API_BASE_URL}/api/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return
+        setProfileData((prev: any) => ({ ...prev, ...data }))
+        // Sync updated profile back to localStorage so other pages stay in sync
+        localStorage.setItem('signetra_profile', JSON.stringify({ ...profileData, ...data }))
+      })
+      .catch(() => {/* network error — use cached data */})
+  }, [])
 
   // Preferences State
   const [preferences, setPreferences] = useState({
@@ -81,10 +99,36 @@ export default function Profile() {
       reader.readAsDataURL(file);
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsEditing(false)
-    localStorage.setItem('signetra_profile', JSON.stringify(profileData))
-    // Changes saved securely to local device
+    // Persist to localStorage immediately (fast)
+    const updatedProfile = { ...profileData }
+    localStorage.setItem('signetra_profile', JSON.stringify(updatedProfile))
+
+    // Persist to backend DB so it survives logouts
+    const token = localStorage.getItem('signetra_token')
+    if (token) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            firstName: profileData.firstName || '',
+            lastName:  profileData.lastName  || '',
+            age:       profileData.age       ? Number(profileData.age) : null,
+            gender:    profileData.gender    || null,
+          }),
+        })
+        if (res.ok) {
+          const { profile } = await res.json()
+          setProfileData((prev: any) => ({ ...prev, ...profile }))
+          localStorage.setItem('signetra_profile', JSON.stringify({ ...updatedProfile, ...profile }))
+        }
+      } catch { /* network error — localStorage copy is still saved */ }
+    }
   }
 
   const handleLogout = () => {

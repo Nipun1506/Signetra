@@ -18,6 +18,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPExcept
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import SessionLocal, get_db, engine, Base
@@ -30,6 +31,26 @@ from gesture_classifier import GestureClassifier
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def user_to_profile_dict(user) -> dict:
+    """Serialize a User ORM row to the full frontend profile dict."""
+    name_parts = (user.full_name or "").split(" ", 1)
+    first_name = name_parts[0] if name_parts else ""
+    last_name  = name_parts[1] if len(name_parts) > 1 else ""
+    avatar_name = (user.full_name or "User").replace(" ", "+")
+    return {
+        "firstName": first_name,
+        "lastName":  last_name,
+        "fullName":  user.full_name or "",
+        "email":     user.email,
+        "role":      user.role,
+        "baseRole":  user.role,
+        "age":       user.age,
+        "gender":    user.gender or "Not Specified",
+        "joinDate":  user.created_at.strftime("%B %d, %Y") if getattr(user, "created_at", None) else "",
+        "avatarUrl": f"https://ui-avatars.com/api/?name={avatar_name}&background=4d8eff&color=fff",
+    }
 
 # Admin / Lead emails (pre-defined roles)
 ADMIN_EMAILS = {'nipunnaikwadi15@gmail.com'}
@@ -904,12 +925,7 @@ def register_user(req: RegisterRequest, db: Session = Depends(get_db)):
     return {
         "success": True,
         "access_token": access_token,
-        "profile": {
-            "fullName": new_user.full_name,
-            "email": new_user.email,
-            "role": new_user.role,
-            "avatarUrl": f"https://ui-avatars.com/api/?name={new_user.full_name.replace(' ', '+')}&background=4d8eff&color=fff"
-        }
+        "profile": user_to_profile_dict(new_user),
     }
 
 
@@ -990,13 +1006,50 @@ def login_verify(req: LoginVerifyRequest, db: Session = Depends(get_db)):
     return {
         "success": True,
         "access_token": access_token,
-        "profile": {
-            "fullName": user.full_name,
-            "email": user.email,
-            "role": user.role,
-            "avatarUrl": f"https://ui-avatars.com/api/?name={user.full_name.replace(' ', '+')}&background=4d8eff&color=fff"
-        }
+        "profile": user_to_profile_dict(user),
     }
+
+# ---------------------------------------------------------------------------
+# Profile — GET (fetch) and PUT (update) for the authenticated user
+# ---------------------------------------------------------------------------
+
+@app.get("/api/profile")
+def get_profile(db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    """Return the full profile for the currently authenticated user."""
+    user = db.query(User).filter(User.email == current_user["sub"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user_to_profile_dict(user)
+
+
+class ProfileUpdateRequest(BaseModel):
+    firstName: str = ""
+    lastName:  str = ""
+    age:       Optional[int]  = None
+    gender:    Optional[str]  = None
+
+
+@app.put("/api/profile")
+def update_profile(
+    req: ProfileUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """Persist profile edits (name, age, gender) to the database."""
+    user = db.query(User).filter(User.email == current_user["sub"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    combined_name = f"{req.firstName} {req.lastName}".strip()
+    if combined_name:
+        user.full_name = combined_name
+    if req.age is not None:
+        user.age = req.age
+    if req.gender is not None:
+        user.gender = req.gender
+    db.commit()
+    db.refresh(user)
+    return {"success": True, "profile": user_to_profile_dict(user)}
+
 
 @app.post("/api/admin/populate")
 def api_populate_templates(db: Session = Depends(get_db)):
