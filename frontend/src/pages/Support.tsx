@@ -492,35 +492,35 @@ export default function Support() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              className="fixed right-0 top-0 h-screen w-[520px] bg-[#1b2235] border-l border-white/5 z-[201] flex flex-col shadow-2xl"
+              className="fixed right-0 top-0 h-screen w-[650px] bg-[#1b2235] border-l border-white/5 z-[201] flex flex-col shadow-2xl"
             >
                {/* Drawer Header */}
-               <div className="p-10 border-b border-white/5">
-                  <div className="flex justify-between items-center mb-10">
+               <div className="p-6 border-b border-white/5 flex-shrink-0">
+                  <div className="flex justify-between items-center mb-4">
                     <button onClick={() => setSelectedTicket(null)} className="flex items-center gap-2 group transition-all">
                        <span className="material-symbols-outlined opacity-40 group-hover:opacity-100 group-hover:translate-x-[-2px] transition-all">arrow_back</span>
                        <span className="text-[10px] font-black uppercase tracking-widest opacity-20 group-hover:opacity-100">Back to Inbox</span>
                     </button>
                     <div className="text-right">
-                       <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 mb-2">Internal Routing</p>
+                       <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">Internal Routing</p>
                        <p className="text-xs font-mono text-primary font-bold">#SIG-{selectedTicket.id.toString().padStart(4, '0')}</p>
                     </div>
                   </div>
 
-                  <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">{selectedTicket.subject}</h3>
-                  <div className="flex items-center gap-4 mb-10">
+                  <h3 className="text-2xl font-black uppercase tracking-tighter mb-3">{selectedTicket.subject}</h3>
+                  <div className="flex items-center gap-4 mb-4">
                      <span className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border ${getPriorityColor(selectedTicket.priority)}`}>{selectedTicket.priority}</span>
                   </div>
 
                   {/* HIGH VISIBILITY STATUS CONTROL */}
-                  <div className="bg-black/30 rounded-3xl p-6 border border-white/5">
-                     <p className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-4 text-center">Set Resolution Status</p>
+                  <div className="bg-black/30 rounded-2xl p-4 border border-white/5">
+                     <p className="text-[10px] font-black uppercase tracking-widest opacity-30 mb-3 text-center">Set Resolution Status</p>
                      <div className="flex gap-2">
                         {(['Open', 'Pending', 'Resolved'] as const).map(s => (
                           <button 
                             key={s}
                             onClick={() => handleUpdateStatus(s)}
-                            className={`flex-1 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${selectedTicket.status === s ? `${getStatusColor(s).replace('/10', '/100')} border-white/20 shadow-lg` : 'bg-white/5 border-white/5 opacity-40 hover:opacity-100'}`}
+                            className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${selectedTicket.status === s ? `${getStatusColor(s).replace('/10', '/100')} border-white/20 shadow-lg` : 'bg-white/5 border-white/5 opacity-40 hover:opacity-100'}`}
                           >
                             {s}
                           </button>
@@ -568,16 +568,16 @@ export default function Support() {
                </div>
 
                {/* Reply Compose Area */}
-               <div className="p-10 bg-[#0a0e1a] border-t border-white/5">
+               <div className="p-6 bg-[#0a0e1a] border-t border-white/5 flex-shrink-0">
                   <div className="relative">
                     <textarea 
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
                       placeholder="Type your official response..."
-                      className="w-full h-32 bg-white/5 rounded-3xl border border-white/5 p-8 text-sm focus:ring-1 focus:ring-primary/40 outline-none resize-none transition-all placeholder:opacity-20 font-medium"
+                      className="w-full min-h-[160px] bg-white/5 rounded-2xl border border-white/10 p-5 text-base leading-relaxed focus:ring-2 focus:ring-primary/40 outline-none resize-y transition-all placeholder:opacity-30 font-medium text-white"
                     />
-                    <div className="absolute bottom-6 right-6 flex items-center gap-4">
-                       <p className="text-[9px] font-black uppercase tracking-widest opacity-20">{replyText.length} Characters</p>
+                    <div className="flex justify-between items-center mt-3">
+                       <p className="text-[10px] font-black uppercase tracking-widest opacity-30">{replyText.length} Characters</p>
                        <button 
                          onClick={handleSendReply}
                          disabled={isSendingReply || !replyText.trim()}

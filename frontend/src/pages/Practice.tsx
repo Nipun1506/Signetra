@@ -25,6 +25,12 @@ export default function Practice() {
   const currentTutorial = TUTORIALS.find(t => t.title.toLowerCase() === gestureId?.toLowerCase())
   const referenceImage = currentTutorial?.img || "https://lh3.googleusercontent.com/aida-public/AB6AXuA6vbUq3RJd73uTQ9kPz_EWd5KbmODzcqravX38ccCdA6h3GH8RqknID62VrC7XLy_o_CEsx4rUa5Vl1-jhvuUY_JUIAHlLMMvvOQPnAwsp9o2JAVpUT-pCmT-L5uhnbzLbFeAViu6308pJkxd99DMdODE2_aULlNMcWD5z9NPXybOhTc5Fud7uvWOOdWKgfpRP_gZl2i3FNi9HDpCSeHZofQsQahkfF754LpzdeAwy5Xa37mSqPXvW7O7p_g2Ah9fjWycOFOf0ngo"
 
+  // Next / previous gesture navigation
+  const gestureList = TUTORIALS.filter(t => t.phrase) // only practice gestures (not video tutorials)
+  const currentIndex = gestureList.findIndex(t => t.title.toLowerCase() === gestureId?.toLowerCase())
+  const nextGesture = gestureList[(currentIndex + 1) % gestureList.length]
+  const prevGesture = currentIndex > 0 ? gestureList[currentIndex - 1] : null
+
   // Trigger popup when high accuracy is met, but only for Level Ups
   useEffect(() => {
     if (accuracy >= 90 && status === 'MOTION PERFECT' && !showLevelUp) {
@@ -283,7 +289,11 @@ export default function Practice() {
            </div>
         </div>
          <div className="flex items-center gap-10 border-l border-white/5 pl-10">
-            <button className="bg-primary-container h-12 w-12 rounded-xl flex items-center justify-center group hover:scale-105 transition-all shadow-xl shadow-blue-500/20">
+            <button
+               onClick={() => navigate(`/practice/${nextGesture?.title.toLowerCase()}`)}
+               title={`Next: ${nextGesture?.phrase || ''}`}
+               className="bg-primary-container h-12 w-12 rounded-xl flex items-center justify-center group hover:scale-105 transition-all shadow-xl shadow-blue-500/20"
+            >
                <span className="material-symbols-outlined text-on-primary-container group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </button>
          </div>
