@@ -18,6 +18,8 @@ import Support from './pages/Support'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import Landing from './pages/Landing'
+import TermsOfService from './pages/TermsOfService'
+import CookiePolicy from './pages/CookiePolicy'
 import LegalConsentModal from './components/legal/LegalConsentModal'
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -84,6 +86,10 @@ export default function App() {
       <Route path="/welcome" element={<PublicRoute><Landing /></PublicRoute>} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+
+      {/* Fully public — readable BEFORE consent (required for consent to be meaningful) */}
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/cookies" element={<CookiePolicy />} />
 
       {/* Secure App Sandbox */}
       <Route element={<ProtectedAppLayout />}>
