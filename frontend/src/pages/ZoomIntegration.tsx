@@ -397,13 +397,13 @@ export default function VideoCallIntegrations() {
                   </div>
                   <div>
                     <h4 className={`font-bold text-lg ${activeStep === 4 ? 'text-primary' : 'text-white'}`}>Start Broadcasting</h4>
-                    <p className="text-sm text-on-surface-variant mt-1">Head over to the Vision Interface to start analyzing your gestures. The overlay will appear in your {platform.name} tab.</p>
+                    <p className="text-sm text-on-surface-variant mt-1">Open the <strong className="text-white">Recognize tab</strong> (the camera page) and start signing. The subtitle overlay will automatically appear on your active {platform.name} tab — no extra setup needed.</p>
                     {activeStep === 4 && (
                       <Link
                         to="/recognize"
                         className="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-blue-500 text-white font-bold rounded-xl hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all"
                       >
-                        Go to Vision Interface
+                        Open Recognize Tab (Camera) →
                       </Link>
                     )}
                   </div>
