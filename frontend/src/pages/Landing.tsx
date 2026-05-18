@@ -122,7 +122,7 @@ export default function Landing() {
               {[
                 { icon: 'videocam', title: 'Real-Time Translation', desc: 'Instantly map hand gestures via your webcam using advanced low-latency AI.' },
                 { icon: 'school', title: 'Learn & Practice', desc: 'Interactive lessons to build your sign language vocabulary visually.' },
-                { icon: 'integration_instructions', title: 'Zoom & WhatsApp', desc: 'Bring translation directly into your favorite remote calling software.' },
+                { icon: 'integration_instructions', title: 'Zoom, Meet & Teams', desc: 'Bring sign language subtitles directly into Zoom, Google Meet, and Microsoft Teams calls.' },
                 { icon: 'support_agent', title: 'Enterprise Support', desc: 'Comprehensive ticketing and remote system diagnostics built-in.' }
               ].map((f, i) => (
                 <motion.div key={i} variants={itemVariants} className="bg-surface-container-low p-8 rounded-3xl border border-outline-variant/5 shadow-xl hover:bg-surface-container-high transition-colors">

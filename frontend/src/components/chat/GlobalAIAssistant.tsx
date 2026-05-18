@@ -61,8 +61,8 @@ export default function GlobalAIAssistant() {
     }
     
     // Zoom / integrations
-    if (lowerPrompt.includes('zoom') || lowerPrompt.includes('whatsapp') || lowerPrompt.includes('integrate')) {
-      return "Signetra supports deep integrations! Click 'Zoom' or 'WhatsApp' on the sidebar to inject our real-time translating algorithms directly into your communication pipelines."
+    if (lowerPrompt.includes('zoom') || lowerPrompt.includes('meet') || lowerPrompt.includes('teams') || lowerPrompt.includes('whatsapp') || lowerPrompt.includes('integrate')) {
+      return "Signetra supports deep integrations with Zoom, Google Meet, and Microsoft Teams! Click 'Integrations' on the sidebar to inject our real-time sign language subtitles directly into your video calls."
     }
 
     return "I am the Signetra proprietary UI Agent. Ask me anything regarding American Sign Language education, or how to utilize the various Machine Learning modules across the website!"

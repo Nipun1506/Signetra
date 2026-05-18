@@ -206,7 +206,7 @@ export const Home = () => {
               <p className="text-on-surface-variant text-sm">Interactive curriculum to master ASL and regional sign languages.</p>
             </div>
           </Link>
-          <Link to="/zoom">
+          <Link to="/integrations">
             <div className="group cursor-pointer relative overflow-hidden rounded-xl bg-surface-container-high border-b-4 border-[#4ADE80] p-8 transition-transform hover:-translate-y-1">
               <div className="flex justify-between items-start mb-12">
                 <div className="bg-[#4ADE80]/10 p-3 rounded-lg">
@@ -215,7 +215,7 @@ export const Home = () => {
                 <span className="material-symbols-outlined text-on-surface-variant group-hover:text-[#4ADE80] transition-colors">arrow_outward</span>
               </div>
               <h4 className="text-xl font-bold mb-2">Video Call Overlay</h4>
-              <p className="text-on-surface-variant text-sm">Seamless integration for Zoom, Teams, and WhatsApp Web.</p>
+              <p className="text-on-surface-variant text-sm">Seamless integration for Zoom, Google Meet, and Microsoft Teams.</p>
             </div>
           </Link>
         </div>

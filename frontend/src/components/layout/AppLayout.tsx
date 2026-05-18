@@ -8,28 +8,16 @@ export const AppLayout = () => {
   const { role } = useAuth()
 
   const navItems = [
-    { name: 'Home', path: '/', icon: 'home' },
-    { name: 'Recognize', path: '/recognize', icon: 'back_hand' },
-    { name: 'Learn', path: '/learn', icon: 'school' },
-    { name: 'Zoom', path: '/zoom-integration', icon: 'videocam' },
-    { name: 'WhatsApp', path: '/whatsapp', icon: 'chat' },
-    { name: 'History', path: '/history', icon: 'history' },
-    { name: 'Settings', path: '/settings', icon: 'settings' },
-    { name: 'Admin', path: '/admin', icon: 'admin_panel_settings' },
+    { name: 'Home',         path: '/',             icon: 'home' },
+    { name: 'Recognize',   path: '/recognize',    icon: 'gesture' },
+    { name: 'Learn',       path: '/learn',        icon: 'school' },
+    { name: 'Integrations',path: '/integrations', icon: 'videocam' },
+    { name: 'History',     path: '/history',      icon: 'history' },
+    { name: 'Settings',    path: '/settings',     icon: 'settings' },
+    { name: 'Admin',       path: '/admin',        icon: 'admin_panel_settings' },
   ]
 
-  // We map the previous icons exactly: home, gesture, school, videocam, chat, history, settings, admin_panel_settings
-  // Wait, the previous use had `gesture` for Recognize.
-  const navItemsFixed = [
-    { name: 'Home', path: '/', icon: 'home' },
-    { name: 'Recognize', path: '/recognize', icon: 'gesture' },
-    { name: 'Learn', path: '/learn', icon: 'school' },
-    { name: 'Zoom', path: '/zoom-integration', icon: 'videocam' },
-    { name: 'WhatsApp', path: '/whatsapp', icon: 'chat' },
-    { name: 'History', path: '/history', icon: 'history' },
-    { name: 'Settings', path: '/settings', icon: 'settings' },
-    { name: 'Admin', path: '/admin', icon: 'admin_panel_settings' },
-  ]
+  const navItemsFixed = navItems
 
   return (
     <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body overflow-hidden flex">
