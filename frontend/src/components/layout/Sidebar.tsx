@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { House, Camera, BookOpen, Video, MessageCircle, Clock, Settings, Lock, Hand, ChevronLeft, ChevronRight } from 'lucide-react'
+import { House, Camera, BookOpen, Video, Clock, Settings, Lock, Hand, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { cn } from '@/lib/utils'
 
@@ -9,8 +9,7 @@ const navItems = [
   { name: 'Home', path: '/', icon: House },
   { name: 'Recognize', path: '/recognize', icon: Camera },
   { name: 'Learn', path: '/learn', icon: BookOpen },
-  { name: 'Zoom', path: '/zoom-integration', icon: Video },
-  { name: 'WhatsApp', path: '/whatsapp-integration', icon: MessageCircle },
+  { name: 'Integrations', path: '/integrations', icon: Video },
   { name: 'History', path: '/history', icon: Clock },
   { name: 'Settings', path: '/settings', icon: Settings },
 ]

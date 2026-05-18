@@ -7,7 +7,6 @@ import { Home } from './pages/Home'
 import Recognize from './pages/Recognize'
 import Learn from './pages/Learn'
 import ZoomIntegration from './pages/ZoomIntegration'
-import WhatsAppIntegration from './pages/WhatsAppIntegration'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import Admin from './pages/Admin'
@@ -92,8 +91,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/recognize" element={<Recognize />} />
         <Route path="/learn" element={<Learn />} />
-        <Route path="/zoom-integration" element={<ZoomIntegration />} />
-        <Route path="/whatsapp" element={<WhatsAppIntegration />} />
+        <Route path="/integrations" element={<ZoomIntegration />} />
+        <Route path="/zoom-integration" element={<Navigate to="/integrations" replace />} />
         <Route path="/history" element={<History />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/support" element={<Support />} />

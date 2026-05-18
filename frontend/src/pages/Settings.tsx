@@ -6,7 +6,8 @@ const DEFAULT_SETTINGS = {
   confidenceThreshold: 75,
   outputMode: 'both',
   zoomBridge: true,
-  whatsAppWeb: false,
+  googleMeet: true,
+  teamsBridge: false,
   sourceDevice: 'default',
   outputResolution: '720p'
 };
@@ -218,8 +219,9 @@ export default function Settings() {
               </div>
                <div className="space-y-4">
                 {[
-                  { id: 'zoomBridge', name: 'Zoom Bridge', icon: 'videocam', color: '#2D8CFF' },
-                  { id: 'whatsAppWeb', name: 'WhatsApp Web', icon: 'chat', color: '#25D366' }
+                  { id: 'zoomBridge', name: 'Zoom', icon: 'videocam', color: '#2D8CFF' },
+                  { id: 'googleMeet', name: 'Google Meet', icon: 'video_call', color: '#34A853' },
+                   { id: 'teamsBridge', name: 'Microsoft Teams', icon: 'groups', color: '#6264A7' }
                 ].map((int) => (
                   <div key={int.id} className="flex items-center justify-between p-4 bg-surface-container rounded-xl border border-outline-variant/10">
                     <div className="flex items-center gap-3">
