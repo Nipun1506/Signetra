@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()  # Load .env before anything else
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -539,7 +539,7 @@ async def export_metrics(db: Session = Depends(get_db), current_user: dict = Dep
     for h in history:
         writer.writerow([h.id, h.timestamp, h.phrase, h.confidence, h.platform, h.category])
     
-    from fastapi.responses import StreamingResponse
+    from fastapi.responses import StreamingResponse, FileResponse
     output.seek(0)
     return StreamingResponse(
         iter([output.getvalue()]),
@@ -709,29 +709,23 @@ def health():
 
 @app.get("/api/extension/download")
 async def download_extension():
-    # Base path for the extension folder
-    extension_dir = os.path.join(os.path.dirname(__file__), "../signetra-extension")
-    
-    # In-memory buffer for the ZIP file
-    zip_buffer = io.BytesIO()
-    
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for root, dirs, files in os.walk(extension_dir):
-            for file in files:
-                if file.startswith('.'):  # skip hidden files
-                    continue
-                file_path = os.path.join(root, file)
-                # Ensure the path in the ZIP is relative to the extension_dir
-                arcname = os.path.relpath(file_path, extension_dir)
-                zip_file.write(file_path, arcname)
-                
-    zip_buffer.seek(0)
-    
-    return StreamingResponse(
-        zip_buffer,
+    # Serve the pre-built extension ZIP that is committed alongside the backend.
+    # Dynamic path walking via ../signetra-extension won't work in Railway containers
+    # because COPY . . in the Dockerfile only includes the backend/ directory.
+    zip_path = os.path.join(os.path.dirname(__file__), "signetra-extension.zip")
+
+    if not os.path.exists(zip_path):
+        raise HTTPException(
+            status_code=503,
+            detail="Extension package not found on server. Contact support@signetra.com"
+        )
+
+    return FileResponse(
+        zip_path,
         media_type="application/zip",
-        headers={"Content-Disposition": "attachment; filename=signetra-extension.zip"}
+        filename="signetra-extension.zip",
     )
+
 
 # =====================================================================
 # OTP Verification Endpoints
