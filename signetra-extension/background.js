@@ -1,5 +1,6 @@
 // Initialize storage defaults for all three supported platforms
 chrome.runtime.onInstalled.addListener(() => {
+  console.log('[SIGNETRA-BG] Extension installed/updated. Initializing storage defaults.');
   chrome.storage.sync.get(['zoom_enabled', 'meet_enabled', 'teams_enabled'], (result) => {
     const initData = {};
     if (result.zoom_enabled  === undefined) initData.zoom_enabled  = true;
@@ -7,7 +8,9 @@ chrome.runtime.onInstalled.addListener(() => {
     if (result.teams_enabled === undefined) initData.teams_enabled = true;
 
     if (Object.keys(initData).length > 0) {
-      chrome.storage.sync.set(initData);
+      chrome.storage.sync.set(initData, () => {
+        console.log('[SIGNETRA-BG] Storage defaults set:', initData);
+      });
     }
   });
 });
@@ -18,7 +21,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.sync.get(['zoom_enabled', 'meet_enabled', 'teams_enabled'], (result) => {
       sendResponse(result);
     });
-    return true; // keep message channel open for async response
+    return true;
   }
 
   // Popup: toggle a platform on/off
@@ -33,19 +36,38 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   // Forward gesture from the Signetra recognition tab to all active video call tabs
   if (request.type === 'SIGNETRA_GESTURE') {
+    console.log('[SIGNETRA-BG] Received gesture:', request.phrase, '— routing to video call tabs');
+
     chrome.tabs.query({
       url: [
         "*://app.zoom.us/*",
+        "*://*.zoom.us/*",
         "*://meet.google.com/*",
         "*://teams.microsoft.com/*",
         "*://teams.live.com/*"
       ]
     }, (tabs) => {
+      console.log('[SIGNETRA-BG] Found', tabs.length, 'matching video call tab(s)');
+
+      if (tabs.length === 0) {
+        console.warn('[SIGNETRA-BG] No Zoom/Meet/Teams tabs found. Open a video call in Chrome first.');
+      }
+
       tabs.forEach(tab => {
-        chrome.tabs.sendMessage(tab.id, request).catch(() => {
-          // Tab may not have the content script — silently ignore
+        console.log('[SIGNETRA-BG] Sending to tab', tab.id, ':', tab.url);
+        chrome.tabs.sendMessage(tab.id, request, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('[SIGNETRA-BG] Failed to send to tab', tab.id, ':', chrome.runtime.lastError.message);
+          } else {
+            console.log('[SIGNETRA-BG] Successfully sent to tab', tab.id);
+          }
         });
       });
     });
+
+    sendResponse({ received: true });
+    return true;
   }
 });
+
+console.log('[SIGNETRA-BG] Background service worker started.');

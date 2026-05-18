@@ -9,15 +9,21 @@ const isMeet   = hostname.includes('meet.google.com');
 const isTeams  = hostname.includes('teams.microsoft.com') || hostname.includes('teams.live.com');
 
 const platformKey = isZoom ? 'zoom_enabled' : isMeet ? 'meet_enabled' : 'teams_enabled';
+const platformName = isZoom ? 'Zoom' : isMeet ? 'Google Meet' : 'Microsoft Teams';
+
+console.log('[SIGNETRA-OVERLAY] Content script loaded on', platformName, '| URL:', window.location.href);
+console.log('[SIGNETRA-OVERLAY] Platform key:', platformKey);
 
 function initStorage() {
   chrome.storage.sync.get([platformKey], (result) => {
     isEnabled = result[platformKey] !== false;
+    console.log('[SIGNETRA-OVERLAY] Platform enabled:', isEnabled);
   });
 
   chrome.storage.onChanged.addListener((changes) => {
     if (changes[platformKey]) {
       isEnabled = changes[platformKey].newValue;
+      console.log('[SIGNETRA-OVERLAY] Platform toggle changed to:', isEnabled);
       if (!isEnabled) hideOverlay();
     }
   });
@@ -50,6 +56,7 @@ function createOverlay() {
     backdropFilter: 'blur(8px)'
   });
   document.body.appendChild(overlay);
+  console.log('[SIGNETRA-OVERLAY] Overlay element created and added to DOM');
 }
 
 function getCategoryColor(category) {
@@ -77,6 +84,7 @@ function showOverlay(phrase, category, confidence) {
 
   void overlay.offsetWidth;
   overlay.style.opacity = '1';
+  console.log('[SIGNETRA-OVERLAY] Showing subtitle:', phrase, '| confidence:', confidence);
 
   hideTimeout = setTimeout(() => hideOverlay(), 4000);
 }
@@ -85,9 +93,15 @@ function hideOverlay() {
   if (overlay) overlay.style.opacity = '0';
 }
 
-// Listen for gestures forwarded from the Signetra tab
-chrome.runtime.onMessage.addListener((message) => {
-  if (!isEnabled) return;
+// Listen for gestures forwarded from the background script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[SIGNETRA-OVERLAY] Message received:', message);
+
+  if (!isEnabled) {
+    console.log('[SIGNETRA-OVERLAY] Platform disabled, ignoring message');
+    return;
+  }
+
   if (message.type === 'SIGNETRA_GESTURE' && message.phrase && message.phrase !== 'UNKNOWN') {
     showOverlay(message.phrase, message.category || 'General', message.confidence);
   }
@@ -98,5 +112,4 @@ window.addEventListener('beforeunload', () => {
 });
 
 initStorage();
-const platformName = isZoom ? 'Zoom' : isMeet ? 'Google Meet' : 'Microsoft Teams';
-console.log(`SIGNETRA Overlay loaded on ${platformName}`);
+console.log('[SIGNETRA-OVERLAY] Initialization complete — waiting for gestures from background.js');
